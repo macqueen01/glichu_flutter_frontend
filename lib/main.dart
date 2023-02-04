@@ -14,6 +14,12 @@ import 'package:mockingjae2_mobile/src/components/icons.dart';
 import 'package:flutter/services.dart';
 
 void main() {
+  // This prevents landscape view
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+
+  // Running App
   runApp(const MockingJaeMain());
 }
 
@@ -22,7 +28,10 @@ class MockingJaeMain extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // This sets default app view as Dark mode
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+
+    
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: "mockingJae 2.0",

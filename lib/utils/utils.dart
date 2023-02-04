@@ -1,5 +1,9 @@
 import 'dart:io';
+
+import 'package:flutter/material.dart';
+
 import 'package:path_provider/path_provider.dart';
+import 'package:mockingjae2_mobile/utils/colors.dart';
 
 
   Future<String> getOrCreateFolder(String basename) async {
@@ -19,7 +23,17 @@ import 'package:path_provider/path_provider.dart';
     return folder.path;
   }
 
+Text idTextParser({required String id, int maxLength = 20}) {
+  if (id.length >= maxLength) {
+    id = '${id.substring(0, 16)}...';
+  }
 
+  return Text(
+    id,
+    style: TextStyle(
+        color: mainBackgroundColor, fontWeight: FontWeight.w400, fontSize: 16),
+  );
+}
 
 
 

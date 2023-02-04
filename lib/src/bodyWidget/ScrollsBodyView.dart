@@ -1,21 +1,41 @@
 import 'dart:io';
 
+// Packages imports
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mockingjae2_mobile/src/components/icons.dart';
+
+// Utility local imports
 
 import 'package:mockingjae2_mobile/utils/colors.dart';
 import 'package:mockingjae2_mobile/utils/ui.dart';
 import 'package:mockingjae2_mobile/utils/utils.dart';
+import 'package:mockingjae2_mobile/src/components/icons.dart';
+
+// Scroll Controller and Statusbar local import
 
 import 'package:mockingjae2_mobile/src/controller/scrollControlers.dart';
 import 'package:mockingjae2_mobile/src/bodyWidget/ScrollsWidget/StatusBar.dart';
+
+
+// Scrolls Button related local import
+
+import 'package:mockingjae2_mobile/src/components/buttons.dart';
+
+import 'ScrollsWidget/InteractionWidgets.dart';
+import 'ScrollsWidget/ScrollsHeader.dart';
+
+
+
+
+
+
+
+
 
 class ScrollsBodyView extends StatefulWidget {
   const ScrollsBodyView({super.key});
@@ -192,14 +212,6 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
                               duration: const Duration(seconds: 2),
                               curve: Curves.easeInCubic);
                         },
-                        /*
-                        onScaleStart: (details) {
-                          print('start');
-                        },
-                        onScaleEnd: (details) {
-                          print('end');
-                        },
-                        */
                         child: BoxContainer(
                             context: context,
                             backgroundColor: scrollsBackgroundColor,
@@ -215,91 +227,14 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
                                 // remix number
                                 Positioned(
                                   right: 2.5,
-                                  top: 15,
-                                  child: SizedBox(
-                                    width: 60,
-                                    height: 60,
-                                    child: Center(
-                                      child: Column(
-                                        children: [
-                                          const Icon(
-                                            CupertinoIcons.arrow_2_circlepath,
-                                            size: 24,
-                                            color: mainBackgroundColor,
-                                          ),
-                                          Text(
-                                            "61",
-                                            style: GoogleFonts.quicksand(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w500,
-                                                color: mainBackgroundColor),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
+                                  top: 20,
+                                  child: ScrollsRelatedInfoButtonWrap(),
                                 ),
                                 Positioned(
                                   left: 10,
                                   top: 15,
                                   width: 250,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(right: 10),
-                                        child: Container(
-                                          width: 53,
-                                          height: 53,
-                                          alignment: Alignment.center,
-                                          decoration: const BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            gradient: lensFlareGradient
-                                          ),
-                                          child: Container(
-                                            width: 46,
-                                            height: 46,
-                                            decoration: const BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: mainBackgroundColor
-                                            ),
-                                            clipBehavior: Clip.antiAlias,
-                                            alignment: Alignment.center,
-                                            child: Image.asset(
-                                              'assets/icons/dalli.jpg',
-                                              width: 50,
-                                              height: 50,
-                                            )
-                                          ),
-                                        ),
-                                      ),
-                                      Column(
-                                        children: [
-                                          Container(
-                                            alignment: Alignment.topLeft,
-                                            child: Text(
-                                              'sample_person',
-                                              style: TextStyle(
-                                                color: mainBackgroundColor,
-                                                fontSize: 14
-                                              ),
-                                            ),
-                                            
-                                          ),
-                                          Expanded(
-                                            flex: 0,
-                                            child: Text(
-                                              '7h ago',
-                                              style: TextStyle(
-                                                  color: mainBackgroundColor,
-                                                  fontSize: 12
-                                                ),
-                                            ),
-                                          )
-                                        ],
-                                      )
-                                    ],
-                                  ),
+                                  child: ScrollsHeader(),
                                 )
                               ],
                             )),
@@ -311,6 +246,9 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
     );
   }
 }
+
+
+
 
 Future<List<Image>> _loadImages(String path, BuildContext context) async {
   Directory testDir =

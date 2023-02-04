@@ -1,44 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:mockingjae2_mobile/src/components/icons.dart';
 import 'package:mockingjae2_mobile/utils/colors.dart';
 
-Widget Button({required void Function() onTap}) {
-  return GestureDetector(
-    onTap: () => {onTap()},
-    child: Container(
-      width: 70,
-      height: 70,
-      alignment: Alignment.center,
-      decoration:
-          BoxDecoration(shape: BoxShape.circle, color: mainBackgroundColor),
-      child: Text('CLICK!'),
-    ),
-  );
-}
-
-Widget SampleButton({required void Function() onTap}) {
-  return GestureDetector(
-      onTap: () {
-        onTap();
-      },
-      child: Container(
-        width: 230,
-        height: 50,
-        decoration: BoxDecoration(
-            color: mainSubThemeColor,
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: mainThemeColor, width: 1.5)),
-        alignment: Alignment.center,
-        child: Text(
-          'Login',
-          style: TextStyle(
-            fontSize: 18,
-            color: mainThemeColor,
-          ),
-        ),
-      ));
-}
 
 class FlatButtonLarge extends StatefulWidget {
   final String text;
@@ -94,5 +59,70 @@ class _FlatButtonLargeState extends State<FlatButtonLarge> {
             ),
           ),
         ));
+  }
+}
+
+// Side Buttons in Scrolls View
+
+class ScrollsInfoButton extends StatefulWidget {
+  final IconData iconData;
+  final int statistic;
+  final Function? callBack;
+
+
+  const ScrollsInfoButton({
+    super.key,
+    required this.iconData,
+    required this.statistic,
+    this.callBack,
+  });
+
+  @override
+  State<ScrollsInfoButton> createState() => _ScrollsInfoButtonState();
+}
+
+class _ScrollsInfoButtonState extends State<ScrollsInfoButton> {
+  IconData? iconData;
+  int? statistic;
+
+  @override
+  void initState() {
+    super.initState();
+    iconData = widget.iconData;
+    statistic = widget.statistic;
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        if (widget.callBack != null) {
+          widget.callBack!();
+        }
+      },
+      child: SizedBox(
+        width: 60,
+        height: 60,
+        child: Center(
+          child: Column(
+            children: [
+              Icon(
+                iconData,
+                size: 24,
+                color: mainBackgroundColor,
+              ),
+              Text(
+                '$statistic',
+                style: GoogleFonts.quicksand(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w400,
+                    color: mainBackgroundColor),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
