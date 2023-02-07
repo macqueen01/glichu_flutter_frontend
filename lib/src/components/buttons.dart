@@ -239,3 +239,88 @@ Widget FlatButtonSmall(
             )
           : null);
 }
+
+class IndexStringButton extends StatefulWidget {
+  final String content;
+  final Color focusColor;
+  final Color outFocusColor;
+  final void Function(int index) onPressed;
+  final double focusSize;
+  final double outFocusSize;
+  final int index;
+  final int selectedIndex;
+
+  // onPressed should be (int => void) Function so that the selected index
+  // is passed to the parent widget
+
+  const IndexStringButton(
+      {super.key,
+      required this.content,
+      required this.focusColor,
+      required this.outFocusColor,
+      required this.focusSize,
+      required this.outFocusSize,
+      required this.onPressed,
+      this.selectedIndex = 0,
+      this.index = 0});
+
+  @override
+  State<IndexStringButton> createState() => _IndexStringButtonState();
+}
+
+class _IndexStringButtonState extends State<IndexStringButton> {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        widget.onPressed(widget.index);
+      },
+      child: AnimatedDefaultTextStyle(
+        style: GoogleFonts.quicksand(
+            color: (widget.index == widget.selectedIndex)
+                ? widget.focusColor
+                : widget.outFocusColor,
+            fontSize: (widget.index == widget.selectedIndex)
+                ? widget.focusSize
+                : widget.outFocusSize,
+            fontWeight: FontWeight.w500),
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.ease,
+        child: Text(widget.content),
+      ),
+    );
+  }
+}
+
+List<Widget> IndexStringButtonProvider(
+    {required List<String> stringList,
+    required void Function(int index) Function(int item) callback,
+    required Color focusColor,
+    required Color outFocusColor,
+    required double focusSize,
+    required double outFocusSize,
+    required int selectedIndex,
+    required Widget divider}) {
+  List<Widget> widgetList = [];
+
+  for (String item in stringList) {
+
+    void Function(int) onPressed = callback(stringList.indexOf(item));
+
+    widgetList.add(IndexStringButton(
+        content: item,
+        focusColor: focusColor,
+        outFocusColor: outFocusColor,
+        focusSize: focusSize,
+        outFocusSize: outFocusSize,
+        onPressed: onPressed,
+        selectedIndex: selectedIndex,
+        index: stringList.indexOf(item)));
+
+    if (item != stringList.last) {
+      widgetList.add(divider);
+    }
+  }
+
+  return widgetList;
+}

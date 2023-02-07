@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mockingjae2_mobile/src/bodyWidget/ScrollsWidget/ScrollsPreviewWidgets.dart';
 
 // Utility local imports
 
@@ -215,8 +216,8 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
                               width: MediaQuery.of(context).size.width,
                               child: Stack(
                                 alignment: AlignmentDirectional.topStart,
-                                children: [
-                                  widget.images[currentIndex],
+                                children: ([
+                                  Hero(tag: widget.index, child: widget.images[currentIndex]),
                                   // status bar
                                   StatusBar(
                                       currentIndex: currentIndex,
@@ -233,7 +234,7 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
                                     width: 250,
                                     child: ScrollsHeader(),
                                   )
-                                ],
+                                ]) ,
                               )),
                         ),
                       )

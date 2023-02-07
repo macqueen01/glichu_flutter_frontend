@@ -7,8 +7,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mockingjae2_mobile/src/bodyWidget/ScrollsWidget/ScrollsHeader.dart';
+import 'package:mockingjae2_mobile/src/bodyWidget/ScrollsWidget/ScrollsPreviewWidgets.dart';
 import 'package:mockingjae2_mobile/src/bodyWidget/main.dart';
 import 'package:mockingjae2_mobile/src/components/buttons.dart';
+import 'package:mockingjae2_mobile/src/components/inputs.dart';
 import 'package:mockingjae2_mobile/src/controller/scrollControlers.dart';
 
 import 'package:mockingjae2_mobile/utils/colors.dart';
@@ -47,11 +49,12 @@ class _ProfilePageState extends State<ProfilePage> {
           builder: ((context, value, child) {
             return Scaffold(
               backgroundColor: scrollsBackgroundColor,
-                resizeToAvoidBottomInset: true,
-                extendBody: false,
-                appBar: const ProfileAppBar(
-                    backgroundColor: scrollsBackgroundColor),
-                body: ProfileBody(),
+              resizeToAvoidBottomInset: true,
+              extendBody: false,
+              appBar:
+                  const ProfileAppBar(backgroundColor: scrollsBackgroundColor),
+              body: ProfileBody(),
+              /*
                 bottomNavigationBar: MJBottomNavBar(
                   onTap: _onIconTap,
                   items: [
@@ -87,7 +90,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             height: 28,
                             width: 28)),
                   ],
-                ));
+                )*/
+            );
           }),
           valueListenable: selectedIndex,
         ),
@@ -108,7 +112,7 @@ class _ProfileBodyState extends State<ProfileBody> {
   bool _load = false;
 
   void _reload() {
-    // this should recieve all data from the server, 
+    // this should recieve all data from the server,
     // then refreshed all contents of the page
     setState(() {
       _load = true;
@@ -120,17 +124,18 @@ class _ProfileBodyState extends State<ProfileBody> {
     });
   }
 
-  @override 
+  @override
   void initState() {
     super.initState();
-    _reload();
+    //_reload();
   }
 
   @override
   Widget build(BuildContext context) {
     return NotificationListener<ScrollNotification>(
       onNotification: (ScrollNotification notification) {
-        if (notification.metrics.pixels < -MediaQuery.of(context).size.height * 0.065) {
+        if (notification.metrics.pixels <
+            -MediaQuery.of(context).size.height * 0.065) {
           _reload();
         }
         return true;
@@ -145,21 +150,22 @@ class _ProfileBodyState extends State<ProfileBody> {
               AnimatedContainer(
                 duration: const Duration(milliseconds: 500),
                 curve: Curves.ease,
-                height: (_load) ? MediaQuery.of(context).size.height * 0.065 : 0,
+                height:
+                    (_load) ? MediaQuery.of(context).size.height * 0.065 : 0,
                 width: MediaQuery.of(context).size.width,
                 alignment: Alignment.center,
                 child: SvgPicture.asset(
-                    'assets/icons/Me.svg',
-                    width: 30,
-                    height: 30,
-                    color: mainBackgroundColor,
-                  ),
+                  'assets/icons/Me.svg',
+                  width: 30,
+                  height: 30,
+                  color: mainBackgroundColor,
+                ),
               ),
               ProfilePageHeader(),
               Padding(
                 padding: const EdgeInsets.only(top: 4),
                 child: ScrollsMenu(),
-              )
+              ),
             ],
           ),
         ),
@@ -185,32 +191,11 @@ class _ScrollsMenuState extends State<ScrollsMenu> {
         alignment: Alignment.centerLeft,
         height: 50,
         child: Container(
-          width: 200,
+          width: 300,
           alignment: Alignment.centerLeft,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                "Scrolls",
-                style: GoogleFonts.quicksand(
-                    color: mainBackgroundColor,
-                    fontSize: 30,
-                    fontWeight: FontWeight.w500),
-              ),
-              const VerticalDivider(
-                width: 2.5,
-                thickness: 1.6,
-                indent: 13,
-                endIndent: 4,
-                color: mainBackgroundColor,
-              ),
-              Text("Video",
-                  style: GoogleFonts.quicksand(
-                      color: Colors.white60,
-                      fontSize: 25,
-                      fontWeight: FontWeight.w500))
-            ],
+          child: CategorySelect(
+            categories: ['Scrolls', 'Videos', 'Images'],
+            onPressed: (int index) {},
           ),
         ),
       ),
@@ -219,19 +204,30 @@ class _ScrollsMenuState extends State<ScrollsMenu> {
           child: Column(
             children: [
               ScrollsPair(
-                  firstScrolls: ScrollsPreview(
+                firstScrolls: Hero(
+                  tag: 0,
+                  child: ScrollsPreview(
                       sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
                       width: MediaQuery.of(context).size.width / 2),
-                  secondScrolls: ScrollsPreview(
-                      sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                      width: MediaQuery.of(context).size.width / 2)),
+                ),
+                secondScrolls: Hero(
+                    tag: 3,
+                    child: ScrollsPreview(
+                        sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                        width: MediaQuery.of(context).size.width / 2)),
+              ),
               ScrollsPair(
-                  firstScrolls: ScrollsPreview(
-                      sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                      width: MediaQuery.of(context).size.width / 2),
-                  secondScrolls: ScrollsPreview(
-                      sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                      width: MediaQuery.of(context).size.width / 2)),
+                firstScrolls: Hero(
+                    tag: 5,
+                    child: ScrollsPreview(
+                        sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                        width: MediaQuery.of(context).size.width / 2)),
+                secondScrolls: Hero(
+                    tag: 9,
+                    child: ScrollsPreview(
+                        sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                        width: MediaQuery.of(context).size.width / 2)),
+              )
             ],
           ),
           width: MediaQuery.of(context).size.width,
@@ -241,42 +237,51 @@ class _ScrollsMenuState extends State<ScrollsMenu> {
   }
 }
 
-Widget ScrollsPair({
-  required ScrollsPreview firstScrolls,
-  required ScrollsPreview secondScrolls,
-}) {
-  return Row(
-    mainAxisSize: MainAxisSize.max,
-    children: [firstScrolls, secondScrolls],
-  );
-}
+class CategorySelect extends StatefulWidget {
+  final List<String> categories;
+  final void Function(int index)? onPressed;
 
-class ScrollsPreview extends StatefulWidget {
-  final String sampleSrc;
-  final double width;
-
-  ScrollsPreview({super.key, required this.sampleSrc, required this.width});
+  const CategorySelect({super.key, required this.categories, this.onPressed});
 
   @override
-  State<ScrollsPreview> createState() => _ScrollsPreviewState();
+  State<CategorySelect> createState() => _CategorySelectState();
 }
 
-class _ScrollsPreviewState extends State<ScrollsPreview> {
+class _CategorySelectState extends State<CategorySelect> {
+  int _selected = 0;
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          border: Border.all(color: scrollsBackgroundColor, width: 1)),
-      child: Image.asset(
-        widget.sampleSrc,
-        fit: BoxFit.fitWidth,
-        width: widget.width - 2,
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: IndexStringButtonProvider(
+          stringList: widget.categories,
+          callback: (int item) {
+            return (int index) {
+              if (index == item) {
+                setState(() {
+                  _selected = item;
+                });
+              }
+              widget.onPressed!(index);
+            };
+          },
+          focusColor: mainBackgroundColor,
+          outFocusColor: Colors.white60,
+          focusSize: 30,
+          outFocusSize: 25,
+          selectedIndex: _selected,
+          divider: const VerticalDivider(
+            width: 2.5,
+            thickness: 1.6,
+            indent: 14,
+            endIndent: 4,
+            color: Colors.white60,
+          )),
     );
   }
 }
-
-
 
 class ProfilePageHeader extends StatelessWidget {
   const ProfilePageHeader({
