@@ -21,21 +21,12 @@ import 'package:mockingjae2_mobile/src/components/icons.dart';
 import 'package:mockingjae2_mobile/src/controller/scrollControlers.dart';
 import 'package:mockingjae2_mobile/src/bodyWidget/ScrollsWidget/StatusBar.dart';
 
-
 // Scrolls Button related local import
 
 import 'package:mockingjae2_mobile/src/components/buttons.dart';
 
 import 'ScrollsWidget/InteractionWidgets.dart';
 import 'ScrollsWidget/ScrollsHeader.dart';
-
-
-
-
-
-
-
-
 
 class ScrollsBodyView extends StatefulWidget {
   const ScrollsBodyView({super.key});
@@ -131,6 +122,9 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
   int currentIndex = 0;
   double scrollDelta = 0;
   double _height = 3000;
+  bool _overscroll = false;
+
+
 
   @override
   void initState() {
@@ -158,97 +152,97 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
       decoration: const BoxDecoration(color: scrollsBackgroundColor),
-      child: NotificationListener<ScrollNotification>(
-          onNotification: (ScrollNotification notification) {
-            _controller.value = notification.metrics.pixels / (_height - 800);
-            scrollDelta = notification.metrics.pixels;
+        child: NotificationListener<ScrollNotification>(
+            onNotification: (ScrollNotification notification) {
+              _controller.value = notification.metrics.pixels / (_height - 800);
+              scrollDelta = notification.metrics.pixels;
 
-            if (currentIndex / widget.images.length > 0.88) {
-              widget.parentScrollController.animateTo(
-                  (widget.index + 1) * MediaQuery.of(context).size.height,
-                  duration: const Duration(milliseconds: 230),
-                  curve: Curves.ease);
-            }
+              if (currentIndex / widget.images.length >= 0.88) {
+                widget.parentScrollController.animateTo(
+                    (widget.index + 1) * MediaQuery.of(context).size.height,
+                    duration: const Duration(milliseconds: 230),
+                    curve: Curves.ease);
+                _scrollController.animateTo(0, duration: const Duration(milliseconds: 300), curve: Curves.ease);
+              }
 
-            if (_controller.value < -0.05) {
-              widget.parentScrollController.animateTo(0,
-                  duration: const Duration(seconds: 2),
-                  curve: Curves.easeInCubic);
-            }
+              if (notification.metrics.pixels < -30 && widget.index != 0) {
+                widget.parentScrollController.animateTo(
+                    (widget.index - 1) * MediaQuery.of(context).size.height,
+                    duration: const Duration(milliseconds: 100),
+                    curve: Curves.ease);
+              }
 
-            return true;
-          },
-          child: RepaintBoundary(
-            child: SingleChildScrollView(
-                controller: _scrollController,
-                physics: const ScrollsScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                child: SizedBox(
-                  height: _height,
-                  width: MediaQuery.of(context).size.width,
-                  child: Stack(fit: StackFit.expand, children: [
-                    Positioned(
-                      top: scrollDelta,
-                      child: GestureDetector(
-                        onLongPressStart: (LongPressStartDetails detail) {
-                          _scrollController.animateTo(_height,
-                              duration: Duration(
-                                  seconds: 5 -
-                                      ((5 / _height) * scrollDelta).floor()),
-                              curve: Curves.ease);
-                        },
-                        onLongPressEnd: (LongPressEndDetails detail) {
-                          _scrollController.jumpTo(scrollDelta);
-                        },
-                        onDoubleTap: () {
-                          _scrollController.animateTo(0,
-                              duration: const Duration(milliseconds: 600),
-                              curve: Curves.ease);
-                        },
-                        onTertiaryTapDown: (TapDownDetails detail) {
-                          widget.parentScrollController.animateTo(
-                              (widget.index - 1) *
-                                  MediaQuery.of(context).size.height,
-                              duration: const Duration(seconds: 2),
-                              curve: Curves.easeInCubic);
-                        },
-                        child: BoxContainer(
-                            context: context,
-                            backgroundColor: scrollsBackgroundColor,
-                            height: MediaQuery.of(context).size.height,
-                            width: MediaQuery.of(context).size.width,
-                            child: Stack(
-                              alignment: AlignmentDirectional.topStart,
-                              children: [
-                                widget.images[currentIndex],
-                                // status bar
-                                StatusBar(
-                                    currentIndex: currentIndex, widget: widget),
-                                // remix number
-                                Positioned(
-                                  right: 2.5,
-                                  top: 20,
-                                  child: ScrollsRelatedInfoButtonWrap(),
-                                ),
-                                Positioned(
-                                  left: 10,
-                                  top: 15,
-                                  width: 250,
-                                  child: ScrollsHeader(),
-                                )
-                              ],
-                            )),
-                      ),
-                    )
-                  ]),
-                )),
-          )),
+              return true;
+            },
+            child: RepaintBoundary(
+              child: SingleChildScrollView(
+                  controller: _scrollController,
+                  physics: const DampedScrollPhysics(),
+                  scrollDirection: Axis.vertical,
+                  child: SizedBox(
+                    height: _height,
+                    width: MediaQuery.of(context).size.width,
+                    child: Stack(fit: StackFit.expand, children: [
+                      Positioned(
+                        top: (scrollDelta > 0) ? scrollDelta : (-1 * scrollDelta),
+                        child: GestureDetector(
+                          onLongPressStart: (LongPressStartDetails detail) {
+                            _scrollController.animateTo(_height,
+                                duration: Duration(
+                                    seconds: 5 -
+                                        ((5 / _height) * scrollDelta).floor()),
+                                curve: Curves.ease);
+                          },
+                          onLongPressEnd: (LongPressEndDetails detail) {
+                            _scrollController.jumpTo(scrollDelta);
+                          },
+                          onDoubleTap: () {
+                            _scrollController.animateTo(0,
+                                duration: const Duration(milliseconds: 600),
+                                curve: Curves.ease);
+                          },
+                          onTertiaryTapDown: (TapDownDetails detail) {
+                            widget.parentScrollController.animateTo(
+                                (widget.index - 1) *
+                                    MediaQuery.of(context).size.height,
+                                duration: const Duration(seconds: 2),
+                                curve: Curves.easeInCubic);
+                          },
+                          child: BoxContainer(
+                              context: context,
+                              backgroundColor: scrollsBackgroundColor,
+                              height: MediaQuery.of(context).size.height,
+                              width: MediaQuery.of(context).size.width,
+                              child: Stack(
+                                alignment: AlignmentDirectional.topStart,
+                                children: [
+                                  widget.images[currentIndex],
+                                  // status bar
+                                  StatusBar(
+                                      currentIndex: currentIndex,
+                                      widget: widget),
+                                  // remix number
+                                  Positioned(
+                                    right: 2.5,
+                                    top: 20,
+                                    child: ScrollsRelatedInfoButtonWrap(),
+                                  ),
+                                  Positioned(
+                                    left: 10,
+                                    top: 15,
+                                    width: 250,
+                                    child: ScrollsHeader(),
+                                  )
+                                ],
+                              )),
+                        ),
+                      )
+                    ]),
+                  )),
+            )),
     );
   }
 }
-
-
-
 
 Future<List<Image>> _loadImages(String path, BuildContext context) async {
   Directory testDir =

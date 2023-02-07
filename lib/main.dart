@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:mockingjae2_mobile/src/pages/profile.dart';
 
 import 'package:mockingjae2_mobile/utils/colors.dart';
 import 'package:mockingjae2_mobile/src/app.dart';
@@ -32,8 +33,13 @@ class MockingJaeMain extends StatelessWidget {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
 
     
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
+    return MaterialApp(
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const MainPage(),
+        '/profile': (context) => const ProfilePage()
+      },
+      debugShowCheckedModeBanner: true,
       title: "mockingJae 2.0",
       theme: ThemeData(
         brightness: Brightness.light,
@@ -45,7 +51,6 @@ class MockingJaeMain extends StatelessWidget {
           bottomNavigationBarTheme: const BottomNavigationBarThemeData(
                 backgroundColor: mainSubThemeColor),
           ),
-      home: const MainPage(),
     );
   }
 }

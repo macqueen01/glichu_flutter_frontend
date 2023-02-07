@@ -5,7 +5,7 @@ import 'package:figma_squircle/figma_squircle.dart';
 
 
 
-Widget BoxContainer({required BuildContext context, required Widget child, required double height, required double width, required Color backgroundColor}) {
+Widget BoxContainer({required BuildContext context, required Widget child, double? height, double? width, required Color backgroundColor, double radius = 20}) {
   return Container(
     clipBehavior: Clip.antiAlias,
     width: width,
@@ -15,7 +15,7 @@ Widget BoxContainer({required BuildContext context, required Widget child, requi
       color: backgroundColor,
       shape: SmoothRectangleBorder(
         borderRadius: SmoothBorderRadius(
-          cornerRadius: 20,
+          cornerRadius: radius,
           cornerSmoothing: 0.8,
         ),
       ),

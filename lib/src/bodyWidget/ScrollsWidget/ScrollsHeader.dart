@@ -52,7 +52,14 @@ class ScrollsHeader extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              idTextParser(id: 'mocking_jae_^.^', maxLength: 17),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/profile');
+                },
+                child: idTextParser(id: 'mocking_jae_^.^', maxLength: 17)
+              ),
               const SizedBox(
                 height: 8,
               ),
@@ -77,8 +84,23 @@ class ScrollsHeader extends StatelessWidget {
 
 class Profile extends StatefulWidget {
   final Image image;
+  final int size;
 
-  const Profile({super.key, required this.image});
+  const Profile({
+    super.key,
+    required this.image,
+    this.size = 0
+  });
+
+  List<double> sizeConvert(int size) {
+    switch (size) {
+      case 0 : return [53, 49, 46];
+    
+      case 1 : return [80, 76, 71];
+
+      default : return [53, 49, 46];
+    }
+  }
 
   @override
   State<Profile> createState() => _ProfileState();
@@ -87,27 +109,36 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
-    
-    return Container(
-      width: 53,
-      height: 53,
-      alignment: Alignment.center,
-      decoration: const BoxDecoration(
-          shape: BoxShape.circle, gradient: lensFlareGradient),
+    return GestureDetector(
+      onTap: () {
+        // check if current route starts with '/profile'
+        // if not, activate the following pushNamed
+        Navigator.pushNamed(
+          context,
+          '/profile'
+          );
+      },
       child: Container(
-        width: 49,
-        height: 49,
+        width: widget.sizeConvert(widget.size)[0],
+        height: widget.sizeConvert(widget.size)[0],
         alignment: Alignment.center,
         decoration: const BoxDecoration(
-            shape: BoxShape.circle, color: mainBackgroundColor),
+            shape: BoxShape.circle, gradient: lensFlareGradient),
         child: Container(
-            width: 46,
-            height: 46,
-            decoration: const BoxDecoration(
-                shape: BoxShape.circle, color: mainBackgroundColor),
-            clipBehavior: Clip.antiAlias,
-            alignment: Alignment.center,
-            child: widget.image),
+          width: widget.sizeConvert(widget.size)[1],
+          height: widget.sizeConvert(widget.size)[1],
+          alignment: Alignment.center,
+          decoration: const BoxDecoration(
+              shape: BoxShape.circle, color: mainBackgroundColor),
+          child: Container(
+              width: widget.sizeConvert(widget.size)[2],
+              height: widget.sizeConvert(widget.size)[2],
+              decoration: const BoxDecoration(
+                  shape: BoxShape.circle, color: mainBackgroundColor),
+              clipBehavior: Clip.antiAlias,
+              alignment: Alignment.center,
+              child: widget.image),
+        ),
       ),
     );
   }

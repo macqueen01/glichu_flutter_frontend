@@ -11,6 +11,12 @@ const scrollsBackgroundColor = Color.fromARGB(255, 20, 20, 20);
 const iconVoidColor = Color.fromARGB(255, 244, 244, 244);
 const iconFilledColor = Colors.black87;
 
+const lensFlareMain = Color.fromRGBO(85, 61, 244, 1);
+const lensFlareSub = Color.fromARGB(255, 134, 118, 238);
+
+
+const buttonHue = Color.fromARGB(255, 222, 222, 222);
+
 const warmGradient = LinearGradient(colors: [
   Color.fromRGBO(100, 137, 93, 1),
   Color.fromRGBO(229, 209, 134, 1),

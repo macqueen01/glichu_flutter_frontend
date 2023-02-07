@@ -1,9 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:mockingjae2_mobile/src/components/icons.dart';
 import 'package:mockingjae2_mobile/utils/colors.dart';
-
+import 'package:mockingjae2_mobile/utils/ui.dart';
+import 'package:mockingjae2_mobile/utils/utils.dart';
 
 class FlatButtonLarge extends StatefulWidget {
   final String text;
@@ -14,8 +17,8 @@ class FlatButtonLarge extends StatefulWidget {
 
   const FlatButtonLarge(
       {super.key,
-      required this.text, 
-      required this.onPressed, 
+      required this.text,
+      required this.onPressed,
       required this.backgroundColor,
       required this.fontColor,
       required this.decoration});
@@ -26,7 +29,6 @@ class FlatButtonLarge extends StatefulWidget {
 
 class _FlatButtonLargeState extends State<FlatButtonLarge> {
   bool _tapped = false;
-
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +71,6 @@ class ScrollsInfoButton extends StatefulWidget {
   final int statistic;
   final Function? callBack;
 
-
   const ScrollsInfoButton({
     super.key,
     required this.iconData,
@@ -92,7 +93,6 @@ class _ScrollsInfoButtonState extends State<ScrollsInfoButton> {
     statistic = widget.statistic;
   }
 
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -113,9 +113,10 @@ class _ScrollsInfoButtonState extends State<ScrollsInfoButton> {
                 color: mainBackgroundColor,
               ),
               Text(
-                '$statistic',
+                numberParser(number: statistic!),
                 style: GoogleFonts.quicksand(
-                    fontSize: 15,
+                    fontSize: fontSizeParser(
+                        length: numberParser(number: statistic!).length),
                     fontWeight: FontWeight.w400,
                     color: mainBackgroundColor),
               ),
@@ -125,4 +126,116 @@ class _ScrollsInfoButtonState extends State<ScrollsInfoButton> {
       ),
     );
   }
+}
+
+class FlatButton extends StatefulWidget {
+  final Color color;
+  final Text? content;
+  final Widget? icon;
+  final double radius;
+  final double height;
+  final double width;
+  final void Function() onPressed;
+
+  const FlatButton(
+      {super.key,
+      this.icon,
+      this.content,
+      required this.onPressed,
+      required this.color,
+      required this.width,
+      required this.height,
+      required this.radius});
+
+  @override
+  State<FlatButton> createState() => _FlatButtonState();
+}
+
+class _FlatButtonState extends State<FlatButton> {
+  @override
+  Widget build(BuildContext context) {
+    if (widget.icon == null && widget.content == null) {
+      return CupertinoButton(
+          onPressed: widget.onPressed,
+          padding: EdgeInsets.all(0),
+          child: BoxContainer(
+              context: context,
+              child: Container(),
+              backgroundColor: widget.color,
+              height: widget.height,
+              width: widget.width,
+              radius: widget.radius));
+    } else if (widget.icon == null) {
+      return CupertinoButton(
+          onPressed: widget.onPressed,
+          padding: EdgeInsets.all(0),
+          child: BoxContainer(
+              context: context,
+              child: widget.content!,
+              backgroundColor: widget.color,
+              height: widget.height,
+              width: widget.width,
+              radius: widget.radius));
+    } else if (widget.content == null) {
+      return CupertinoButton(
+          onPressed: widget.onPressed,
+          padding: EdgeInsets.all(0),
+          child: BoxContainer(
+              context: context,
+              child: widget.icon!,
+              backgroundColor: widget.color,
+              height: widget.height,
+              width: widget.width,
+              radius: widget.radius));
+    }
+
+    return CupertinoButton(
+        onPressed: widget.onPressed,
+        padding: EdgeInsets.all(0),
+        child: BoxContainer(
+            context: context,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: widget.icon!,
+                ),
+                widget.content!,
+              ],
+            ),
+            backgroundColor: widget.color,
+            height: widget.height,
+            width: widget.width,
+            radius: widget.radius));
+  }
+}
+
+Widget FlatButtonSmall(
+    {Widget? icon,
+    String? content,
+    required Color backgroundColor,
+    Color textColor = mainBackgroundColor,
+    required double width,
+    required void Function() onPressed,
+    double radius = 10}) {
+  return FlatButton(
+      color: backgroundColor,
+      width: width,
+      height: 38,
+      radius: radius,
+      icon: icon,
+      onPressed: onPressed,
+      content: (content != null)
+          ? Text(
+              content,
+              style: TextStyle(
+                  fontSize: 14,
+                  textBaseline: TextBaseline.ideographic,
+                  color: textColor,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.4),
+            )
+          : null);
 }

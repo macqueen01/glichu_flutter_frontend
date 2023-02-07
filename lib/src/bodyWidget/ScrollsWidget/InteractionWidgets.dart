@@ -32,7 +32,7 @@ class ScrollsRelatedInfoButtonWrap extends StatelessWidget {
       children: const [
         ScrollsInfoButton(
           iconData: CupertinoIcons.arrow_2_circlepath, 
-          statistic: 61),
+          statistic: 29390),
         ScrollsInfoButton(
           iconData: CupertinoIcons.heart,
           statistic: 3)
