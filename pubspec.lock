@@ -9,6 +9,70 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.10.0"
+  audio_session:
+    dependency: transitive
+    description:
+      name: audio_session
+      sha256: e4acc4e9eaa32436dfc5d7aed7f0a370f2d7bb27ee27de30d6c4f220c2a05c73
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.13"
+  audioplayers:
+    dependency: "direct main"
+    description:
+      name: audioplayers
+      sha256: "16451eab798b23ad9307aef6f9ca62bb8fb06542af8810eead0d236d3fd40a42"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.1"
+  audioplayers_android:
+    dependency: transitive
+    description:
+      name: audioplayers_android
+      sha256: b2c833e6f718b6b030454e329931229afafe9327fdb002874dd544dc8bf2484d
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
+  audioplayers_darwin:
+    dependency: transitive
+    description:
+      name: audioplayers_darwin
+      sha256: e7a3c8759bf11ecfe4b20df338bf9f3d37c7719a5761c46a3833aba0ceeaacff
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.1"
+  audioplayers_linux:
+    dependency: transitive
+    description:
+      name: audioplayers_linux
+      sha256: e95b65e1f4d4764601dac5e65f8d8186fc29401043ab020f1dacec483d708707
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.4"
+  audioplayers_platform_interface:
+    dependency: transitive
+    description:
+      name: audioplayers_platform_interface
+      sha256: "178581a44cb685fd798d2108111d2e98cca3400e30b9c3a05546f124fb37f600"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0"
+  audioplayers_web:
+    dependency: transitive
+    description:
+      name: audioplayers_web
+      sha256: "859ba09be2a57e57a787273f18c8cf0d9b61383870c5ee4b5632fe9adbc37edf"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.0"
+  audioplayers_windows:
+    dependency: transitive
+    description:
+      name: audioplayers_windows
+      sha256: "622e01c4c357c2aaf1b956c3a0f89d97c3cb40315c03f16e3b6c2a31ff9c38bc"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.3"
   boolean_selector:
     dependency: transitive
     description:
@@ -150,6 +214,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.1"
+  flutter_slidable:
+    dependency: "direct main"
+    description:
+      name: flutter_slidable
+      sha256: "6c68e1fad129b4b807b2218ef4cf7f7f6f61c5ec8861c990dc2278d9d03cb09f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   flutter_svg:
     dependency: "direct main"
     description:
@@ -160,6 +232,11 @@ packages:
     version: "1.1.6"
   flutter_test:
     dependency: "direct dev"
+    description: flutter
+    source: sdk
+    version: "0.0.0"
+  flutter_web_plugins:
+    dependency: transitive
     description: flutter
     source: sdk
     version: "0.0.0"
@@ -180,7 +257,7 @@ packages:
     source: hosted
     version: "3.0.1"
   http:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: http
       sha256: "6aa2946395183537c8b880962d935877325d6a09a2867c3970c05c0fed6ac482"
@@ -203,6 +280,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.5"
+  just_audio:
+    dependency: "direct main"
+    description:
+      name: just_audio
+      sha256: "7a5057a4d05c8f88ee968cec6fdfe1015577d5184e591d5ac15ab16d8f5ecb17"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.9.31"
+  just_audio_platform_interface:
+    dependency: transitive
+    description:
+      name: just_audio_platform_interface
+      sha256: eff112d5138bea3ba544b6338b1e0537a32b5e1425e4d0dc38f732771cda7c84
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.0"
+  just_audio_web:
+    dependency: transitive
+    description:
+      name: just_audio_web
+      sha256: "89d8db6f19f3821bb6bf908c4bfb846079afb2ab575b783d781a6bf119e3abaf"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.7"
   lints:
     dependency: transitive
     description:
@@ -235,6 +336,31 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.8.0"
+  modal_bottom_sheet:
+    dependency: "direct main"
+    description:
+      path: modal_bottom_sheet
+      ref: main
+      resolved-ref: "3e8c3682be91a4a86ee73f39606901d5eb033f0b"
+      url: "https://github.com/followthemoney1/modal_bottom_sheet.git"
+    source: git
+    version: "2.1.2+1"
+  modals:
+    dependency: "direct main"
+    description:
+      name: modals
+      sha256: "2b4a7fa55c77afb086a20cd5fc5e101da6f88c9f225a7af9bacaee7a3eaad833"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0+1"
+  nested:
+    dependency: transitive
+    description:
+      name: nested
+      sha256: "03bac4c528c64c95c722ec99280375a6f2fc708eec17c7b3f07253b626cd2a20"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   octo_image:
     dependency: transitive
     description:
@@ -355,6 +481,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.2.4"
+  provider:
+    dependency: "direct main"
+    description:
+      name: provider
+      sha256: cdbe7530b12ecd9eb455bdaa2fcb8d4dad22e80b8afb4798b41479d5ce26847f
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.5"
   rxdart:
     dependency: transitive
     description:
@@ -400,6 +534,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.11.0"
+  sticky_headers:
+    dependency: "direct main"
+    description:
+      name: sticky_headers
+      sha256: "9b3dd2cb0fd6a7038170af3261f855660cbb241cb56c501452cb8deed7023ede"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.0+2"
   stream_channel:
     dependency: transitive
     description:

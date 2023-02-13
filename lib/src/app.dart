@@ -6,7 +6,6 @@ import 'package:mockingjae2_mobile/src/bodyWidget/main.dart';
 import 'package:mockingjae2_mobile/utils/colors.dart';
 import 'package:mockingjae2_mobile/src/components/icons.dart';
 import 'package:mockingjae2_mobile/src/components/Navbar.dart';
-import 'package:mockingjae2_mobile/src/controller/botton_nav_controller.dart';
 
 import 'package:get/get.dart';
 
@@ -47,8 +46,7 @@ class _MainPageState extends State<MainPage> {
             return Scaffold(
                 resizeToAvoidBottomInset: false,
                 extendBody: (selectedIndex.value == 1) ? true : false,
-                appBar: MJAppBar(
-                    backgroundColor: _NavBarColor(selectedIndex)),
+                appBar: MJAppBar(backgroundColor: _NavBarColor(selectedIndex)),
                 body: MainViewGenerator(context, selectedIndex.value),
                 bottomNavigationBar: MJBottomNavBar(
                   onTap: _onIconTap,

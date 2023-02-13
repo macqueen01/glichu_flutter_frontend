@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mockingjae2_mobile/src/UiComponents.dart/Buttons.dart';
 
 import 'package:mockingjae2_mobile/src/components/icons.dart';
 import 'package:mockingjae2_mobile/utils/colors.dart';
-import 'package:mockingjae2_mobile/src/components/buttons.dart';
 import 'package:mockingjae2_mobile/src/components/inputs.dart';
 import 'package:mockingjae2_mobile/utils/ui.dart';
 
@@ -18,12 +18,6 @@ class _LoginState extends State<LoginBodyView> {
   int _counter = 0;
   String _username = '';
   String _password = '';
-
-  void _increment() {
-    setState(() {
-      _counter++;
-    });
-  }
 
   void _emailChange(text) {
     setState(() {
@@ -56,21 +50,9 @@ class _LoginState extends State<LoginBodyView> {
                         height: 60,
                         width: 300,
                         alignment: Alignment.center,
-                        child: Text(
-                          'Login To',
-                          style: GoogleFonts.quicksand(
-                              fontSize: 22, fontWeight: FontWeight.w400),
-                        ),
-                      ),
-                      Container(
-                        height: 60,
-                        width: 300,
-                        alignment: Alignment.center,
                         child: LogoNavIcon(100, 55, mainThemeColor),
                         margin: EdgeInsets.only(bottom: 40),
                       ),
-
-                      //Button(onTap: _increment),
                       Container(
                         height: 125,
                         child: Column(
@@ -91,7 +73,6 @@ class _LoginState extends State<LoginBodyView> {
                           ],
                         ),
                       ),
-
                       Container(
                         width: 300,
                         height: 70,
@@ -110,13 +91,13 @@ class _LoginState extends State<LoginBodyView> {
                         ),
                       ),
                       Container(
-                        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                         child: Text(
                           'or',
                           style: TextStyle(fontSize: 16),
                         ),
                       ),
-
                       Container(
                         width: 300,
                         height: 60,
@@ -133,16 +114,6 @@ class _LoginState extends State<LoginBodyView> {
                                   color: mainThemeColor, width: 1.5)),
                         ),
                       )
-                    ]))
-            /*
-            Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [Text('$_counter'), Button(onTap: _increment)])
-
-                */
-            ));
+                    ]))));
   }
 }
-
-

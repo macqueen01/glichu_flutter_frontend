@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:mockingjae2_mobile/src/pages/likes.dart';
 import 'package:mockingjae2_mobile/src/pages/profile.dart';
 
 import 'package:mockingjae2_mobile/utils/colors.dart';
@@ -32,26 +33,27 @@ class MockingJaeMain extends StatelessWidget {
     // This sets default app view as Dark mode
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
 
-    
     return MaterialApp(
       initialRoute: '/',
+      // route with navigation arguments should be imported, and added to routes
+      // this will break the dependancy policy... need to find a way to fix this
       routes: {
         '/': (context) => const MainPage(),
-        '/profile': (context) => const ProfilePage()
+        '/profile': (context) => const ProfilePage(),
+        LikesPage.routeName: (context) => const LikesPage(),
       },
       debugShowCheckedModeBanner: true,
       title: "mockingJae 2.0",
       theme: ThemeData(
         brightness: Brightness.light,
-          primaryColor: mainBackgroundColor,
-          appBarTheme: const AppBarTheme(
-              backgroundColor: mainThemeColor,
-              elevation: 0,
-              titleTextStyle: TextStyle(color: Colors.black)),
-          bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-                backgroundColor: mainSubThemeColor),
-          ),
+        primaryColor: mainBackgroundColor,
+        appBarTheme: const AppBarTheme(
+            backgroundColor: mainThemeColor,
+            elevation: 0,
+            titleTextStyle: TextStyle(color: Colors.black)),
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+            backgroundColor: mainSubThemeColor),
+      ),
     );
   }
 }
-

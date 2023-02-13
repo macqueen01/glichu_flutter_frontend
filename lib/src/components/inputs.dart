@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:mockingjae2_mobile/src/components/icons.dart';
 import 'package:mockingjae2_mobile/utils/colors.dart';
-import 'package:mockingjae2_mobile/src/components/buttons.dart';
-
 
 class AnimatedTextField extends StatefulWidget {
   final Function callBack;
@@ -52,10 +50,9 @@ class AnimatedTextFieldState extends State<AnimatedTextField> {
               Container(
                 padding: EdgeInsets.fromLTRB(0, _textPaddingTop, 0, 10),
                 child: AnimatedDefaultTextStyle(
-                  style: TextStyle(fontSize: _textSize, color: _textColor),
-                  duration: const Duration(milliseconds: 150),
-                  child: Text(widget.placeholder))
-                ,
+                    style: TextStyle(fontSize: _textSize, color: _textColor),
+                    duration: const Duration(milliseconds: 150),
+                    child: Text(widget.placeholder)),
               ),
               Container(
                 padding: EdgeInsets.fromLTRB(0, 0, 0, _textFieldPaddingBottom),
@@ -115,6 +112,6 @@ double textFieldTopPadding(String text) {
 double textFieldBottomPadding(text) {
   if (text == '') {
     return 13;
-  } 
+  }
   return 5;
 }

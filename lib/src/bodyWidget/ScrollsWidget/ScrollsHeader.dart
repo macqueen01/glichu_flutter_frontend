@@ -16,16 +16,10 @@ import 'package:mockingjae2_mobile/src/components/icons.dart';
 
 // Scroll Controller and Statusbar local import
 
-import 'package:mockingjae2_mobile/src/controller/scrollControlers.dart';
+import 'package:mockingjae2_mobile/src/controller/scrollPhysics.dart';
 import 'package:mockingjae2_mobile/src/bodyWidget/ScrollsWidget/StatusBar.dart';
 
 // Scrolls Button related local import
-
-import 'package:mockingjae2_mobile/src/components/buttons.dart';
-
-
-
-
 
 class ScrollsHeader extends StatelessWidget {
   const ScrollsHeader({
@@ -53,13 +47,10 @@ class ScrollsHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               GestureDetector(
-                onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    '/profile');
-                },
-                child: idTextParser(id: 'mocking_jae_^.^', maxLength: 17)
-              ),
+                  onTap: () {
+                    Navigator.pushNamed(context, '/profile');
+                  },
+                  child: idTextParser(id: 'mocking_jae_^.^', maxLength: 17)),
               const SizedBox(
                 height: 8,
               ),
@@ -86,19 +77,18 @@ class Profile extends StatefulWidget {
   final Image image;
   final int size;
 
-  const Profile({
-    super.key,
-    required this.image,
-    this.size = 0
-  });
+  const Profile({super.key, required this.image, this.size = 0});
 
   List<double> sizeConvert(int size) {
     switch (size) {
-      case 0 : return [53, 49, 46];
-    
-      case 1 : return [80, 76, 71];
+      case 0:
+        return [53, 49, 46];
 
-      default : return [53, 49, 46];
+      case 1:
+        return [80, 76, 71];
+
+      default:
+        return [53, 49, 46];
     }
   }
 
@@ -113,10 +103,7 @@ class _ProfileState extends State<Profile> {
       onTap: () {
         // check if current route starts with '/profile'
         // if not, activate the following pushNamed
-        Navigator.pushNamed(
-          context,
-          '/profile'
-          );
+        Navigator.pushNamed(context, '/profile');
       },
       child: Container(
         width: widget.sizeConvert(widget.size)[0],

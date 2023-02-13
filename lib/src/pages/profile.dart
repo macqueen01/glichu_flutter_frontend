@@ -1,22 +1,34 @@
 import 'dart:async';
+import 'dart:math';
 
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mockingjae2_mobile/src/StateMixins/frameworks.dart';
+import 'package:mockingjae2_mobile/src/UiComponents.dart/Buttons.dart';
+import 'package:mockingjae2_mobile/src/components/modals/modalForm.dart';
+import 'package:mockingjae2_mobile/src/components/snackbars.dart';
+import 'package:mockingjae2_mobile/src/models/User.dart';
+import 'package:mockingjae2_mobile/src/pages/likes.dart';
+
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+
+import 'package:sticky_headers/sticky_headers.dart';
+
 import 'package:mockingjae2_mobile/src/bodyWidget/ScrollsWidget/ScrollsHeader.dart';
 import 'package:mockingjae2_mobile/src/bodyWidget/ScrollsWidget/ScrollsPreviewWidgets.dart';
 import 'package:mockingjae2_mobile/src/bodyWidget/main.dart';
-import 'package:mockingjae2_mobile/src/components/buttons.dart';
 import 'package:mockingjae2_mobile/src/components/inputs.dart';
-import 'package:mockingjae2_mobile/src/controller/scrollControlers.dart';
+import 'package:mockingjae2_mobile/src/controller/scrollPhysics.dart';
 
 import 'package:mockingjae2_mobile/utils/colors.dart';
 import 'package:mockingjae2_mobile/src/components/icons.dart';
 import 'package:mockingjae2_mobile/src/components/Navbar.dart';
-import 'package:mockingjae2_mobile/src/controller/botton_nav_controller.dart';
+import 'package:mockingjae2_mobile/src/components/navbars/topBars.dart';
 
 import 'package:mockingjae2_mobile/utils/functions.dart';
 import 'package:mockingjae2_mobile/utils/ui.dart';
@@ -43,6 +55,11 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return WillPopScope(
         child: ValueListenableBuilder(
@@ -51,46 +68,17 @@ class _ProfilePageState extends State<ProfilePage> {
               backgroundColor: scrollsBackgroundColor,
               resizeToAvoidBottomInset: true,
               extendBody: false,
-              appBar:
-                  const ProfileAppBar(backgroundColor: scrollsBackgroundColor),
+              appBar: ProfileAppBar(
+                  title: const Text(
+                "mocking_jae_^.^",
+                style: TextStyle(
+                    decoration: TextDecoration.none,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w400,
+                    color: mainBackgroundColor,
+                    textBaseline: TextBaseline.alphabetic),
+              )),
               body: ProfileBody(),
-              /*
-                bottomNavigationBar: MJBottomNavBar(
-                  onTap: _onIconTap,
-                  items: [
-                    MJIconItem(
-                        iconData: iconData(
-                            activeDir: 'assets/icons/Home.svg',
-                            // inactiveDir: 'assets/icons/Home_stroke.svg',
-                            inactiveDir: 'assets/icons/Home.svg',
-                            defaultColor: mainThemeColor,
-                            height: 28,
-                            width: 28)),
-                    MJIconItem(
-                        iconData: iconData(
-                            activeDir: 'assets/icons/Global.svg',
-                            // inactiveDir: 'assets/icons/Global_stroke.svg',
-                            inactiveDir: 'assets/icons/Global.svg',
-                            defaultColor: mainThemeColor,
-                            height: 28,
-                            width: 28)),
-                    MJIconItem(
-                        iconData: iconData(
-                            activeDir: 'assets/icons/addWithBorder_inverse.svg',
-                            inactiveDir: 'assets/icons/addWithBorder.svg',
-                            defaultColor: mainThemeColor,
-                            height: 28,
-                            width: 28)),
-                    MJIconItem(
-                        iconData: iconData(
-                            activeDir: 'assets/icons/locked.svg',
-                            // inactiveDir: 'assets/icons/locked_stroke.svg',
-                            inactiveDir: 'assets/icons/locked.svg',
-                            defaultColor: mainThemeColor,
-                            height: 28,
-                            width: 28)),
-                  ],
-                )*/
             );
           }),
           valueListenable: selectedIndex,
@@ -108,21 +96,10 @@ class ProfileBody extends StatefulWidget {
   State<ProfileBody> createState() => _ProfileBodyState();
 }
 
-class _ProfileBodyState extends State<ProfileBody> {
-  bool _load = false;
-
-  void _reload() {
-    // this should recieve all data from the server,
-    // then refreshed all contents of the page
-    setState(() {
-      _load = true;
-      Timer(const Duration(seconds: 2), () {
-        setState(() {
-          _load = false;
-        });
-      });
-    });
-  }
+class _ProfileBodyState extends State<ProfileBody>
+    with DragUpdatable<ProfileBody> {
+  @override
+  int _duration = 2;
 
   @override
   void initState() {
@@ -131,43 +108,29 @@ class _ProfileBodyState extends State<ProfileBody> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return NotificationListener<ScrollNotification>(
-      onNotification: (ScrollNotification notification) {
-        if (notification.metrics.pixels <
-            -MediaQuery.of(context).size.height * 0.065) {
-          _reload();
-        }
-        return true;
-      },
-      child: SingleChildScrollView(
-        physics: const ScrollPhysics(),
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          decoration: BoxDecoration(color: scrollsBackgroundColor),
-          child: Column(
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 500),
-                curve: Curves.ease,
-                height:
-                    (_load) ? MediaQuery.of(context).size.height * 0.065 : 0,
-                width: MediaQuery.of(context).size.width,
-                alignment: Alignment.center,
-                child: SvgPicture.asset(
-                  'assets/icons/Me.svg',
-                  width: 30,
-                  height: 30,
-                  color: mainBackgroundColor,
-                ),
+  Widget AnimatedLoader(BuildContext context) {
+    return super.AnimatedLoader(context);
+  }
+
+  @override
+  Widget child(BuildContext context) {
+    return SingleChildScrollView(
+      physics: const ScrollPhysics(),
+      controller: mainScrollController,
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        decoration: const BoxDecoration(color: scrollsBackgroundColor),
+        child: Column(
+          children: [
+            AnimatedLoader(context),
+            const ProfilePageHeader(),
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: ScrollsMenu(
+                parentController: mainScrollController,
               ),
-              ProfilePageHeader(),
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: ScrollsMenu(),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -175,73 +138,208 @@ class _ProfileBodyState extends State<ProfileBody> {
 }
 
 class ScrollsMenu extends StatefulWidget {
-  const ScrollsMenu({super.key});
+  final ScrollController parentController;
+
+  const ScrollsMenu({super.key, required this.parentController});
 
   @override
   State<ScrollsMenu> createState() => _ScrollsMenuState();
 }
 
 class _ScrollsMenuState extends State<ScrollsMenu> {
+  int currentIndex = 0;
+  ScrollController menuScrollController = ScrollController();
+
+  void indexChange(int index) {
+    moveToTop();
+    Timer(const Duration(milliseconds: 250), () {
+      moveToIndexedMenu(index);
+      setState(() {
+        currentIndex = index;
+      });
+    });
+  }
+
+  void moveToTop() {
+    widget.parentController.animateTo(0,
+        duration: const Duration(milliseconds: 200), curve: Curves.ease);
+  }
+
+  double _indexToPosition(int index) {
+    if (index == 0) {
+      return 0;
+    } else if (index == 1) {
+      return MediaQuery.of(context).size.width;
+    }
+    return 2 * MediaQuery.of(context).size.width;
+  }
+
+  void moveToIndexedMenu(int index) {
+    menuScrollController.animateTo(_indexToPosition(index),
+        duration: const Duration(milliseconds: 200), curve: Curves.ease);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      Container(
+    return StickyHeader(
+      header: Container(
         width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.fromLTRB(15, 0, 15, 10),
+        padding: EdgeInsets.fromLTRB(15, 0, 15, 15),
         alignment: Alignment.centerLeft,
         height: 50,
+        color: scrollsBackgroundColor,
         child: Container(
-          width: 300,
+          width: 330,
           alignment: Alignment.centerLeft,
           child: CategorySelect(
-            categories: ['Scrolls', 'Videos', 'Images'],
-            onPressed: (int index) {},
+            categories: ['Scrolls', 'Videos', 'Favorates'],
+            onPressed: indexChange,
           ),
         ),
       ),
-      BoxContainer(
-          context: context,
-          child: Column(
-            children: [
-              ScrollsPair(
-                firstScrolls: Hero(
-                  tag: 0,
-                  child: ScrollsPreview(
-                      sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                      width: MediaQuery.of(context).size.width / 2),
+      content: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        controller: menuScrollController,
+        physics: const NeverScrollableScrollPhysics(),
+        child: Row(children: [
+          AnimatedContainer(
+            duration: const Duration(seconds: 0),
+            curve: Curves.ease,
+            height: (currentIndex == 0) ? null : 0,
+            child: BoxContainer(
+                context: context,
+                child: Column(
+                  children: [
+                    ScrollsPair(
+                      firstScrolls: ScrollsPreview(
+                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                          width: MediaQuery.of(context).size.width / 2),
+                      secondScrolls: ScrollsPreview(
+                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                          width: MediaQuery.of(context).size.width / 2),
+                    ),
+                    ScrollsPair(
+                      firstScrolls: ScrollsPreview(
+                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                          width: MediaQuery.of(context).size.width / 2),
+                      secondScrolls: ScrollsPreview(
+                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                          width: MediaQuery.of(context).size.width / 2),
+                    ),
+                  ],
                 ),
-                secondScrolls: Hero(
-                    tag: 3,
-                    child: ScrollsPreview(
-                        sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                        width: MediaQuery.of(context).size.width / 2)),
-              ),
-              ScrollsPair(
-                firstScrolls: Hero(
-                    tag: 5,
-                    child: ScrollsPreview(
-                        sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                        width: MediaQuery.of(context).size.width / 2)),
-                secondScrolls: Hero(
-                    tag: 9,
-                    child: ScrollsPreview(
-                        sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                        width: MediaQuery.of(context).size.width / 2)),
-              )
-            ],
+                width: MediaQuery.of(context).size.width,
+                backgroundColor: scrollsBackgroundColor,
+                radius: 15),
           ),
-          width: MediaQuery.of(context).size.width,
-          backgroundColor: scrollsBackgroundColor,
-          radius: 13),
-    ]);
+          AnimatedContainer(
+            duration: const Duration(seconds: 0),
+            curve: Curves.ease,
+            height: (currentIndex == 1) ? null : 0,
+            child: BoxContainer(
+                context: context,
+                child: Column(
+                  children: [
+                    ScrollsPair(
+                      firstScrolls: ScrollsPreview(
+                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                          width: MediaQuery.of(context).size.width / 2),
+                      secondScrolls: ScrollsPreview(
+                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                          width: MediaQuery.of(context).size.width / 2),
+                    ),
+                    ScrollsPair(
+                      firstScrolls: ScrollsPreview(
+                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                          width: MediaQuery.of(context).size.width / 2),
+                      secondScrolls: ScrollsPreview(
+                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                          width: MediaQuery.of(context).size.width / 2),
+                    ),
+                    ScrollsPair(
+                      firstScrolls: ScrollsPreview(
+                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                          width: MediaQuery.of(context).size.width / 2),
+                      secondScrolls: ScrollsPreview(
+                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                          width: MediaQuery.of(context).size.width / 2),
+                    ),
+                    ScrollsPair(
+                      firstScrolls: ScrollsPreview(
+                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                          width: MediaQuery.of(context).size.width / 2),
+                      secondScrolls: ScrollsPreview(
+                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                          width: MediaQuery.of(context).size.width / 2),
+                    ),
+                    ScrollsPair(
+                      firstScrolls: ScrollsPreview(
+                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                          width: MediaQuery.of(context).size.width / 2),
+                      secondScrolls: ScrollsPreview(
+                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                          width: MediaQuery.of(context).size.width / 2),
+                    )
+                  ],
+                ),
+                width: MediaQuery.of(context).size.width,
+                backgroundColor: scrollsBackgroundColor,
+                radius: 15),
+          ),
+          AnimatedContainer(
+            duration: const Duration(seconds: 0),
+            curve: Curves.ease,
+            height: (currentIndex == 2) ? null : 0,
+            child: BoxContainer(
+                context: context,
+                child: Column(
+                  children: [
+                    ScrollsPair(
+                      firstScrolls: ScrollsPreview(
+                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                          width: MediaQuery.of(context).size.width / 2),
+                      secondScrolls: ScrollsPreview(
+                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                          width: MediaQuery.of(context).size.width / 2),
+                    ),
+                    ScrollsPair(
+                      firstScrolls: ScrollsPreview(
+                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                          width: MediaQuery.of(context).size.width / 2),
+                      secondScrolls: ScrollsPreview(
+                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                          width: MediaQuery.of(context).size.width / 2),
+                    ),
+                    ScrollsPair(
+                      firstScrolls: ScrollsPreview(
+                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                          width: MediaQuery.of(context).size.width / 2),
+                      secondScrolls: ScrollsPreview(
+                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
+                          width: MediaQuery.of(context).size.width / 2),
+                    ),
+                  ],
+                ),
+                width: MediaQuery.of(context).size.width,
+                backgroundColor: scrollsBackgroundColor,
+                radius: 15),
+          )
+        ]),
+      ),
+    );
   }
 }
 
 class CategorySelect extends StatefulWidget {
   final List<String> categories;
   final void Function(int index)? onPressed;
+  final void Function(int index)? onIndexChange;
 
-  const CategorySelect({super.key, required this.categories, this.onPressed});
+  const CategorySelect(
+      {super.key,
+      required this.categories,
+      this.onPressed,
+      this.onIndexChange});
 
   @override
   State<CategorySelect> createState() => _CategorySelectState();
@@ -375,6 +473,93 @@ class ProfilePageHeader extends StatelessWidget {
                       iconSize: 28,
                       textColor: Colors.black87,
                       textSize: 13,
+                      onPressed: () {
+                        Navigator.pushNamed(context, LikesPage.routeName,
+                            arguments: LikePageArguments(
+                              user: User(
+                                  userName: "JaeKim",
+                                  userId: "mockingjae_^.^",
+                                  followers: 35134,
+                                  followed: 2344523,
+                                  scrolled: 1235,
+                                  likes: 45145,
+                                  remixed: 54627),
+                              likes: <User>[
+                                User(
+                                    userName: "JaeKim",
+                                    userId: "mockingjae_^.^",
+                                    followers: 35134,
+                                    followed: 2344523,
+                                    scrolled: 1235,
+                                    likes: 45145,
+                                    remixed: 54627),
+                                User(
+                                    userName: "JaeKim",
+                                    userId: "mockingjae_^.^",
+                                    followers: 35134,
+                                    followed: 2344523,
+                                    scrolled: 1235,
+                                    likes: 45145,
+                                    remixed: 54627),
+                                User(
+                                    userName: "JaeKim",
+                                    userId: "mockingjae_^.^",
+                                    followers: 35134,
+                                    followed: 2344523,
+                                    scrolled: 1235,
+                                    likes: 45145,
+                                    remixed: 54627),
+                                User(
+                                    userName: "JaeKim",
+                                    userId: "mockingjae_^.^",
+                                    followers: 35134,
+                                    followed: 2344523,
+                                    scrolled: 1235,
+                                    likes: 45145,
+                                    remixed: 54627),
+                                User(
+                                    userName: "JaeKim",
+                                    userId: "mockingjae_^.^",
+                                    followers: 35134,
+                                    followed: 2344523,
+                                    scrolled: 1235,
+                                    likes: 45145,
+                                    remixed: 54627),
+                                User(
+                                    userName: "JaeKim",
+                                    userId: "mockingjae_^.^",
+                                    followers: 35134,
+                                    followed: 2344523,
+                                    scrolled: 1235,
+                                    likes: 45145,
+                                    remixed: 54627),
+                                User(
+                                    userName: "JaeKim",
+                                    userId: "mockingjae_^.^",
+                                    followers: 35134,
+                                    followed: 2344523,
+                                    scrolled: 1235,
+                                    likes: 45145,
+                                    remixed: 54627),
+                                User(
+                                    userName: "JaeKim",
+                                    userId: "mockingjae_^.^",
+                                    followers: 35134,
+                                    followed: 2344523,
+                                    scrolled: 1235,
+                                    likes: 45145,
+                                    remixed: 54627),
+                                User(
+                                    userName: "JaeKim",
+                                    userId: "mockingjae_^.^",
+                                    followers: 35134,
+                                    followed: 2344523,
+                                    scrolled: 1235,
+                                    likes: 45145,
+                                    remixed: 54627)
+                              ],
+                            ));
+                      },
                     ),
                     VerticalDivider(
                       width: 2,
@@ -400,8 +585,14 @@ class ProfilePageHeader extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // Follow action button
                 FlatButtonSmall(
-                  onPressed: () {},
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        lensFlareSnackbar(
+                            context, "You are now following mockingjae"));
+                  },
                   icon: SvgPicture.asset(
                     'assets/icons/Me.svg',
                     width: 16,
@@ -413,6 +604,7 @@ class ProfilePageHeader extends StatelessWidget {
                   width: 135,
                   textColor: mainBackgroundColor,
                 ),
+                // Send message action button
                 FlatButtonSmall(
                   onPressed: () {},
                   icon: SvgPicture.asset(
@@ -426,6 +618,7 @@ class ProfilePageHeader extends StatelessWidget {
                   width: 90,
                   textColor: scrollsBackgroundColor,
                 ),
+                // Set alarm at update action button
                 FlatButtonSmall(
                   onPressed: () {},
                   icon: const Icon(
@@ -438,8 +631,18 @@ class ProfilePageHeader extends StatelessWidget {
                   width: 40,
                   textColor: scrollsBackgroundColor,
                 ),
+                // open more infos and actions button
+                // this opens up a bottom sheet modal
                 FlatButtonSmall(
-                  onPressed: () {},
+                  onPressed: () {
+                    showCupertinoModalBottomSheet(
+                        context: context,
+                        expand: false,
+                        barrierColor: Colors.black54,
+                        topRadius: const Radius.circular(20),
+                        backgroundColor: mainBackgroundColor,
+                        builder: (context) => ListModalBottomSheet());
+                  },
                   icon: SvgPicture.asset(
                     "assets/icons/more.svg",
                     width: 16,
@@ -455,52 +658,6 @@ class ProfilePageHeader extends StatelessWidget {
           )
         ],
       ),
-    );
-  }
-}
-
-class InfoWithIcon extends StatefulWidget {
-  late int statistic;
-
-  IconData iconData;
-  double iconSize;
-  double textSize;
-  Color iconColor;
-  Color textColor;
-
-  InfoWithIcon(
-      {super.key,
-      required this.iconData,
-      required this.statistic,
-      required this.iconSize,
-      required this.textSize,
-      required this.iconColor,
-      required this.textColor});
-
-  @override
-  State<InfoWithIcon> createState() => _InfoWithIconState();
-}
-
-class _InfoWithIconState extends State<InfoWithIcon> {
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 50,
-      height: 45,
-      child: Column(children: [
-        Icon(
-          widget.iconData,
-          size: widget.iconSize,
-          color: widget.iconColor,
-        ),
-        Text(
-          numberParser(number: widget.statistic),
-          style: GoogleFonts.quicksand(
-              fontSize: widget.textSize,
-              color: widget.textColor,
-              fontWeight: FontWeight.w600),
-        )
-      ]),
     );
   }
 }

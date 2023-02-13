@@ -2,8 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:mockingjae2_mobile/utils/colors.dart';
 import 'package:mockingjae2_mobile/utils/ui.dart';
 
+SnackBar coloredSnackbar(BuildContext context, String content, Color textColor,
+    Color backgroundColor) {
+  double width = 230;
 
-SnackBar greenSnackbar(BuildContext context, String content) {
+  switch ((content.length / 10).floor()) {
+    case 0:
+      break;
+    case 1:
+      break;
+    case 2:
+      width = 260;
+      break;
+    default:
+      width = 300;
+  }
   return SnackBar(
       dismissDirection: DismissDirection.none,
       behavior: SnackBarBehavior.floating,
@@ -16,49 +29,29 @@ SnackBar greenSnackbar(BuildContext context, String content) {
         height: 45,
         alignment: Alignment.center,
         child: BoxContainer(
-          context: context,
-          height: 35,
-          width: 230,
-          backgroundColor: Color.fromARGB(255, 72, 203, 76),
-          radius: 9,
-          child: Text(
-            content,
-            style: TextStyle(
-              color: mainBackgroundColor,
-              fontSize: 14,
-              fontWeight: FontWeight.w500
-            ),
-          )
-          ),
+            context: context,
+            height: 38,
+            width: width,
+            backgroundColor: backgroundColor,
+            radius: 9,
+            child: Text(
+              content,
+              style: TextStyle(
+                  color: textColor, fontSize: 14, fontWeight: FontWeight.w500),
+            )),
       ));
 }
 
+SnackBar greenSnackbar(BuildContext context, String content) {
+  return coloredSnackbar(
+      context, content, mainBackgroundColor, Color.fromARGB(255, 72, 203, 76));
+}
 
 SnackBar redSnackbar(BuildContext context, String content) {
-  return SnackBar(
-      dismissDirection: DismissDirection.none,
-      behavior: SnackBarBehavior.floating,
-      elevation: 0,
-      width: MediaQuery.of(context).size.width,
-      backgroundColor: Colors.transparent,
-      duration: const Duration(milliseconds: 1000),
-      content: Container(
-        width: MediaQuery.of(context).size.width,
-        alignment: Alignment.center,
-        child: BoxContainer(
-          context: context,
-          height: 35,
-          width: 230,
-          backgroundColor: Color.fromARGB(255, 255, 64, 50),
-          radius: 9,
-          child: Text(
-            content,
-            style: TextStyle(
-              color: mainBackgroundColor,
-              fontSize: 14,
-              fontWeight: FontWeight.w500
-            ),
-          )
-          ),
-      ));
+  return coloredSnackbar(
+      context, content, mainBackgroundColor, Color.fromARGB(255, 255, 64, 50));
+}
+
+SnackBar lensFlareSnackbar(BuildContext context, String content) {
+  return coloredSnackbar(context, content, mainBackgroundColor, lensFlareMain);
 }
