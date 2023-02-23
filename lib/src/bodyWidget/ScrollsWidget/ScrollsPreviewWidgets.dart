@@ -37,9 +37,11 @@ class _ScrollsPreviewState extends State<ScrollsPreview> {
   }
 
   void _resetTap() {
-    setState(() {
-      _tapped = false;
-    });
+    (mounted)
+        ? setState(() {
+            _tapped = false;
+          })
+        : null;
   }
 
   @override

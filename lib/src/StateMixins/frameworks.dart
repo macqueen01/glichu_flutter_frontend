@@ -17,9 +17,11 @@ mixin DragUpdatable<T extends StatefulWidget> on State<T> {
     setState(() {
       _load = true;
       Timer(Duration(seconds: _duration), () {
-        setState(() {
-          _load = false;
-        });
+        (mounted)
+            ? setState(() {
+                _load = false;
+              })
+            : null;
       });
     });
   }

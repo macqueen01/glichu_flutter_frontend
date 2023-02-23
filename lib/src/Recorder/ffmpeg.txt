@@ -1,0 +1,72 @@
+ffmpeg version n5.1.2 Copyright (c) 2000-2022 the FFmpeg developers
+  built with Apple clang version 14.0.0 (clang-1400.0.29.102)
+  configuration: --cross-prefix=arm64-ios-darwin- --sysroot=/Applications/Xcode-v13.4.1.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator16.0.sdk --prefix=/Users/taner/Projects/ffmpeg-kit/prebuilt/apple-ios-arm64-simulator/ffmpeg --pkg-config=/opt/homebrew/bin/pkg-config --enable-version3 --arch=aarch64 --cpu=armv8 --target-os=darwin --enable-neon --enable-asm --ar=/Applications/Xcode-v13.4.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar --cc=clang --cxx=clang++ --as='/Users/taner/Projects/ffmpeg-kit/.tmp/gas-preprocessor.pl -arch aarch64 -- clang -arch arm64 -target arm64-apple-ios12.1-simulator -march=armv8-a+crc+crypto -mcpu=generic -DFFMPEG_KIT_ARM64_SIMULATOR -Wno-unused-function -Wno-deprecated-declarations -fstrict-aliasing -DIOS -DFFMPEG_KIT_BUILD_DATE=20220929 -isysroot /Applications/Xcode-v13.4.1.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator16.0.sdk -O2 -mios-simulator-version-min=12.1 -I/Applications/Xcode-v13.4.1.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator16.0.sdk/usr/include' --ranlib=/Applications/Xcode-v13.4.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib --strip=/Applications/Xcode-v13.4.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip --nm=/Applications/Xcode-v13.4.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/nm --extra-ldflags='-mios-simulator-version-min=12.1' --disable-autodetect --enable-cross-compile --enable-pic --enable-inline-asm --enable-optimizations --enable-swscale --enable-shared --disable-static --install-name-dir='@rpath' --enable-pthreads --disable-v4l2-m2m --disable-outdev=v4l2 --disable-outdev=fbdev --disable-indev=v4l2 --disable-indev=fbdev --enable-small --disable-xmm-clobber-test --disable-debug --disable-neon-clobber-test --disable-programs --disable-postproc --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-sndio --disable-schannel --disable-securetransport --disable-xlib --disable-cuda --disable-cuvid --disable-nvenc --disable-vaapi --disable-vdpau --disable-alsa --disable-cuda --disable-cuvid --disable-nvenc --disable-vaapi --disable-vdpau --enable-gmp --enable-gnutls --disable-sdl2 --disable-openssl --enable-zlib --enable-audiotoolbox --disable-outdev=audiotoolbox --enable-bzlib --enable-videotoolbox --enable-avfoundation --enable-iconv --disable-coreimage --disable-appkit --disable-opencl --disable-opengl
+  libavutil      57. 28.100 / 57. 28.100
+  libavcodec     59. 37.100 / 59. 37.100
+  libavformat    59. 27.100 / 59. 27.100
+  libavdevice    59.  7.100 / 59.  7.100
+  libavfilter     8. 44.100 /  8. 44.100
+  libswscale      6.  7.100 /  6.  7.100
+  libswresample   4.  7.100 /  4.  7.100
+Input #0, concat, from '/Users/jaekim/Library/Developer/CoreSimulator/Devices/09E40A31-D180-44FE-89CB-B8A30BC68A19/data/Containers/Data/Application/FCE2F1F9-E628-4386-B1B1-8912B1953071/Library/ffmpegTemp/file.txt':
+  Duration: 00:00:06.88, start: 0.000000, bitrate: 63 kb/s
+  Stream #0:0: Video: mjpeg, yuvj420p(pc, bt470bg/unknown/unknown), 370x658, 25 fps, 25 tbr, 25 tbn
+Stream mapping:
+  Stream #0:0 -> #0:0 (mjpeg (native) -> mpeg4 (native))
+Press [q] to stop, [?] for help
+[swscaler @ 0x138088000] [swscaler @ 0x1282e8000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x138088000] [swscaler @ 0x1280f8000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x138088000] [swscaler @ 0x128108000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x138088000] [swscaler @ 0x128050000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x138088000] [swscaler @ 0x128060000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x138088000] [swscaler @ 0x128070000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x138088000] [swscaler @ 0x128250000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x138088000] [swscaler @ 0x128260000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x138088000] [swscaler @ 0x128270000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x138088000] [swscaler @ 0x128280000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x138088000] [swscaler @ 0x128290000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x138088000] [swscaler @ 0x138098000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x138088000] [swscaler @ 0x1380a8000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x138088000] [swscaler @ 0x1380b8000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x138088000] [swscaler @ 0x1380c8000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x138088000] [swscaler @ 0x1380d8000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x138088000] [swscaler @ 0x1380e8000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x138088000] [swscaler @ 0x138140000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x138088000] [swscaler @ 0x138150000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x138088000] [swscaler @ 0x138160000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x138088000] [swscaler @ 0x138170000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x138088000] [swscaler @ 0x138180000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x130008000] [swscaler @ 0x128290000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x130008000] [swscaler @ 0x1282e8000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x130008000] [swscaler @ 0x1280f8000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x130008000] [swscaler @ 0x128108000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x130008000] [swscaler @ 0x128050000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x130008000] [swscaler @ 0x128060000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x130008000] [swscaler @ 0x128070000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x130008000] [swscaler @ 0x1282a0000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x130008000] [swscaler @ 0x1282b0000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x130008000] [swscaler @ 0x1282c0000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x130008000] [swscaler @ 0x128250000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x140008000] [swscaler @ 0x128250000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x140008000] [swscaler @ 0x1282e8000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x140008000] [swscaler @ 0x1280f8000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x140008000] [swscaler @ 0x128108000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x140008000] [swscaler @ 0x128050000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x140008000] [swscaler @ 0x128060000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x140008000] [swscaler @ 0x128070000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x140008000] [swscaler @ 0x128260000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x140008000] [swscaler @ 0x128270000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x140008000] [swscaler @ 0x128280000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x140008000] [swscaler @ 0x128290000] deprecated pixel format used, make sure you did set range correctly
+Output #0, mp4, to '/Users/jaekim/projects/mockingjae2_mobile/lib/src/Recorder/newOutput(6).mp4':
+  Metadata:
+    encoder         : Lavf59.27.100
+  Stream #0:0: Video: mpeg4 (mp4v / 0x7634706D), yuv420p(tv, bt470bg/unknown/unknown, progressive), 370x658, q=2-31, 200 kb/s, 25 fps, 12800 tbn
+    Metadata:
+      encoder         : Lavc59.37.100 mpeg4
+    Side data:
+      cpb: bitrate max/min/avg: 0/0/200000 buffer size: 0 vbv_delay: N/A
+frame=    1 fps=0.0 q=5.4 size=       0kB time=00:00:00.00 bitrate=4512.8kbits/s speed=N/A    frame=  175 fps=0.0 q=31.0 Lsize=     396kB time=00:00:06.96 bitrate= 465.9kbits/s dup=44 drop=113 speed=23.4x    
+video:394kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.413472%
+frame=  175 fps=0.0 q=31.0 Lsize=N/A time=00:00:06.96 bitrate=N/A dup=44 drop=113 speed=23.4x    
+video:394kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown

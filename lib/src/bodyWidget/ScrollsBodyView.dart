@@ -10,9 +10,15 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mockingjae2_mobile/src/FileManager/ScrollsManager.dart';
+import 'package:mockingjae2_mobile/src/FileManager/lowestActions.dart';
+import 'package:mockingjae2_mobile/src/Recorder/indexTimestamp.dart';
+import 'package:mockingjae2_mobile/src/Recorder/recorder.dart';
 import 'package:mockingjae2_mobile/src/StateMixins/frameworks.dart';
 import 'package:mockingjae2_mobile/src/bodyWidget/ScrollsWidget/ScrollsPreviewWidgets.dart';
 import 'package:mockingjae2_mobile/src/controller/scrollsControllers.dart';
+import 'package:mockingjae2_mobile/src/models/Remix.dart';
+import 'package:mockingjae2_mobile/src/models/Scrolls.dart';
 
 // Utility local imports
 
@@ -25,6 +31,7 @@ import 'package:mockingjae2_mobile/src/components/icons.dart';
 
 import 'package:mockingjae2_mobile/src/controller/scrollPhysics.dart';
 import 'package:mockingjae2_mobile/src/bodyWidget/ScrollsWidget/StatusBar.dart';
+import 'package:mockingjae2_mobile/src/Recorder/testConverter.dart';
 
 // Scrolls Button related local import
 
@@ -40,13 +47,13 @@ class ScrollsBodyView extends StatefulWidget {
 
 class _ScrollsBodyViewState extends State<ScrollsBodyView>
     with DragUpdatable<ScrollsBodyView> {
-  List<Image> images = <Image>[];
+  List<ScrollsModel> scrollsList = <ScrollsModel>[];
   Highlight? highlight;
-  late MainScrollsController _scrollController;
+  MainScrollsController _scrollController = MainScrollsController();
+  late ScrollsManager scrollsManager;
 
   @override
   void initState() {
-    _scrollController = MainScrollsController();
     _loadAudios('').then((audios) {
       setState(() {
         this.highlight = Highlight(
@@ -55,21 +62,48 @@ class _ScrollsBodyViewState extends State<ScrollsBodyView>
             reverseAudioBuffer: audios[24]);
       });
     });
-    _loadImages(
-            '/Users/jaekim/projects/mockingjae2_mobile/sample_scrolls/scrolls1/',
-            context)
-        .then((value) {
-      setState(() {
-        this.images = value;
-      });
-      _scrollController.addIndecies([images, images, images, images, images]);
-    });
+    scrollsManager = ScrollsManager(context: context);
+    _scrollController.setRefresh(_refresh);
+    _refresh();
     super.initState();
+  }
+
+  Future<void> _refresh() async {
+    // refreshes the page and adds scrolls model to the
+    // page, appending at the bottom
+
+    // This is dummy function that fetches scrolls from the server,
+    // parses into scrolls model
+
+    Future<List<ScrollsModel>> newModels({int num = 1}) async {
+      List<ScrollsModel> dummyResult = [];
+      var value = await _loadImages(
+          '/Users/jaekim/projects/mockingjae2_mobile/sample_scrolls/scrolls1/',
+          context);
+
+      for (int i = 0; i < num; i++) {
+        dummyResult.add(value);
+      }
+      return dummyResult;
+    }
+
+    List<ScrollsModel> toBeAdded = await newModels(num: 3);
+
+    // Add scrolls from the front
+    (mounted)
+        ? setState(() {
+            scrollsList.insertAll(0, toBeAdded);
+            toBeAdded.forEach((e) async {
+              await scrollsManager.getScrollsImageFromNetwork(e.scrollsName);
+              _scrollController.addIndex();
+            });
+          })
+        : null;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (images.isEmpty || highlight == null) {
+    if (scrollsList.isEmpty || highlight == null) {
       return Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
@@ -82,43 +116,63 @@ class _ScrollsBodyViewState extends State<ScrollsBodyView>
       );
     } else {
       return ScrollsListViewBuilder(
-          [images, images, images, images, images],
-          [highlight!, highlight!, highlight!, highlight!, highlight!],
-          _scrollController,
-          context);
+          scrollsList: scrollsList,
+          highlights: [
+            highlight!,
+            highlight!,
+            highlight!,
+            highlight!,
+            highlight!
+          ],
+          scrollController: _scrollController);
     }
   }
 }
 
-Widget ScrollsListViewBuilder(
-    List<List<Image>> scrollsList,
-    List<Highlight> highlights,
-    MainScrollsController scrollController,
-    BuildContext context) {
-  return Flex(
-    direction: Axis.vertical,
-    children: [
-      Expanded(
-        child: ListView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          controller: scrollController,
-          scrollDirection: Axis.vertical,
-          itemCount: scrollsList.length,
-          itemBuilder: (context, index) {
-            return Scrolls(
-                images: scrollsList[index],
-                highlight: highlights[index],
-                parentScrollController: scrollController,
-                index: index);
-          },
-        ),
-      )
-    ],
-  );
+class ScrollsListViewBuilder extends StatefulWidget {
+  final List<ScrollsModel> scrollsList;
+  final List<Highlight> highlights;
+  final MainScrollsController scrollController;
+
+  const ScrollsListViewBuilder(
+      {super.key,
+      required this.scrollsList,
+      required this.highlights,
+      required this.scrollController});
+
+  @override
+  State<ScrollsListViewBuilder> createState() => _ScrollsListViewBuilderState();
+}
+
+class _ScrollsListViewBuilderState extends State<ScrollsListViewBuilder> {
+  @override
+  Widget build(BuildContext context) {
+    return Flex(
+      direction: Axis.vertical,
+      children: [
+        Expanded(
+          child: ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            controller: widget.scrollController,
+            scrollDirection: Axis.vertical,
+            itemCount: widget.scrollsList.length,
+            itemBuilder: (context, index) {
+              return Scrolls(
+                  scrollsModel: widget.scrollsList[index],
+                  // need to implement the highlight adding...
+                  highlight: widget.highlights[0],
+                  parentScrollController: widget.scrollController,
+                  index: index);
+            },
+          ),
+        )
+      ],
+    );
+  }
 }
 
 class Scrolls extends StatefulWidget {
-  final List<Image> images;
+  final ScrollsModel scrollsModel;
   final MainScrollsController parentScrollController;
   final int index;
   final int duration;
@@ -126,7 +180,7 @@ class Scrolls extends StatefulWidget {
 
   const Scrolls(
       {super.key,
-      required this.images,
+      required this.scrollsModel,
       required this.parentScrollController,
       this.duration = 10,
       required this.index,
@@ -138,12 +192,16 @@ class Scrolls extends StatefulWidget {
 
 class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late ScrollController _scrollController;
+  late SingleScrollsController _scrollController;
   int currentIndex = 0;
   double scrollDelta = 0;
   final double _height = 3000;
   // Each scroll has seperate audio player
   final AudioPlayer player = AudioPlayer();
+  // Whether scrubbing has been recorded
+  bool recording = false;
+  Recorder recorder = Recorder();
+  List<Image> images = [];
 
   Future<void> playAudioFromMemory(Uint8List audioData) async {
     if (player.playing == true) {
@@ -157,13 +215,14 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-
     _controller =
         AnimationController(vsync: this, duration: const Duration(seconds: 2));
-    _scrollController = ScrollController();
-    _controller.addListener(() {
+    _scrollController =
+        SingleScrollsController(height: _height, context: context);
+    ScrollsManager(context: context).getScrollsImageFromNetwork(
+        widget.scrollsModel.scrollsName, callback: (loadedImages) {
       setState(() {
-        currentIndex = (_controller.value * widget.images.length).floor();
+        images = loadedImages;
       });
     });
   }
@@ -174,54 +233,160 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
+  bool scrollsIndexCheck(int index) {
+    if (scrollsLowerBound(index) && scrollsUpperBound(index)) {
+      return true;
+    }
+    return false;
+  }
+
+  bool scrollsLowerBound(int index) {
+    if (0 <= index) {
+      return true;
+    }
+
+    return false;
+  }
+
+  bool scrollsUpperBound(int index) {
+    if (index < images.length) {
+      return true;
+    }
+
+    return false;
+  }
+
+  bool scrollsIndexChangeManager(ScrollNotification notification) {
+    // Buisness manager to scrolls item
+    // this method manages actions related to image index changes
+    // on scroll position change
+    //
+    // Consider this as a core functionality to the scrolls
+
+    // defines scroll delta to use this metrix in dummy padding in
+    // Stack-Position widget (Minor utility)
+    scrollDelta = notification.metrics.pixels;
+
+    // defines the _controller value by calculating current scroll position in percent
+    _controller.value = 1 - _scrollController.remaining();
+
+    // defines how image index is going to be displayed as in relationship to current scroll position
+    int candidateIndex = (_controller.value * images.length).floor();
+    if (!scrollsUpperBound(candidateIndex)) {
+      // set index to image's last index if index exceeds upper bound
+      currentIndex = images.length - 1;
+    } else if (!scrollsLowerBound(candidateIndex)) {
+      // set index to images's first index if index exceeds lower bound
+      currentIndex = 0;
+    } else {
+      currentIndex = candidateIndex;
+    }
+
+    setState(() {
+      candidateIndex = candidateIndex;
+      scrollDelta = scrollDelta;
+    });
+
+    // Auto scroll position-time recording functionality
+    // This should be imported from Recording Module
+
+    if (!recording) {
+      recorder.startRecording();
+      recording = true;
+    }
+
+    recorder.updateRecording(currentIndex);
+
+    // Highlight position audio play
+    // defines the scroll direction to play forward audio and backward audio in
+    // according situation
+    var scrollDirection = _scrollController.position.userScrollDirection;
+    if (widget.highlight != null &&
+        currentIndex - 10 <= widget.highlight!.index &&
+        widget.highlight!.index <= currentIndex) {
+      if (scrollDirection == ScrollDirection.forward) {
+        playAudioFromMemory(widget.highlight!.forwardAudioBuffer);
+      } else if (scrollDirection == ScrollDirection.reverse) {
+        playAudioFromMemory(widget.highlight!.reverseAudioBuffer);
+      } else {
+        playAudioFromMemory(widget.highlight!.forwardAudioBuffer);
+      }
+    }
+
+    if (currentIndex / images.length > 0.88) {
+      recording = false;
+      IndexTimeLine recordedTimeline = recorder.stopRecording()!;
+
+      if (recordedTimeline.last! - recordedTimeline.first! >
+          const Duration(seconds: 2)) {
+        // convert into remix
+        RemixModel remix = RemixModel(
+          'new',
+          scrolls: widget.scrollsModel,
+          timeline: recordedTimeline,
+        );
+
+        Converter converter = Converter();
+
+        converter.convertRemixToVideo(remix,
+            '/Users/jaekim/projects/mockingjae2_mobile/lib/src/Recorder/newOutput.mp4');
+      }
+
+      // snap to the next scrolls
+      widget.parentScrollController.switchToNextScrolls(context);
+      // reset the scrolls at start
+      _scrollController.fastScrubToStart();
+    }
+
+    if (notification.metrics.pixels < -20 && widget.index != 0) {
+      recording = false;
+      IndexTimeLine recordedTimeline = recorder.stopRecording()!;
+
+      if (recordedTimeline.last! - recordedTimeline.first! >
+          const Duration(seconds: 2)) {
+        // convert into remix
+        RemixModel remix = RemixModel(
+          'new',
+          scrolls: widget.scrollsModel,
+          timeline: recordedTimeline,
+        );
+
+        Converter converter = Converter();
+
+        converter.convertRemixToVideo(remix,
+            '/Users/jaekim/projects/mockingjae2_mobile/lib/src/Recorder/newOutput.mp4');
+      }
+
+      // snap to the last scrolls if one exists
+      widget.parentScrollController.switchToLastScrolls(context);
+    }
+
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (images.isEmpty) {
+      return Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        decoration: const BoxDecoration(
+          color: scrollsBackgroundColor,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 103),
+          child: Center(
+            child: JaeIcon(55, 55, mainBackgroundColor),
+          ),
+        ),
+      );
+    }
     return Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
       decoration: const BoxDecoration(color: scrollsBackgroundColor),
       child: NotificationListener<ScrollNotification>(
-          onNotification: (ScrollNotification notification) {
-            _controller.value = notification.metrics.pixels / (_height - 800);
-            scrollDelta = notification.metrics.pixels;
-            var scrollDirection =
-                _scrollController.position.userScrollDirection;
-            /*
-            if (currentIndex.remainder(15) == 0) {
-              playAudioFromMemory(widget.audios[(currentIndex / 15).floor()]);
-            }
-            */
-
-            //print(currentIndex);
-
-            // highlight position audio play
-            if (widget.highlight != null &&
-                currentIndex - 10 <= widget.highlight!.index &&
-                widget.highlight!.index <= currentIndex) {
-              if (scrollDirection == ScrollDirection.forward) {
-                playAudioFromMemory(widget.highlight!.forwardAudioBuffer);
-              } else if (scrollDirection == ScrollDirection.reverse) {
-                playAudioFromMemory(widget.highlight!.reverseAudioBuffer);
-              } else {
-                playAudioFromMemory(widget.highlight!.forwardAudioBuffer);
-              }
-            }
-
-            if (currentIndex / widget.images.length > 0.88) {
-              // snap to the next scrolls
-              widget.parentScrollController.switchToNextScrolls(context);
-              // reset the scrolls at start
-              _scrollController.animateTo(0,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.ease);
-            }
-
-            if (notification.metrics.pixels < -20 && widget.index != 0) {
-              widget.parentScrollController.switchToLastScrolls(context);
-            }
-
-            return true;
-          },
+          onNotification: scrollsIndexChangeManager,
           child: SingleChildScrollView(
               controller: _scrollController,
               physics: const DampedScrollPhysics(),
@@ -236,23 +401,21 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
                       onLongPressStart: (LongPressStartDetails detail) {
                         // this auto scrolls at velocity (_height / widget.duration)
                         // works alongside with onLongPressEnd
-                        _scrollController.animateTo(_height,
-                            duration: Duration(
-                                seconds: widget.duration -
-                                    ((widget.duration / _height) * scrollDelta)
-                                        .floor()),
-                            curve: Curves.ease);
+                        _scrollController.scrubToEnd();
                       },
                       onLongPressEnd: (LongPressEndDetails detail) {
                         // this auto scrolls at velocity (_height / widget.duration)
                         // works alongside with onLongPressStart
-                        _scrollController.jumpTo(scrollDelta);
+                        _scrollController.scrubStop();
                       },
                       onDoubleTap: () {
                         // this animates back to beginning of the scrolls
-                        _scrollController.animateTo(0,
-                            duration: const Duration(milliseconds: 600),
-                            curve: Curves.ease);
+                        _scrollController.fastScrubToStart();
+                      },
+                      onHorizontalDragStart: (details) {
+                        // for test utilities only
+                        // used only in test pipeline
+                        widget.parentScrollController.refreshScroll();
                       },
                       child: BoxContainer(
                           context: context,
@@ -262,10 +425,11 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
                           child: Stack(
                             alignment: AlignmentDirectional.topStart,
                             children: ([
-                              widget.images[currentIndex],
+                              images[currentIndex],
                               // status bar
                               StatusBar(
-                                  currentIndex: currentIndex, widget: widget),
+                                  currentIndex: currentIndex,
+                                  length: images.length),
                               // remix number
                               Positioned(
                                 right: 2.5,
@@ -308,7 +472,7 @@ class BytesSource extends StreamAudioSource {
   }
 }
 
-Future<List<Image>> _loadImages(String path, BuildContext context) async {
+Future<ScrollsModel> _loadImages(String path, BuildContext context) async {
   Directory testDir =
       await _testImageLoader('newDir', 'sample_scrolls/scrolls1', 824);
 
@@ -337,7 +501,10 @@ Future<List<Image>> _loadImages(String path, BuildContext context) async {
     },
   ));
 
-  return images;
+  ScrollsModel scrollsModel = ScrollsModel(
+      imagePath: testDir, scrollsName: 'Scrolls1', imageList: images);
+
+  return scrollsModel;
 }
 
 class Highlight {
@@ -407,7 +574,7 @@ Future<List<String>> _loadAudiosAsDir(String path) async {
 
 Future<Directory> _testImageLoader(
     String newDir, String assetDir, int assetLength) async {
-  String newFullDir = await getOrCreateFolder(newDir);
+  String newFullDir = await getOrCreateFolder('scrolls/cached/Scrolls1');
 
   for (int i = 1; i <= assetLength; i++) {
     String filePath = newFullDir + '/$i.jpeg';

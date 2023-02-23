@@ -1,3 +1,7 @@
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+
 /*
 
 class Scrolls {
@@ -8,3 +12,14 @@ class Scrolls {
   })
 }
 */
+
+class ScrollsModel {
+  final Directory imagePath;
+  final String scrollsName;
+  final List<Image> imageList;
+
+  const ScrollsModel(
+      {required this.imagePath,
+      required this.scrollsName,
+      required this.imageList});
+}

@@ -34,7 +34,9 @@ class ScrollsRelatedInfoButtonWrap extends StatelessWidget {
         ScrollsInfoButton(
           iconData: CupertinoIcons.videocam,
           statistic: 390278,
-        )
+        ),
+        ScrollsInfoButton(
+            iconData: CupertinoIcons.add_circled, statistic: 209438)
       ],
     );
   }
