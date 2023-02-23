@@ -13,6 +13,19 @@ class ScrollsManager extends Manager {
   final BuildContext context;
   final Future<String> cachedPath = getOrCreateFolder('scrolls/cached');
 
+  Future<File?> getScrollsPreviewFromCache(String scrollsName) async {
+    if (!await isCached(scrollsName)) {
+      return null;
+    }
+
+    Directory scrollsDirectory =
+        getDirectory(Directory(await cachedPath), scrollsName)!;
+    File thumbnail = getFile(scrollsDirectory,
+        '1')!; // Thumbnail should be the first image of the scrolls
+
+    return thumbnail;
+  }
+
   Future<List<Image>> getScrollsImageFromCache(String scrollsName) async {
     List<Image> scrollsImages = [];
 

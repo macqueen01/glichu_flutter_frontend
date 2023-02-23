@@ -12,7 +12,12 @@ class Video {}
 
 class RecordedVideoManager extends Manager {
   final BuildContext? context;
+  // cachedPath manages remix videos scrolled by the user
   final Future<String> cachedPath = getOrCreateFolder('videos/recorded');
+  // uploadedPath manages videos (mostly mp4s) that are uploaded and being converted to scrolls
+  // possible alternative to manual getOrCreateFolder is to set videos to choose from a local gallery
+  final Future<String> uploadedPath = getOrCreateFolder(
+      'videos/uploaded'); // = getGalleryFolder(); -> in case of choosing from local gallery
   // Converter should be managed by its parent
   final Converter converter;
 

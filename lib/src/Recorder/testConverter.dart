@@ -1,5 +1,5 @@
 // Test Converter should be only used during debug phase
-// Converter is used to convert scrolls into mp4 file using ffmpeg in client-side
+// Converter is used to convert scrolls into mp4 or video into scrolls files using ffmpeg in client-side
 import 'dart:io';
 
 import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
@@ -8,17 +8,25 @@ import 'package:mockingjae2_mobile/src/FileManager/lowestActions.dart';
 import 'package:mockingjae2_mobile/src/Recorder/indexTimestamp.dart';
 import 'package:mockingjae2_mobile/src/models/Remix.dart';
 
+class EncodingSettings {
+  const EncodingSettings();
+}
+
 class Converter {
   Converter();
 
+  Future<String?> convertVideoToScrolls(
+      File uploadingVideo, String outputFolderPath,
+      {EncodingSettings? settings = null}) async {
+    // This method will return null if fails or is in conversion progress
+    String command = '';
+    FFmpegSession result = await FFmpegKit.execute(command);
+    return outputFolderPath;
+  }
+
   Future<void> convertRemixToVideo(
       RemixModel remix, String outputFilePath) async {
-    int index = 1;
-    while (await File(outputFilePath).exists()) {
-      outputFilePath =
-          outputFilePath.split(".").first.split('(').first + "($index).mp4";
-      index++;
-    }
+    outputFilePath = await resolveFilePath(outputFilePath);
 
     String command = "";
     List<String> imagePaths = [];

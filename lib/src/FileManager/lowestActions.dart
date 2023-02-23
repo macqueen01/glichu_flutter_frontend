@@ -56,8 +56,14 @@ Future<Directory?> getFolderDirectory(String basename) async {
 
 Future<String> resolveFilePath(path) async {
   int index = 1;
+  String parent = Directory(path).parent.path;
+  String extension = fileExtension(File(path));
   while (await File(path).exists()) {
-    path = path.split('/').last.split('.').first.split('(').first + '($index)';
+    // Continuously add index if there is a file the with same name exists
+    path = '${parent + '/' + path.split('/').last // basename
+        .split('.').first // filename without extension if one exists
+        .split('(').first}($index).$extension'; // add extension
+    index++;
   }
   return path;
 }
@@ -67,6 +73,7 @@ Future<String> resolveDirectoryPath(path) async {
   String parent = Directory(path).parent.path;
   while (await Directory(path).exists()) {
     path = path.split('/').last.split('(').first + '($index)';
+    index++;
   }
   return '$parent/$path';
 }
@@ -125,4 +132,27 @@ Directory? getDirectory(Directory parent, String basename) {
   });
 
   return returnDirectory;
+}
+
+File? getFile(Directory parent, String basename) {
+  String basenameWithoutExtension = basename.split('/').last.split('.').first;
+  File? returnFile;
+
+  fileList(parent).forEach((element) {
+    if (element.path.split('/').last.split('.').first ==
+        basenameWithoutExtension) {
+      returnFile = element;
+    }
+  });
+
+  return returnFile;
+}
+
+String fileExtension(File file) {
+  String path = file.path;
+  if (!path.split('/').last.contains('.')) {
+    return '';
+  }
+
+  return path.split('/').last.split('.').last;
 }

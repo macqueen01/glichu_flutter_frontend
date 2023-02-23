@@ -4,6 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mockingjae2_mobile/utils/colors.dart';
 
+// PlaceHoldLoadable provides custom placeholder view on future then gives desired view on load finish
+
+mixin PlaceHoldLoadable<T extends StatefulWidget> on State<T> {
+  bool _load = false;
+}
+
 // DragUpdatable provides update on overscroll.
 
 mixin DragUpdatable<T extends StatefulWidget> on State<T> {

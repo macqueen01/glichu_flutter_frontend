@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mockingjae2_mobile/src/UiComponents.dart/Buttons.dart';
+import 'package:mockingjae2_mobile/src/bodyWidget/ScrollsBodyView.dart';
+import 'package:mockingjae2_mobile/src/models/Scrolls.dart';
 import 'package:mockingjae2_mobile/utils/colors.dart';
 
 Widget ScrollsPair({
@@ -16,11 +18,11 @@ Widget ScrollsPair({
 }
 
 class ScrollsPreview extends StatefulWidget {
-  final String sampleSrc;
+  final ScrollsModel scrollsModel;
   final double width;
 
   const ScrollsPreview(
-      {super.key, required this.sampleSrc, required this.width});
+      {super.key, required this.scrollsModel, required this.width});
 
   @override
   State<ScrollsPreview> createState() => _ScrollsPreviewState();
@@ -51,7 +53,6 @@ class _ScrollsPreviewState extends State<ScrollsPreview> {
         if (!_tapped) {
           _setFirstTap();
         }
-
         return;
       },
       child: Container(
