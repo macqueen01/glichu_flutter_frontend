@@ -16,6 +16,7 @@ import 'package:mockingjae2_mobile/src/Recorder/indexTimestamp.dart';
 import 'package:mockingjae2_mobile/src/Recorder/recorder.dart';
 import 'package:mockingjae2_mobile/src/StateMixins/frameworks.dart';
 import 'package:mockingjae2_mobile/src/bodyWidget/ScrollsWidget/ScrollsPreviewWidgets.dart';
+import 'package:mockingjae2_mobile/src/controller/imageIndexController.dart';
 import 'package:mockingjae2_mobile/src/controller/scrollsControllers.dart';
 import 'package:mockingjae2_mobile/src/models/Remix.dart';
 import 'package:mockingjae2_mobile/src/models/Scrolls.dart';
@@ -32,28 +33,42 @@ import 'package:mockingjae2_mobile/src/components/icons.dart';
 import 'package:mockingjae2_mobile/src/controller/scrollPhysics.dart';
 import 'package:mockingjae2_mobile/src/bodyWidget/ScrollsWidget/StatusBar.dart';
 import 'package:mockingjae2_mobile/src/Recorder/testConverter.dart';
+import 'package:provider/provider.dart';
 
 // Scrolls Button related local import
 
 import 'ScrollsWidget/InteractionWidgets.dart';
 import 'ScrollsWidget/ScrollsHeader.dart';
 
-class ScrollsBodyView extends StatefulWidget {
+class ScrollsBodyView extends StatelessWidget {
   const ScrollsBodyView({super.key});
 
   @override
-  State<ScrollsBodyView> createState() => _ScrollsBodyViewState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (BuildContext context) => ScrollsManager(context: context),
+      child: const ScrollsBody(),
+    );
+  }
 }
 
-class _ScrollsBodyViewState extends State<ScrollsBodyView>
-    with DragUpdatable<ScrollsBodyView> {
-  List<ScrollsModel> scrollsList = <ScrollsModel>[];
+class ScrollsBody extends StatefulWidget {
+  const ScrollsBody({super.key});
+
+  @override
+  State<ScrollsBody> createState() => _ScrollsBodyState();
+}
+
+class _ScrollsBodyState extends State<ScrollsBody>
+    with DragUpdatable<ScrollsBody> {
   Highlight? highlight;
-  MainScrollsController _scrollController = MainScrollsController();
-  late ScrollsManager scrollsManager;
+  late MainScrollsController _scrollController;
 
   @override
   void initState() {
+    super.initState();
+    _scrollController = MainScrollsController(
+        onIndexChange: context.read<ScrollsManager>().setIndex);
     _loadAudios('').then((audios) {
       setState(() {
         this.highlight = Highlight(
@@ -62,10 +77,15 @@ class _ScrollsBodyViewState extends State<ScrollsBodyView>
             reverseAudioBuffer: audios[24]);
       });
     });
-    scrollsManager = ScrollsManager(context: context);
     _scrollController.setRefresh(_refresh);
     _refresh();
-    super.initState();
+    // context.read<ScrollsManager>().addAllScrollsCache(newCacheList);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _refresh() async {
@@ -89,56 +109,54 @@ class _ScrollsBodyViewState extends State<ScrollsBodyView>
 
     List<ScrollsModel> toBeAdded = await newModels(num: 3);
 
-    // Add scrolls from the front
-    (mounted)
-        ? setState(() {
-            scrollsList.insertAll(0, toBeAdded);
-            toBeAdded.forEach((e) async {
-              await scrollsManager.getScrollsImageFromNetwork(e.scrollsName);
-              _scrollController.addIndex();
-            });
-          })
-        : null;
+    addAllScrolls(toBeAdded);
+  }
+
+  void addAllScrolls(List<ScrollsModel> scrollsModels) {
+    List<ScrollsIndexImageCache> scrollsCaches = [];
+
+    for (var scrollsModel in scrollsModels) {
+      ScrollsIndexImageCache newCache =
+          ScrollsIndexImageCache(scrollsModel: scrollsModel);
+      scrollsCaches.add(newCache);
+      _scrollController.addIndex();
+    }
+
+    context.read<ScrollsManager>().addAllScrollsCache(scrollsCaches);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (scrollsList.isEmpty || highlight == null) {
-      return Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        decoration: const BoxDecoration(
-          color: scrollsBackgroundColor,
-        ),
-        child: Center(
-          child: JaeIcon(55, 55, mainBackgroundColor),
-        ),
-      );
-    } else {
-      return ScrollsListViewBuilder(
-          scrollsList: scrollsList,
-          highlights: [
-            highlight!,
-            highlight!,
-            highlight!,
-            highlight!,
-            highlight!
-          ],
-          scrollController: _scrollController);
-    }
+    return Consumer<ScrollsManager>(builder: (context, scrollsManager, child) {
+      if (scrollsManager.isEmpty() || highlight == null) {
+        return Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          decoration: const BoxDecoration(
+            color: scrollsBackgroundColor,
+          ),
+          child: Center(
+            child: JaeIcon(55, 55, mainBackgroundColor),
+          ),
+        );
+      }
+      return ScrollsListViewBuilder(highlights: [
+        highlight!,
+        highlight!,
+        highlight!,
+        highlight!,
+        highlight!
+      ], scrollController: _scrollController);
+    });
   }
 }
 
 class ScrollsListViewBuilder extends StatefulWidget {
-  final List<ScrollsModel> scrollsList;
   final List<Highlight> highlights;
   final MainScrollsController scrollController;
 
   const ScrollsListViewBuilder(
-      {super.key,
-      required this.scrollsList,
-      required this.highlights,
-      required this.scrollController});
+      {super.key, required this.highlights, required this.scrollController});
 
   @override
   State<ScrollsListViewBuilder> createState() => _ScrollsListViewBuilderState();
@@ -155,10 +173,9 @@ class _ScrollsListViewBuilderState extends State<ScrollsListViewBuilder> {
             physics: const NeverScrollableScrollPhysics(),
             controller: widget.scrollController,
             scrollDirection: Axis.vertical,
-            itemCount: widget.scrollsList.length,
+            itemCount: context.read<ScrollsManager>().num_scrolls(),
             itemBuilder: (context, index) {
               return Scrolls(
-                  scrollsModel: widget.scrollsList[index],
                   // need to implement the highlight adding...
                   highlight: widget.highlights[0],
                   parentScrollController: widget.scrollController,
@@ -172,7 +189,6 @@ class _ScrollsListViewBuilderState extends State<ScrollsListViewBuilder> {
 }
 
 class Scrolls extends StatefulWidget {
-  final ScrollsModel scrollsModel;
   final MainScrollsController parentScrollController;
   final int index;
   final int duration;
@@ -180,7 +196,6 @@ class Scrolls extends StatefulWidget {
 
   const Scrolls(
       {super.key,
-      required this.scrollsModel,
       required this.parentScrollController,
       this.duration = 10,
       required this.index,
@@ -201,7 +216,7 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
   // Whether scrubbing has been recorded
   bool recording = false;
   Recorder recorder = Recorder();
-  List<Image> images = [];
+  ScrollsIndexImageCache? scrollsCache;
 
   Future<void> playAudioFromMemory(Uint8List audioData) async {
     if (player.playing == true) {
@@ -219,12 +234,7 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
         AnimationController(vsync: this, duration: const Duration(seconds: 2));
     _scrollController =
         SingleScrollsController(height: _height, context: context);
-    ScrollsManager(context: context).getScrollsImageFromNetwork(
-        widget.scrollsModel.scrollsName, callback: (loadedImages) {
-      setState(() {
-        images = loadedImages;
-      });
-    });
+    scrollsCache = context.read<ScrollsManager>().getScrollsCache(widget.index);
   }
 
   @override
@@ -248,15 +258,16 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
     return false;
   }
 
-  bool scrollsUpperBound(int index) {
-    if (index < images.length) {
+  bool scrollsUpperBound(int index, int length) {
+    if (index < length) {
       return true;
     }
 
     return false;
   }
 
-  bool scrollsIndexChangeManager(ScrollNotification notification) {
+  bool scrollsIndexChangeManager(
+      ScrollNotification notification, ScrollsIndexImageCache scrollsCache) {
     // Buisness manager to scrolls item
     // this method manages actions related to image index changes
     // on scroll position change
@@ -322,7 +333,7 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
         // convert into remix
         RemixModel remix = RemixModel(
           'new',
-          scrolls: widget.scrollsModel,
+          scrolls: scrollsCache!.scrollsModel,
           timeline: recordedTimeline,
         );
 
@@ -338,7 +349,7 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
       _scrollController.fastScrubToStart();
     }
 
-    if (notification.metrics.pixels < -20 && widget.index != 0) {
+    if (notification.metrics.pixels <= -35 && widget.index != 0) {
       recording = false;
       IndexTimeLine recordedTimeline = recorder.stopRecording()!;
 
@@ -347,7 +358,7 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
         // convert into remix
         RemixModel remix = RemixModel(
           'new',
-          scrolls: widget.scrollsModel,
+          scrolls: scrollsCache!.scrollsModel,
           timeline: recordedTimeline,
         );
 
@@ -366,7 +377,12 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    if (images.isEmpty) {
+    if (widget.parentScrollController.getCurrentScrollsIndex() ==
+            widget.index &&
+        widget.parentScrollController.isIndexChanged()) {
+      context.watch<ScrollsManager>().getCurrentImages(widget.index);
+    }
+    if (!scrollsCache!.isMemoryCached && scrollsCache!.scrollsImages == null) {
       return Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
@@ -501,8 +517,8 @@ Future<ScrollsModel> _loadImages(String path, BuildContext context) async {
     },
   ));
 
-  ScrollsModel scrollsModel = ScrollsModel(
-      imagePath: testDir, scrollsName: 'Scrolls1', imageList: images);
+  ScrollsModel scrollsModel =
+      ScrollsModel(imagePath: testDir, scrollsName: 'Scrolls1');
 
   return scrollsModel;
 }
@@ -521,7 +537,7 @@ class Highlight {
 
 Future<List<Uint8List>> _loadAudios(String path) async {
   Directory testDir =
-      await _testAudioLoader('audioDirectory7', 'audios/audios7', 51);
+      await _testAudioLoader('audioDirectory10', 'audios/audios7', 51);
 
   List<String> audioFiles = testDir
       .listSync()
@@ -548,7 +564,7 @@ Future<List<Uint8List>> _loadAudios(String path) async {
 
 Future<List<String>> _loadAudiosAsDir(String path) async {
   Directory testDir =
-      await _testAudioLoader('audioDirectory7', 'audios/audios7', 51);
+      await _testAudioLoader('audioDirectory10', 'audios/audios7', 51);
 
   List<String> audioFiles = testDir
       .listSync()

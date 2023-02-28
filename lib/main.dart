@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:mockingjae2_mobile/src/pages/likes.dart';
 import 'package:mockingjae2_mobile/src/pages/profile.dart';
+import 'package:mockingjae2_mobile/src/pages/profileScrolls.dart';
 
 import 'package:mockingjae2_mobile/utils/colors.dart';
 import 'package:mockingjae2_mobile/src/app.dart';
@@ -41,6 +42,7 @@ class MockingJaeMain extends StatelessWidget {
         '/': (context) => const MainPage(),
         '/profile': (context) => const ProfilePage(),
         LikesPage.routeName: (context) => const LikesPage(),
+        ProfileScrollsPage.routeName: (context) => const ProfileScrollsPage(),
       },
       debugShowCheckedModeBanner: true,
       title: "mockingJae 2.0",

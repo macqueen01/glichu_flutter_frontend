@@ -17,7 +17,7 @@ mixin DragUpdatable<T extends StatefulWidget> on State<T> {
   int _duration = 2;
   ScrollController mainScrollController = ScrollController();
 
-  void _reload() {
+  void reload() {
     // this should recieve all data from the server,
     // then refreshed all contents of the page
     setState(() {
@@ -38,7 +38,7 @@ mixin DragUpdatable<T extends StatefulWidget> on State<T> {
       onNotification: (ScrollNotification notification) {
         if (notification.metrics.pixels <
             -MediaQuery.of(context).size.height * 0.065) {
-          _reload();
+          reload();
         }
         return true;
       },

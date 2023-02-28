@@ -1,14 +1,40 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 class MainScrollsController extends ScrollController {
   // onScrollsRequest calls the void function that adds
   // new scrolls to the saved scrolls
   Future<void>? onScrollsRequest;
+  Function(int index)? onIndexChange;
   Future<void> Function()? refresh;
   int? _currentIndex;
   int? _lastIndex;
   int? _firstIndex;
+  int? _lastScrollsIndex;
+  bool _indexChanged = true;
   bool indexChangable = false;
+  // if timeout is true, then the last scroll can be changed
+  // else, the last scroll cannot be changed until preset duration has passed
+  bool lastScrollTimeout = true;
+
+  bool isIndexChanged() {
+    // if used once, then set _indexChanged to false
+    // _indexChanged remains false until switchToNextScrolls or switchToLastScrolls is called
+    if (_indexChanged) {
+      _indexChanged = false;
+      return true;
+    }
+    return false;
+  }
+
+  int? getCurrentScrollsIndex() {
+    return _currentIndex;
+  }
+
+  int? getLastScrollsIndex() {
+    return _lastScrollsIndex;
+  }
 
   void addIndex() {
     if (_currentIndex == null || _lastIndex == null || _firstIndex == null) {
@@ -33,18 +59,16 @@ class MainScrollsController extends ScrollController {
   }
 
   bool checkChangableBackward() {
-    if (!indexChangable) {
+    if (!indexChangable || !lastScrollTimeout) {
       return false;
     } else if (_firstIndex == _currentIndex) {
       return false;
     }
+    lastScrollTimeout = false;
+    Timer(const Duration(seconds: 1), () {
+      lastScrollTimeout = true;
+    });
     return true;
-  }
-
-  void addIndecies(List<List<Image>> scrollImageLists) {
-    for (var element in scrollImageLists) {
-      addIndex();
-    }
   }
 
   // These switchToFoo extends from scroll Controller that provides
@@ -52,20 +76,25 @@ class MainScrollsController extends ScrollController {
 
   void switchToNextScrolls(BuildContext context) {
     if (checkChangableForward()) {
+      _lastScrollsIndex = _currentIndex;
       _currentIndex = _currentIndex! + 1;
+      _indexChanged = true;
       animateTo((_currentIndex!) * MediaQuery.of(context).size.height,
           duration: const Duration(milliseconds: 230), curve: Curves.ease);
+      (onIndexChange != null) ? onIndexChange!(_currentIndex!) : null;
     } else {
       // if onScrollsRequest exists, request more scrolls into the view
-      print("end!");
     }
   }
 
   void switchToLastScrolls(BuildContext context) {
     if (checkChangableBackward()) {
+      _lastScrollsIndex = _currentIndex;
       _currentIndex = _currentIndex! - 1;
+      _indexChanged = true;
       animateTo((_currentIndex!) * MediaQuery.of(context).size.height,
           duration: const Duration(milliseconds: 200), curve: Curves.ease);
+      (onIndexChange != null) ? onIndexChange!(_currentIndex!) : null;
     }
     return;
   }
@@ -80,9 +109,8 @@ class MainScrollsController extends ScrollController {
   }
 
   /// Creates a controller for a scrollable widget.
-  ///
-  /// The values of `initialScrollOffset` and `keepScrollOffset` must not be null.
-  MainScrollsController({this.onScrollsRequest, this.refresh});
+  MainScrollsController(
+      {this.onScrollsRequest, this.refresh, this.onIndexChange});
 }
 
 class SingleScrollsController extends ScrollController {

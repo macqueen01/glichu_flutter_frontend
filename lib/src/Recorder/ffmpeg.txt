@@ -8,57 +8,57 @@ ffmpeg version n5.1.2 Copyright (c) 2000-2022 the FFmpeg developers
   libavfilter     8. 44.100 /  8. 44.100
   libswscale      6.  7.100 /  6.  7.100
   libswresample   4.  7.100 /  4.  7.100
-Input #0, concat, from '/Users/jaekim/Library/Developer/CoreSimulator/Devices/09E40A31-D180-44FE-89CB-B8A30BC68A19/data/Containers/Data/Application/F48CD537-48F7-413D-B798-616CB27E83BB/Library/ffmpegTemp/file.txt':
-  Duration: 00:00:13.27, start: 0.000000, bitrate: 83 kb/s
+Input #0, concat, from '/Users/jaekim/Library/Developer/CoreSimulator/Devices/09E40A31-D180-44FE-89CB-B8A30BC68A19/data/Containers/Data/Application/4439F701-A37B-4033-AB01-E207BA67DE18/Library/ffmpegTemp/file.txt':
+  Duration: 00:00:11.43, start: 0.000000, bitrate: 17 kb/s
   Stream #0:0: Video: mjpeg, yuvj420p(pc, bt470bg/unknown/unknown), 370x658, 25 fps, 25 tbr, 25 tbn
 Stream mapping:
   Stream #0:0 -> #0:0 (mjpeg (native) -> mpeg4 (native))
 Press [q] to stop, [?] for help
-[swscaler @ 0x1301a8000] [swscaler @ 0x120008000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x1301a8000] [swscaler @ 0x1301b8000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x1301a8000] [swscaler @ 0x1301c8000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x1301a8000] [swscaler @ 0x1301d8000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x1301a8000] [swscaler @ 0x1301e8000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x1301a8000] [swscaler @ 0x1301f8000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x1301a8000] [swscaler @ 0x160118000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x1301a8000] [swscaler @ 0x160028000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x1301a8000] [swscaler @ 0x160038000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x1301a8000] [swscaler @ 0x160048000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x1301a8000] [swscaler @ 0x160058000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x140030000] [swscaler @ 0x140040000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x140030000] [swscaler @ 0x140050000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x140030000] [swscaler @ 0x158008000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x140030000] [swscaler @ 0x158018000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x140030000] [swscaler @ 0x158028000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x140030000] [swscaler @ 0x158038000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x140030000] [swscaler @ 0x158048000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x140030000] [swscaler @ 0x158148000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x140030000] [swscaler @ 0x158158000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x140030000] [swscaler @ 0x158168000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x140030000] [swscaler @ 0x158178000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x158178000] [swscaler @ 0x160058000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x158178000] [swscaler @ 0x160028000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x158178000] [swscaler @ 0x160038000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x158178000] [swscaler @ 0x160048000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x158178000] [swscaler @ 0x160068000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x158178000] [swscaler @ 0x160078000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x158178000] [swscaler @ 0x160088000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x158178000] [swscaler @ 0x160098000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x158178000] [swscaler @ 0x1600a8000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x158178000] [swscaler @ 0x1600b8000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x158178000] [swscaler @ 0x1600c8000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x1301a8000] [swscaler @ 0x140030000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x1301a8000] [swscaler @ 0x120008000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x1301a8000] [swscaler @ 0x120078000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x1301a8000] [swscaler @ 0x120088000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x1301a8000] [swscaler @ 0x120110000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x1301a8000] [swscaler @ 0x150098000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x1301a8000] [swscaler @ 0x140040000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x1301a8000] [swscaler @ 0x140050000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x1301a8000] [swscaler @ 0x280108000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x1301a8000] [swscaler @ 0x280118000] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x1301a8000] [swscaler @ 0x280128000] deprecated pixel format used, make sure you did set range correctly
-Output #0, mp4, to '/Users/jaekim/projects/mockingjae2_mobile/lib/src/Recorder/newOutput(2).mp4':
+[swscaler @ 0x148460000] [swscaler @ 0x128058000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x148460000] [swscaler @ 0x140078000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x148460000] [swscaler @ 0x140088000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x148460000] [swscaler @ 0x140098000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x148460000] [swscaler @ 0x1400b8000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x148460000] [swscaler @ 0x1400c8000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x148460000] [swscaler @ 0x1400d8000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x148460000] [swscaler @ 0x1400e8000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x148460000] [swscaler @ 0x1400f8000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x148460000] [swscaler @ 0x140108000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x148460000] [swscaler @ 0x140458000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x148460000] [swscaler @ 0x148050000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x148460000] [swscaler @ 0x1380a0000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x148460000] [swscaler @ 0x140458000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x148460000] [swscaler @ 0x140078000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x148460000] [swscaler @ 0x140088000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x148460000] [swscaler @ 0x128058000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x148460000] [swscaler @ 0x118008000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x148460000] [swscaler @ 0x118018000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x148460000] [swscaler @ 0x118028000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x148460000] [swscaler @ 0x118038000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x148460000] [swscaler @ 0x118048000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x118048000] [swscaler @ 0x1380a0000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x118048000] [swscaler @ 0x1380b0000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x118048000] [swscaler @ 0x1380c0000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x118048000] [swscaler @ 0x1500f8000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x118048000] [swscaler @ 0x150108000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x118048000] [swscaler @ 0x150118000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x118048000] [swscaler @ 0x150128000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x118048000] [swscaler @ 0x150138000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x118048000] [swscaler @ 0x150148000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x118048000] [swscaler @ 0x150158000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x118048000] [swscaler @ 0x150168000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x150168000] [swscaler @ 0x140088000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x150168000] [swscaler @ 0x140078000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x150168000] [swscaler @ 0x148460000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x150168000] [swscaler @ 0x148050000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x150168000] [swscaler @ 0x148470000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x150168000] [swscaler @ 0x148480000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x150168000] [swscaler @ 0x128058000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x150168000] [swscaler @ 0x1281a8000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x150168000] [swscaler @ 0x1281b8000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x150168000] [swscaler @ 0x1281c8000] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x150168000] [swscaler @ 0x1281d8000] deprecated pixel format used, make sure you did set range correctly
+Output #0, mp4, to '/Users/jaekim/projects/mockingjae2_mobile/lib/src/Recorder/newOutput(3).mp4':
   Metadata:
     encoder         : Lavf59.27.100
   Stream #0:0: Video: mpeg4 (mp4v / 0x7634706D), yuv420p(tv, bt470bg/unknown/unknown, progressive), 370x658, q=2-31, 200 kb/s, 25 fps, 12800 tbn
@@ -66,7 +66,7 @@ Output #0, mp4, to '/Users/jaekim/projects/mockingjae2_mobile/lib/src/Recorder/n
       encoder         : Lavc59.37.100 mpeg4
     Side data:
       cpb: bitrate max/min/avg: 0/0/200000 buffer size: 0 vbv_delay: N/A
-frame=    1 fps=0.0 q=5.4 size=       0kB time=00:00:00.00 bitrate=4512.8kbits/s speed=  78x    frame=  224 fps=0.0 q=31.0 size=     256kB time=00:00:08.92 bitrate= 235.1kbits/s dup=2 drop=190 speed=17.8x    frame=  335 fps=0.0 q=31.0 Lsize=     686kB time=00:00:13.36 bitrate= 420.7kbits/s dup=3 drop=291 speed=17.8x    
-video:684kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.332618%
-frame=  335 fps=0.0 q=31.0 Lsize=N/A time=00:00:13.36 bitrate=N/A dup=3 drop=291 speed=17.8x    
-video:684kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown
+frame=    1 fps=0.0 q=5.4 size=       0kB time=00:00:00.00 bitrate=4512.8kbits/s speed=  78x    frame=  288 fps=0.0 q=31.0 Lsize=     646kB time=00:00:11.48 bitrate= 461.2kbits/s dup=231 drop=55 speed=54.9x    
+video:644kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.326374%
+frame=  288 fps=0.0 q=31.0 Lsize=N/A time=00:00:11.48 bitrate=N/A dup=231 drop=55 speed=54.9x    
+video:644kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown

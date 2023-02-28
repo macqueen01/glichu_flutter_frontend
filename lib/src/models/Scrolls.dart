@@ -16,10 +16,9 @@ class Scrolls {
 class ScrollsModel {
   final Directory imagePath;
   final String scrollsName;
-  final List<Image> imageList;
 
-  const ScrollsModel(
-      {required this.imagePath,
-      required this.scrollsName,
-      required this.imageList});
+  const ScrollsModel({
+    required this.imagePath,
+    required this.scrollsName,
+  });
 }

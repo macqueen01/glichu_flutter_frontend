@@ -55,6 +55,7 @@ dependencies:
   audioplayers: ^3.0.1
   provider: ^6.0.5
   ffmpeg_kit_flutter: ^5.1.0
+  video_player: ^2.5.2
 
 dev_dependencies:
   flutter_test:
@@ -83,7 +84,7 @@ flutter:
     - assets/icons/
     - sample_scrolls/scrolls1/
     - sample_scrolls/sample_scrolls2/
-    - audios/
+    - audios/audios7/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

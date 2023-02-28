@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mockingjae2_mobile/src/FileManager/ScrollsManager.dart';
 import 'package:mockingjae2_mobile/src/StateMixins/frameworks.dart';
 import 'package:mockingjae2_mobile/src/UiComponents.dart/Buttons.dart';
 import 'package:mockingjae2_mobile/src/components/modals/modalForm.dart';
@@ -16,6 +17,7 @@ import 'package:mockingjae2_mobile/src/models/User.dart';
 import 'package:mockingjae2_mobile/src/pages/likes.dart';
 
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:provider/provider.dart';
 
 import 'package:sticky_headers/sticky_headers.dart';
 
@@ -78,7 +80,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     color: mainBackgroundColor,
                     textBaseline: TextBaseline.alphabetic),
               )),
-              body: ProfileBody(),
+              body: ChangeNotifierProvider(
+                  create: (BuildContext context) {
+                    return ScrollsPreviewManager(context: context);
+                  },
+                  child: ProfileBody()),
             );
           }),
           valueListenable: selectedIndex,
@@ -105,6 +111,11 @@ class _ProfileBodyState extends State<ProfileBody>
   void initState() {
     super.initState();
     //_reload();
+  }
+
+  @override
+  void reload() {
+    super.reload();
   }
 
   @override
@@ -208,26 +219,7 @@ class _ScrollsMenuState extends State<ScrollsMenu> {
             height: (currentIndex == 0) ? null : 0,
             child: BoxContainer(
                 context: context,
-                child: Column(
-                  children: [
-                    ScrollsPair(
-                      firstScrolls: ScrollsPreview(
-                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                          width: MediaQuery.of(context).size.width / 2),
-                      secondScrolls: ScrollsPreview(
-                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                          width: MediaQuery.of(context).size.width / 2),
-                    ),
-                    ScrollsPair(
-                      firstScrolls: ScrollsPreview(
-                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                          width: MediaQuery.of(context).size.width / 2),
-                      secondScrolls: ScrollsPreview(
-                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                          width: MediaQuery.of(context).size.width / 2),
-                    ),
-                  ],
-                ),
+                child: const ScrollsPreviewMenu(),
                 width: MediaQuery.of(context).size.width,
                 backgroundColor: scrollsBackgroundColor,
                 radius: 15),
@@ -238,50 +230,7 @@ class _ScrollsMenuState extends State<ScrollsMenu> {
             height: (currentIndex == 1) ? null : 0,
             child: BoxContainer(
                 context: context,
-                child: Column(
-                  children: [
-                    ScrollsPair(
-                      firstScrolls: ScrollsPreview(
-                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                          width: MediaQuery.of(context).size.width / 2),
-                      secondScrolls: ScrollsPreview(
-                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                          width: MediaQuery.of(context).size.width / 2),
-                    ),
-                    ScrollsPair(
-                      firstScrolls: ScrollsPreview(
-                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                          width: MediaQuery.of(context).size.width / 2),
-                      secondScrolls: ScrollsPreview(
-                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                          width: MediaQuery.of(context).size.width / 2),
-                    ),
-                    ScrollsPair(
-                      firstScrolls: ScrollsPreview(
-                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                          width: MediaQuery.of(context).size.width / 2),
-                      secondScrolls: ScrollsPreview(
-                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                          width: MediaQuery.of(context).size.width / 2),
-                    ),
-                    ScrollsPair(
-                      firstScrolls: ScrollsPreview(
-                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                          width: MediaQuery.of(context).size.width / 2),
-                      secondScrolls: ScrollsPreview(
-                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                          width: MediaQuery.of(context).size.width / 2),
-                    ),
-                    ScrollsPair(
-                      firstScrolls: ScrollsPreview(
-                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                          width: MediaQuery.of(context).size.width / 2),
-                      secondScrolls: ScrollsPreview(
-                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                          width: MediaQuery.of(context).size.width / 2),
-                    )
-                  ],
-                ),
+                child: const ScrollsPreviewMenu(),
                 width: MediaQuery.of(context).size.width,
                 backgroundColor: scrollsBackgroundColor,
                 radius: 15),
@@ -292,34 +241,7 @@ class _ScrollsMenuState extends State<ScrollsMenu> {
             height: (currentIndex == 2) ? null : 0,
             child: BoxContainer(
                 context: context,
-                child: Column(
-                  children: [
-                    ScrollsPair(
-                      firstScrolls: ScrollsPreview(
-                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                          width: MediaQuery.of(context).size.width / 2),
-                      secondScrolls: ScrollsPreview(
-                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                          width: MediaQuery.of(context).size.width / 2),
-                    ),
-                    ScrollsPair(
-                      firstScrolls: ScrollsPreview(
-                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                          width: MediaQuery.of(context).size.width / 2),
-                      secondScrolls: ScrollsPreview(
-                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                          width: MediaQuery.of(context).size.width / 2),
-                    ),
-                    ScrollsPair(
-                      firstScrolls: ScrollsPreview(
-                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                          width: MediaQuery.of(context).size.width / 2),
-                      secondScrolls: ScrollsPreview(
-                          sampleSrc: "sample_scrolls/scrolls1/1.jpeg",
-                          width: MediaQuery.of(context).size.width / 2),
-                    ),
-                  ],
-                ),
+                child: const ScrollsPreviewMenu(),
                 width: MediaQuery.of(context).size.width,
                 backgroundColor: scrollsBackgroundColor,
                 radius: 15),
