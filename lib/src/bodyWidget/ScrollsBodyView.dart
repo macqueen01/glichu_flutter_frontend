@@ -3,6 +3,8 @@ import 'dart:io';
 // Packages imports
 
 import 'package:flutter/rendering.dart';
+import 'package:get/get.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -107,7 +109,7 @@ class _ScrollsBodyState extends State<ScrollsBody>
       return dummyResult;
     }
 
-    List<ScrollsModel> toBeAdded = await newModels(num: 3);
+    List<ScrollsModel> toBeAdded = await newModels(num: 10);
 
     addAllScrolls(toBeAdded);
   }
@@ -177,6 +179,8 @@ class _ScrollsListViewBuilderState extends State<ScrollsListViewBuilder> {
             itemBuilder: (context, index) {
               return Scrolls(
                   // need to implement the highlight adding...
+                  scrollsCache:
+                      context.read<ScrollsManager>().getScrollsCache(index),
                   highlight: widget.highlights[0],
                   parentScrollController: widget.scrollController,
                   index: index);
@@ -193,12 +197,14 @@ class Scrolls extends StatefulWidget {
   final int index;
   final int duration;
   final Highlight? highlight;
+  final ScrollsIndexImageCache scrollsCache;
 
   const Scrolls(
       {super.key,
       required this.parentScrollController,
       this.duration = 10,
       required this.index,
+      required this.scrollsCache,
       this.highlight});
 
   @override
@@ -216,7 +222,7 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
   // Whether scrubbing has been recorded
   bool recording = false;
   Recorder recorder = Recorder();
-  ScrollsIndexImageCache? scrollsCache;
+  List<Image>? images;
 
   Future<void> playAudioFromMemory(Uint8List audioData) async {
     if (player.playing == true) {
@@ -234,7 +240,7 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
         AnimationController(vsync: this, duration: const Duration(seconds: 2));
     _scrollController =
         SingleScrollsController(height: _height, context: context);
-    scrollsCache = context.read<ScrollsManager>().getScrollsCache(widget.index);
+    images = widget.scrollsCache.scrollsImages;
   }
 
   @override
@@ -243,8 +249,8 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
-  bool scrollsIndexCheck(int index) {
-    if (scrollsLowerBound(index) && scrollsUpperBound(index)) {
+  bool scrollsIndexCheck(int index, length) {
+    if (scrollsLowerBound(index) && scrollsUpperBound(index, length)) {
       return true;
     }
     return false;
@@ -267,7 +273,7 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
   }
 
   bool scrollsIndexChangeManager(
-      ScrollNotification notification, ScrollsIndexImageCache scrollsCache) {
+      ScrollNotification notification, List<Image> images) {
     // Buisness manager to scrolls item
     // this method manages actions related to image index changes
     // on scroll position change
@@ -283,7 +289,7 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
 
     // defines how image index is going to be displayed as in relationship to current scroll position
     int candidateIndex = (_controller.value * images.length).floor();
-    if (!scrollsUpperBound(candidateIndex)) {
+    if (!scrollsUpperBound(candidateIndex, images.length)) {
       // set index to image's last index if index exceeds upper bound
       currentIndex = images.length - 1;
     } else if (!scrollsLowerBound(candidateIndex)) {
@@ -333,7 +339,7 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
         // convert into remix
         RemixModel remix = RemixModel(
           'new',
-          scrolls: scrollsCache!.scrollsModel,
+          scrolls: widget.scrollsCache.scrollsModel,
           timeline: recordedTimeline,
         );
 
@@ -358,7 +364,7 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
         // convert into remix
         RemixModel remix = RemixModel(
           'new',
-          scrolls: scrollsCache!.scrollsModel,
+          scrolls: widget.scrollsCache.scrollsModel,
           timeline: recordedTimeline,
         );
 
@@ -377,94 +383,100 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.parentScrollController.getCurrentScrollsIndex() ==
-            widget.index &&
-        widget.parentScrollController.isIndexChanged()) {
-      context.watch<ScrollsManager>().getCurrentImages(widget.index);
-    }
-    if (!scrollsCache!.isMemoryCached && scrollsCache!.scrollsImages == null) {
+    return Consumer<ScrollsManager>(builder: (context, scrollsManager, child) {
+      if (widget.index ==
+              widget.parentScrollController.getCurrentScrollsIndex() &&
+          widget.parentScrollController.isIndexChanged()) {
+        scrollsManager.setIndex(widget.index);
+      }
+      if (!widget.scrollsCache.isMemoryCached ||
+          widget.scrollsCache.scrollsImages == null) {
+        return Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          decoration: const BoxDecoration(
+            color: scrollsBackgroundColor,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 103),
+            child: Center(
+              child: JaeIcon(55, 55, mainBackgroundColor),
+            ),
+          ),
+        );
+      }
       return Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        decoration: const BoxDecoration(
-          color: scrollsBackgroundColor,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 103),
-          child: Center(
-            child: JaeIcon(55, 55, mainBackgroundColor),
-          ),
-        ),
+        decoration: const BoxDecoration(color: scrollsBackgroundColor),
+        child: NotificationListener<ScrollNotification>(
+            onNotification: (notification) => scrollsIndexChangeManager(
+                notification, widget.scrollsCache.scrollsImages!),
+            child: SingleChildScrollView(
+                controller: _scrollController,
+                physics: const DampedScrollPhysics(),
+                scrollDirection: Axis.vertical,
+                child: SizedBox(
+                  height: _height,
+                  width: MediaQuery.of(context).size.width,
+                  child: Stack(fit: StackFit.expand, children: [
+                    Positioned(
+                      top: (scrollDelta >= 0) ? scrollDelta : 0,
+                      child: GestureDetector(
+                        onLongPressStart: (LongPressStartDetails detail) {
+                          // this auto scrolls at velocity (_height / widget.duration)
+                          // works alongside with onLongPressEnd
+                          _scrollController.scrubToEnd();
+                        },
+                        onLongPressEnd: (LongPressEndDetails detail) {
+                          // this auto scrolls at velocity (_height / widget.duration)
+                          // works alongside with onLongPressStart
+                          _scrollController.scrubStop();
+                        },
+                        onDoubleTap: () {
+                          // this animates back to beginning of the scrolls
+                          _scrollController.fastScrubToStart();
+                        },
+                        onHorizontalDragStart: (details) {
+                          // for test utilities only
+                          // used only in test pipeline
+                          widget.parentScrollController.refreshScroll();
+                        },
+                        child: BoxContainer(
+                            context: context,
+                            backgroundColor: scrollsBackgroundColor,
+                            height: MediaQuery.of(context).size.height,
+                            width: MediaQuery.of(context).size.width,
+                            child: Stack(
+                              alignment: AlignmentDirectional.topStart,
+                              children: ([
+                                widget
+                                    .scrollsCache.scrollsImages![currentIndex],
+                                // status bar
+                                StatusBar(
+                                    currentIndex: currentIndex,
+                                    length: widget
+                                        .scrollsCache.scrollsImages!.length),
+                                // remix number
+                                Positioned(
+                                  right: 2.5,
+                                  top: 20,
+                                  child: ScrollsRelatedInfoButtonWrap(),
+                                ),
+                                Positioned(
+                                  left: 10,
+                                  top: 15,
+                                  width: 250,
+                                  child: ScrollsHeader(),
+                                )
+                              ]),
+                            )),
+                      ),
+                    )
+                  ]),
+                ))),
       );
-    }
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height,
-      decoration: const BoxDecoration(color: scrollsBackgroundColor),
-      child: NotificationListener<ScrollNotification>(
-          onNotification: scrollsIndexChangeManager,
-          child: SingleChildScrollView(
-              controller: _scrollController,
-              physics: const DampedScrollPhysics(),
-              scrollDirection: Axis.vertical,
-              child: SizedBox(
-                height: _height,
-                width: MediaQuery.of(context).size.width,
-                child: Stack(fit: StackFit.expand, children: [
-                  Positioned(
-                    top: (scrollDelta >= 0) ? scrollDelta : 0,
-                    child: GestureDetector(
-                      onLongPressStart: (LongPressStartDetails detail) {
-                        // this auto scrolls at velocity (_height / widget.duration)
-                        // works alongside with onLongPressEnd
-                        _scrollController.scrubToEnd();
-                      },
-                      onLongPressEnd: (LongPressEndDetails detail) {
-                        // this auto scrolls at velocity (_height / widget.duration)
-                        // works alongside with onLongPressStart
-                        _scrollController.scrubStop();
-                      },
-                      onDoubleTap: () {
-                        // this animates back to beginning of the scrolls
-                        _scrollController.fastScrubToStart();
-                      },
-                      onHorizontalDragStart: (details) {
-                        // for test utilities only
-                        // used only in test pipeline
-                        widget.parentScrollController.refreshScroll();
-                      },
-                      child: BoxContainer(
-                          context: context,
-                          backgroundColor: scrollsBackgroundColor,
-                          height: MediaQuery.of(context).size.height,
-                          width: MediaQuery.of(context).size.width,
-                          child: Stack(
-                            alignment: AlignmentDirectional.topStart,
-                            children: ([
-                              images[currentIndex],
-                              // status bar
-                              StatusBar(
-                                  currentIndex: currentIndex,
-                                  length: images.length),
-                              // remix number
-                              Positioned(
-                                right: 2.5,
-                                top: 20,
-                                child: ScrollsRelatedInfoButtonWrap(),
-                              ),
-                              Positioned(
-                                left: 10,
-                                top: 15,
-                                width: 250,
-                                child: ScrollsHeader(),
-                              )
-                            ]),
-                          )),
-                    ),
-                  )
-                ]),
-              ))),
-    );
+    });
   }
 }
 

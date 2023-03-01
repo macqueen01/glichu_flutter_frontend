@@ -143,6 +143,9 @@ class ScrollsManager extends ChangeNotifier {
 
   void setIndex(int index) {
     this.currentIndex = index;
+    getCurrentImages(this.currentIndex)
+        // Notify when current image cache has been loaded
+        .then((value) => notifyListeners());
   }
 
   bool isEmpty() {
@@ -172,6 +175,8 @@ class ScrollsManager extends ChangeNotifier {
     newCacheList.forEach((element) {
       addScrollsCache(element);
     });
+    // notify when all the scrolls caches have been added
+    notifyListeners();
   }
 
   List<int> memoryCacheIndexRange() {
@@ -249,7 +254,7 @@ class ScrollsManager extends ChangeNotifier {
     }
   }
 
-  Future<List<Image>> getCurrentImages(int index) async {
+  Future<List<Image>?> getCurrentImages(int index) async {
     ScrollsIndexImageCache currentCache = _scrollsCache[index];
 
     if (!currentCache.isMemoryCached) {
@@ -271,7 +276,7 @@ class ScrollsManager extends ChangeNotifier {
     // Remove all images inside memory that are of scrolls out of bound
     removeMemoryCacheOutOfBound();
 
-    return currentCache.scrollsImages!;
+    // return currentCache.scrollsImages!;
   }
 
   Future<List<Image>> getScrollsImageFromCache(String scrollsName) async {
@@ -301,7 +306,6 @@ class ScrollsManager extends ChangeNotifier {
     if (callback != null) {
       scrollsImages = await getScrollsImageFromCache(scrollsName);
       callback(scrollsImages);
-      notifyListeners();
       return scrollsImages;
     }
 
@@ -311,7 +315,6 @@ class ScrollsManager extends ChangeNotifier {
       await downloadScrolls(scrollsName);
       scrollsImages = await getScrollsImageFromCache(scrollsName);
     }
-    notifyListeners();
     return scrollsImages;
   }
 
