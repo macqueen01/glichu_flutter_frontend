@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:mockingjae2_mobile/src/Recorder/RecorderProvider.dart';
 import 'package:mockingjae2_mobile/src/pages/likes.dart';
 import 'package:mockingjae2_mobile/src/pages/profile.dart';
 import 'package:mockingjae2_mobile/src/pages/profileScrolls.dart';
@@ -15,6 +16,9 @@ import 'package:mockingjae2_mobile/utils/colors.dart';
 import 'package:mockingjae2_mobile/src/components/icons.dart';
 
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+
+import 'package:mockingjae2_mobile/src/pages/example.dart';
 
 void main() {
   // This prevents landscape view
@@ -23,6 +27,8 @@ void main() {
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
   // Running App
+
+  //runApp(const MyApp());
   runApp(const MockingJaeMain());
 }
 
@@ -39,7 +45,9 @@ class MockingJaeMain extends StatelessWidget {
       // route with navigation arguments should be imported, and added to routes
       // this will break the dependancy policy... need to find a way to fix this
       routes: {
-        '/': (context) => const MainPage(),
+        '/': (context) => ChangeNotifierProvider(
+            create: (context) => RecorderProvider(context: context),
+            child: const MainPage()),
         '/profile': (context) => const ProfilePage(),
         LikesPage.routeName: (context) => const LikesPage(),
         ProfileScrollsPage.routeName: (context) => const ProfileScrollsPage(),

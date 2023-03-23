@@ -563,7 +563,40 @@ class ProfilePageHeader extends StatelessWidget {
                         barrierColor: Colors.black54,
                         topRadius: const Radius.circular(20),
                         backgroundColor: mainBackgroundColor,
-                        builder: (context) => ListModalBottomSheet());
+                        builder: (context) => ListModalBottomSheet(children: [
+                              ModalButton(
+                                  icon: const Icon(
+                                    CupertinoIcons.gear_solid,
+                                    size: 30,
+                                    color: scrollsBackgroundColor,
+                                  ),
+                                  text: "settings",
+                                  onPressed: () {}),
+                              ModalButton(
+                                  icon: const Icon(
+                                    CupertinoIcons.gear_solid,
+                                    size: 30,
+                                    color: scrollsBackgroundColor,
+                                  ),
+                                  text: "settings",
+                                  onPressed: () {}),
+                              ModalButton(
+                                  icon: const Icon(
+                                    CupertinoIcons.gear_solid,
+                                    size: 30,
+                                    color: scrollsBackgroundColor,
+                                  ),
+                                  text: "settings",
+                                  onPressed: () {}),
+                              ModalButton(
+                                  icon: const Icon(
+                                    CupertinoIcons.gear_solid,
+                                    size: 30,
+                                    color: scrollsBackgroundColor,
+                                  ),
+                                  text: "settings",
+                                  onPressed: () {}),
+                            ]));
                   },
                   icon: SvgPicture.asset(
                     "assets/icons/more.svg",

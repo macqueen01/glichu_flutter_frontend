@@ -7,7 +7,9 @@ class ListModalBottomSheet extends StatefulWidget {
   // Make sure the number of the items fed to the modal
   // does not exceed the height of the device because the modal won't allow
   // user scroll input
-  const ListModalBottomSheet({super.key});
+  final List<ModalButton> children;
+
+  const ListModalBottomSheet({super.key, required this.children});
 
   @override
   State<ListModalBottomSheet> createState() => _ListModalBottomSheetState();
@@ -15,7 +17,20 @@ class ListModalBottomSheet extends StatefulWidget {
 
 class _ListModalBottomSheetState extends State<ListModalBottomSheet> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // this sets up modal button list with padding
+    List<Widget> children = <Widget>[
+      SizedBox(
+        width: 0,
+        height: 30,
+      )
+    ].followedBy(widget.children).toList();
+
     return Container(
       width: MediaQuery.of(context).size.width,
       color: mainBackgroundColor,
@@ -26,7 +41,7 @@ class _ListModalBottomSheetState extends State<ListModalBottomSheet> {
             height: 20,
             alignment: Alignment.center,
             child: Container(
-              width: 140,
+              width: 50,
               height: 5,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
@@ -34,51 +49,9 @@ class _ListModalBottomSheetState extends State<ListModalBottomSheet> {
             ),
           ),
           ListView(
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            children: [
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: 30,
-              ),
-              ModalButton(
-                icon: Icon(
-                  Icons.settings_sharp,
-                  size: 24,
-                  color: scrollsBackgroundColor,
-                ),
-                text: "settings",
-                onPressed: () {},
-              ),
-              ModalButton(
-                icon: Icon(
-                  Icons.settings_sharp,
-                  size: 24,
-                  color: scrollsBackgroundColor,
-                ),
-                text: "settings",
-                onPressed: () {},
-              ),
-              ModalButton(
-                icon: Icon(
-                  Icons.settings_sharp,
-                  size: 24,
-                  color: scrollsBackgroundColor,
-                ),
-                text: "settings",
-                onPressed: () {},
-              ),
-              ModalButton(
-                icon: Icon(
-                  Icons.settings_sharp,
-                  size: 24,
-                  color: scrollsBackgroundColor,
-                ),
-                text: "settings",
-                onPressed: () {},
-              )
-            ],
-          ),
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              children: children),
         ],
       ),
     );

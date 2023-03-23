@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:mockingjae2_mobile/src/controller/scrollsControllers.dart';
 import 'package:mockingjae2_mobile/utils/colors.dart';
 
 // PlaceHoldLoadable provides custom placeholder view on future then gives desired view on load finish
@@ -69,6 +70,5 @@ mixin DragUpdatable<T extends StatefulWidget> on State<T> {
   }
 }
 
-
-// ScrollsControlManager mixin provides a super controller to 
+// ScrollsControlManager mixin provides a super controller to
 // scrolls body view that enables fluent control on scrolls index change

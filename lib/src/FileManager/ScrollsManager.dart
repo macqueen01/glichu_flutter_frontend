@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mockingjae2_mobile/src/FileManager/AbstractManager.dart';
 import 'package:mockingjae2_mobile/src/FileManager/lowestActions.dart';
+import 'package:mockingjae2_mobile/src/api/scrolls.dart';
 import 'package:mockingjae2_mobile/src/models/Remix.dart';
 import 'package:mockingjae2_mobile/src/models/Scrolls.dart';
 import 'package:mockingjae2_mobile/src/models/ScrollsPreview.dart';
@@ -75,11 +76,23 @@ class ScrollsIndexImageCache {
   bool isMemoryCached = false;
   List<Image>? scrollsImages;
   ScrollsModel scrollsModel;
+  List<Highlight>? highlights;
 
   ScrollsIndexImageCache({required this.scrollsModel}) {
     if (this.scrollsImages == null) {
       this.scrollsImages = [];
     }
+
+    if (this.highlights == null) {
+      this.highlights = [];
+    }
+  }
+
+  bool hasHighlights() {
+    if (highlights == null || highlights!.isEmpty) {
+      return false;
+    }
+    return true;
   }
 
   void setDiskCache() {
@@ -101,6 +114,39 @@ class ScrollsIndexImageCache {
 
     scrollsImages = images;
     isMemoryCached = true;
+  }
+
+  Future<void> setAllAudios(Directory audioDirectory) async {
+    if (isMemoryCached) {
+      return null;
+    }
+
+    if (!isDiskCached) {
+      throw Error();
+    }
+
+    scrollsModel.highlightIndexList.forEach((highlightIndex) async {
+      Highlight highlight = Highlight(index: highlightIndex);
+      await highlight.setAudio(audioDirectory);
+    });
+  }
+
+  Highlight getHighlight(int index) {
+    // returns error when called without highlights inside this.highlights
+    if (!hasHighlights()) {
+      throw Error();
+    }
+
+    // If index errors, calls the first highlight inside highlights
+    Highlight selectedHighlight = highlights![0];
+
+    highlights!.forEach((highlight) {
+      if (highlight.index == index) {
+        selectedHighlight = highlight;
+      }
+    });
+
+    return selectedHighlight;
   }
 
   void removeDiskCache() {
@@ -125,6 +171,7 @@ class ScrollsIndexImageCache {
     }
 
     scrollsImages!.clear();
+    highlights!.clear();
     isMemoryCached = false;
   }
 }
@@ -136,6 +183,7 @@ class ScrollsManager extends ChangeNotifier {
       3; // Index bound (total range be [currentIndex - indexBound, currentIndex + indexBound])
   final BuildContext context;
   final Future<String> cachedPath = getOrCreateFolder('scrolls/cached');
+  late ScrollsFetcher scrollsFetcher;
 
   ScrollsIndexImageCache getScrollsCache(int index) {
     return _scrollsCache[index];
@@ -143,7 +191,7 @@ class ScrollsManager extends ChangeNotifier {
 
   void setIndex(int index) {
     this.currentIndex = index;
-    getCurrentImages(this.currentIndex)
+    setCurrentCacheImages(this.currentIndex)
         // Notify when current image cache has been loaded
         .then((value) => notifyListeners());
   }
@@ -180,10 +228,8 @@ class ScrollsManager extends ChangeNotifier {
   }
 
   List<int> memoryCacheIndexRange() {
-    // Alert!
-    // This needs to be tested!
-
     // Asssumes length of the _scrollsCache is longer than 0
+    // Used
     List<int> indexRange = [];
     if (isEmpty()) {
       return indexRange;
@@ -202,10 +248,16 @@ class ScrollsManager extends ChangeNotifier {
         index++;
       }
     } else if (currentIndex + indexBound > num_scrolls() - 1) {
-      int index = lastIndex()! - num_scrolls() + 1;
+      int index = lastIndex()! - memoryCacheTotalRange() + 1;
       while (index <= lastIndex()!) {
         indexRange.add(index);
         index++;
+      }
+    } else {
+      for (int index = (currentIndex - indexBound);
+          index <= (currentIndex + indexBound);
+          index++) {
+        indexRange.add(index);
       }
     }
     return indexRange;
@@ -254,21 +306,26 @@ class ScrollsManager extends ChangeNotifier {
     }
   }
 
-  Future<List<Image>?> getCurrentImages(int index) async {
+  Future<void> setCurrentCacheImages(int index) async {
     ScrollsIndexImageCache currentCache = _scrollsCache[index];
 
     if (!currentCache.isMemoryCached) {
       currentCache.setMemoryCache(await getScrollsImageFromNetwork(
           currentCache.scrollsModel.scrollsName));
+      await currentCache.setAllAudios(getDirectory(
+          Directory(await cachedPath), currentCache.scrollsModel.scrollsName)!);
     }
 
-    // Feed images of the scrolls within range into memory
+    // Feed images of the scrolls and highlights within range into memory
     // Syncronous manner
     for (ScrollsIndexImageCache scrollsCache in getScrollsWithInBound()) {
       if (!scrollsCache.isMemoryCached) {
         getScrollsImageFromNetwork(scrollsCache.scrollsModel.scrollsName)
-            .then((images) {
+            .then((images) async {
           scrollsCache.setMemoryCache(images);
+          // wait for audio loading since this won't take so long
+          scrollsCache.setAllAudios(getDirectory(Directory(await cachedPath),
+              scrollsCache.scrollsModel.scrollsName)!);
         });
       }
     }
@@ -281,19 +338,24 @@ class ScrollsManager extends ChangeNotifier {
 
   Future<List<Image>> getScrollsImageFromCache(String scrollsName) async {
     List<Image> scrollsImages = [];
+    bool isAndroid = Platform.isAndroid;
 
     if (!await isCached(scrollsName)) {
       return scrollsImages;
     }
 
-    Directory scrollsDirectory =
+    Directory scrollsAudioDirectory =
         getDirectory(Directory(await cachedPath), scrollsName)!;
+    Directory scrollsDirectory =
+        getDirectory(scrollsAudioDirectory, 'scrolls')!;
     List<String> cachedImagePaths = filePathList(scrollsDirectory);
     scrollsPathSort(cachedImagePaths);
     scrollsImages = await Future.wait(cachedImagePaths.map(
       (imagePath) async {
         return await loadImageToMemory(
-            path: imagePath, height: MediaQuery.of(context).size.height);
+            path: imagePath,
+            height: MediaQuery.of(context).size.height,
+            isAndroid: isAndroid);
       },
     ));
     return scrollsImages;
@@ -301,6 +363,7 @@ class ScrollsManager extends ChangeNotifier {
 
   Future<List<Image>> getScrollsImageFromNetwork(String scrollsName,
       {void Function(dynamic arg)? callback}) async {
+    // Passes scrollsImages to callback if one is given as an argument
     List<Image> scrollsImages = [];
 
     if (callback != null) {
@@ -318,9 +381,7 @@ class ScrollsManager extends ChangeNotifier {
     return scrollsImages;
   }
 
-  Future<void> downloadScrolls(String scrollsName) async {
-    return null;
-  }
+  Future<void> downloadScrolls(String scrollsName) async {}
 
   void scrollsPathSort(List<String> scrollsPaths) {
     return scrollsPaths.sort((a, b) {

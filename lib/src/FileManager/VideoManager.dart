@@ -7,10 +7,51 @@ import 'package:mockingjae2_mobile/src/FileManager/AbstractManager.dart';
 import 'package:mockingjae2_mobile/src/FileManager/lowestActions.dart';
 import 'package:mockingjae2_mobile/src/Recorder/testConverter.dart';
 import 'package:mockingjae2_mobile/src/models/Remix.dart';
+import 'package:provider/provider.dart';
 
-class Video {}
+import 'package:video_player/video_player.dart';
 
-class RecordedVideoManager extends Manager {
+class RemixPlayManager extends RecordedVideoManager {
+  List<File> _remixVideos = [];
+  int currentIndex = 0;
+
+  File getRemix(int index) {
+    // assume index is in range
+    return _remixVideos[index];
+  }
+
+  void setIndex(int index) {
+    this.currentIndex = index;
+    //_resetAllVideos();
+    notifyListeners();
+  }
+
+  bool isEmpty() {
+    return _remixVideos.isEmpty;
+  }
+
+  int? lastIndex() {
+    if (isEmpty()) {
+      return null;
+    }
+    return _remixVideos.length - 1;
+  }
+
+  int num_scrolls() {
+    return _remixVideos.length;
+  }
+
+  void addRemixVideo(File video) {
+    _remixVideos.add(video);
+  }
+
+  void addAllRemixVideos(List<File> videos) {
+    _remixVideos.addAll(videos);
+    notifyListeners();
+  }
+}
+
+class RecordedVideoManager extends ChangeNotifier {
   final BuildContext? context;
   // cachedPath manages remix videos scrolled by the user
   final Future<String> cachedPath = getOrCreateFolder('videos/recorded');
@@ -19,7 +60,8 @@ class RecordedVideoManager extends Manager {
   final Future<String> uploadedPath = getOrCreateFolder(
       'videos/uploaded'); // = getGalleryFolder(); -> in case of choosing from local gallery
   // Converter should be managed by its parent
-  final Converter converter;
+  Converter? converter;
+  VideoPlayerController? videoPlayerController;
 
   void saveRemix(RemixModel remixModel) async {
     if (remixModel.getPath() != null) {
@@ -28,21 +70,29 @@ class RecordedVideoManager extends Manager {
       return;
     }
 
-    String remixPath = '${await cachedPath}/${remixModel.getTitle()}';
+    String remixPath = '${await cachedPath}/${remixModel.getTitle()}.mp4';
 
-    remixPath = await resolveDirectoryPath(remixPath);
+    remixPath = await resolveFilePath(remixPath);
     String remixTitle = remixPath.split('/').last;
-    print(remixPath);
     remixModel.setPath(remixPath);
     remixModel.setTitle(remixTitle);
-    converter.convertRemixToVideo(remixModel, remixPath);
+    converter!.convertRemixToVideo(remixModel, remixPath);
   }
 
-  Video? getRemixVideoFromRemix(RemixModel remixModel) {
-    if (remixModel.getPath() == '') {
-      return null;
+  Future<List<File>> getAllRemixes() async {
+    List<File> cachedRemixes = fileList(Directory(await cachedPath));
+    return cachedRemixes;
+  }
+
+  Future<List<File>> getRemixVideoFromRemix(String remixName) async {
+    List<File> remixList = [];
+
+    for (File remix in await getAllRemixes()) {
+      if (videoPathToRemixName(remix.path) == remixName) {
+        remixList.add(remix);
+      }
     }
-    return null;
+    return remixList;
   }
 
   Future<bool> isCached(String remixName) async {
@@ -51,7 +101,7 @@ class RecordedVideoManager extends Manager {
     Directory cachedDir = Directory(await cachedPath);
 
     directoryPathList(cachedDir).forEach((element) {
-      if (element.split('/').last == remixName) {
+      if (videoPathToRemixName(element) == remixName) {
         cached = true;
       }
     });
@@ -59,11 +109,31 @@ class RecordedVideoManager extends Manager {
     return cached;
   }
 
-  RecordedVideoManager({this.context, required this.converter}) {
+  String videoPathToRemixName(String videoPath) {
+    String remixName = videoPath
+        .split('/')
+        .last // get only basename
+        .split('.')
+        .first // get file name without extension
+        .split('(')
+        .first; // get original remix name without numbering... multiple videos may detected
+    return remixName;
+  }
+
+  RecordedVideoManager(
+      {this.context,
+      this.converter = null,
+      this.videoPlayerController = null}) {
+    if (converter == null) {
+      this.converter = Converter();
+    }
+
     appDirectory().then(
       (value) async {
-        path = await getOrCreateFolder('${value.path}/videos/recorded');
-        directory = Directory(path);
+        @override
+        final path = await getOrCreateFolder('${value.path}/videos');
+        @override
+        final directory = Directory(path);
       },
     );
   }

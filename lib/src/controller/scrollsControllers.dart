@@ -17,6 +17,8 @@ class MainScrollsController extends ScrollController {
   // if timeout is true, then the last scroll can be changed
   // else, the last scroll cannot be changed until preset duration has passed
   bool lastScrollTimeout = true;
+  bool nextScrollTimeout = true;
+  bool reloadTimeout = true;
 
   bool isIndexChanged() {
     // if used once, then set _indexChanged to false
@@ -50,11 +52,15 @@ class MainScrollsController extends ScrollController {
   }
 
   bool checkChangableForward() {
-    if (!indexChangable) {
+    if (!indexChangable || !nextScrollTimeout) {
       return false;
     } else if (_lastIndex == _currentIndex) {
       return false;
     }
+    nextScrollTimeout = false;
+    Timer(const Duration(milliseconds: 400), () {
+      nextScrollTimeout = true;
+    });
     return true;
   }
 
@@ -65,7 +71,7 @@ class MainScrollsController extends ScrollController {
       return false;
     }
     lastScrollTimeout = false;
-    Timer(const Duration(seconds: 1), () {
+    Timer(const Duration(milliseconds: 400), () {
       lastScrollTimeout = true;
     });
     return true;
@@ -75,6 +81,10 @@ class MainScrollsController extends ScrollController {
   // straight forward index switching
 
   void switchToNextScrolls(BuildContext context) {
+    if (!reloadTimeout) {
+      return null;
+    }
+
     if (checkChangableForward()) {
       _lastScrollsIndex = _currentIndex;
       _currentIndex = _currentIndex! + 1;
@@ -83,7 +93,11 @@ class MainScrollsController extends ScrollController {
           duration: const Duration(milliseconds: 230), curve: Curves.ease);
       (onIndexChange != null) ? onIndexChange!(_currentIndex!) : null;
     } else {
-      // if onScrollsRequest exists, request more scrolls into the view
+      // if onScrollsRequest exists, request more scrolls into the view.
+      reloadTimeout = false;
+      refreshScroll().then((value) {
+        reloadTimeout = true;
+      });
     }
   }
 
@@ -101,6 +115,9 @@ class MainScrollsController extends ScrollController {
 
   // Refresh calls its parent Widget ScrollsBodyView's _refresh method
   Future<void> refreshScroll() async {
+    if (refresh == null) {
+      // action taken if refresh is not passed.
+    }
     (refresh != null) ? refresh!() : null;
   }
 
@@ -123,7 +140,7 @@ class SingleScrollsController extends ScrollController {
   // height is an entire height of the scrolls item. this value should be passed inside
   // the scrolls widget this controller is called.
   double height;
-  // Build Context for screen height
+  // Build Context for screen height.
   BuildContext context;
 
   void scrubToEnd() {

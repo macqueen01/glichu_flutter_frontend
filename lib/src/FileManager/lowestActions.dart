@@ -78,14 +78,28 @@ Future<String> resolveDirectoryPath(path) async {
   return '$parent/$path';
 }
 
-Future<Image> loadImageToMemory({height = 300, required path}) async {
-  final data = await rootBundle.load(path);
+Future<Image> loadImageToMemory(
+    {isAndroid = false, height = 300, required path}) async {
+  Uint8List data = await fileRead(path);
+
   return Image.memory(
-    Uint8List.view(data.buffer),
+    data,
     gaplessPlayback: true,
     fit: BoxFit.fitHeight,
     height: height,
   );
+}
+
+Future<Uint8List> fileRead(String path) async {
+  Uint8List data;
+
+  if (Platform.isAndroid) {
+    data = (await File(path).readAsBytes());
+  } else {
+    data = Uint8List.view((await rootBundle.load(path)).buffer);
+  }
+
+  return data;
 }
 
 List<String> filePathList(Directory entry) {
@@ -156,3 +170,5 @@ String fileExtension(File file) {
 
   return path.split('/').last.split('.').last;
 }
+
+class FileReader {}

@@ -3,8 +3,7 @@ import 'dart:io';
 // Packages imports
 
 import 'package:flutter/rendering.dart';
-import 'package:get/get.dart';
-import 'package:get/get_state_manager/get_state_manager.dart';
+
 import 'package:just_audio/just_audio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -13,12 +12,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mockingjae2_mobile/src/FileManager/ScrollsManager.dart';
+import 'package:mockingjae2_mobile/src/FileManager/VideoManager.dart';
 import 'package:mockingjae2_mobile/src/FileManager/lowestActions.dart';
+import 'package:mockingjae2_mobile/src/GestureDetectViews/scrollWidget.dart';
+import 'package:mockingjae2_mobile/src/Recorder/RecorderProvider.dart';
 import 'package:mockingjae2_mobile/src/Recorder/indexTimestamp.dart';
 import 'package:mockingjae2_mobile/src/Recorder/recorder.dart';
 import 'package:mockingjae2_mobile/src/StateMixins/frameworks.dart';
-import 'package:mockingjae2_mobile/src/bodyWidget/ScrollsWidget/ScrollsPreviewWidgets.dart';
-import 'package:mockingjae2_mobile/src/controller/imageIndexController.dart';
+import 'package:mockingjae2_mobile/src/UiComponents.dart/Restricted.dart';
+import 'package:mockingjae2_mobile/src/UiComponents.dart/StaticLoading.dart';
+
 import 'package:mockingjae2_mobile/src/controller/scrollsControllers.dart';
 import 'package:mockingjae2_mobile/src/models/Remix.dart';
 import 'package:mockingjae2_mobile/src/models/Scrolls.dart';
@@ -47,8 +50,12 @@ class ScrollsBodyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (BuildContext context) => ScrollsManager(context: context),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+            create: (context) => ScrollsManager(context: context)),
+        ChangeNotifierProvider(create: (context) => RecordedVideoManager())
+      ],
       child: const ScrollsBody(),
     );
   }
@@ -81,7 +88,6 @@ class _ScrollsBodyState extends State<ScrollsBody>
     });
     _scrollController.setRefresh(_refresh);
     _refresh();
-    // context.read<ScrollsManager>().addAllScrollsCache(newCacheList);
   }
 
   @override
@@ -100,7 +106,7 @@ class _ScrollsBodyState extends State<ScrollsBody>
     Future<List<ScrollsModel>> newModels({int num = 1}) async {
       List<ScrollsModel> dummyResult = [];
       var value = await _loadImages(
-          '/Users/jaekim/projects/mockingjae2_mobile/sample_scrolls/scrolls1/',
+          '/Users/jaekim/projects/mockingjae2_mobile/sample_scrolls/Scrolls1/',
           context);
 
       for (int i = 0; i < num; i++) {
@@ -115,15 +121,18 @@ class _ScrollsBodyState extends State<ScrollsBody>
   }
 
   void addAllScrolls(List<ScrollsModel> scrollsModels) {
+    // This is where ScrollsBodyView integrates ScrollsManager and ScrollsController
     List<ScrollsIndexImageCache> scrollsCaches = [];
 
     for (var scrollsModel in scrollsModels) {
       ScrollsIndexImageCache newCache =
           ScrollsIndexImageCache(scrollsModel: scrollsModel);
       scrollsCaches.add(newCache);
+      // Adds index to scroll controller
       _scrollController.addIndex();
     }
 
+    // adds all indicies to Scrolls Manager
     context.read<ScrollsManager>().addAllScrollsCache(scrollsCaches);
   }
 
@@ -216,13 +225,12 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
   late SingleScrollsController _scrollController;
   int currentIndex = 0;
   double scrollDelta = 0;
-  final double _height = 3000;
+  final double _height = 10000;
   // Each scroll has seperate audio player
   final AudioPlayer player = AudioPlayer();
   // Whether scrubbing has been recorded
   bool recording = false;
   Recorder recorder = Recorder();
-  List<Image>? images;
 
   Future<void> playAudioFromMemory(Uint8List audioData) async {
     if (player.playing == true) {
@@ -240,7 +248,6 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
         AnimationController(vsync: this, duration: const Duration(seconds: 2));
     _scrollController =
         SingleScrollsController(height: _height, context: context);
-    images = widget.scrollsCache.scrollsImages;
   }
 
   @override
@@ -314,19 +321,32 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
 
     recorder.updateRecording(currentIndex);
 
+    // User Controlled Recording Unit
+    // This interacts with RecorderProvider from main app runner
+
+    RecorderProvider recorderProvider = context.read<RecorderProvider>();
+
+    if (recorderProvider.isRecording) {
+      recorderProvider.updateRecording(
+          currentIndex, widget.scrollsCache.scrollsModel);
+    }
+
     // Highlight position audio play
     // defines the scroll direction to play forward audio and backward audio in
     // according situation
     var scrollDirection = _scrollController.position.userScrollDirection;
-    if (widget.highlight != null &&
-        currentIndex - 10 <= widget.highlight!.index &&
-        widget.highlight!.index <= currentIndex) {
+    if (widget.scrollsCache.hasHighlights() &&
+        currentIndex - 10 <= 440 &&
+        440 <= currentIndex) {
       if (scrollDirection == ScrollDirection.forward) {
-        playAudioFromMemory(widget.highlight!.forwardAudioBuffer);
+        playAudioFromMemory(
+            widget.scrollsCache.getHighlight(440).forwardAudioBuffer!);
       } else if (scrollDirection == ScrollDirection.reverse) {
-        playAudioFromMemory(widget.highlight!.reverseAudioBuffer);
+        playAudioFromMemory(
+            widget.scrollsCache.getHighlight(440).reverseAudioBuffer!);
       } else {
-        playAudioFromMemory(widget.highlight!.forwardAudioBuffer);
+        playAudioFromMemory(
+            widget.scrollsCache.getHighlight(440).forwardAudioBuffer!);
       }
     }
 
@@ -343,10 +363,31 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
           timeline: recordedTimeline,
         );
 
-        Converter converter = Converter();
+        context.read<RecordedVideoManager>().saveRemix(remix);
+      }
 
-        converter.convertRemixToVideo(remix,
-            '/Users/jaekim/projects/mockingjae2_mobile/lib/src/Recorder/newOutput.mp4');
+      // User Controlled Recording Unit
+      // This interacts with RecorderProvider from main app runner
+
+      if (recorderProvider.isRecording) {
+        // Pop up to query the name of the user recorded video
+
+        recorderProvider.popUp(); // This gets info crutial for generated video
+        recorderProvider.stopRecording();
+        IndexTimeLine? userGeneratedTimeLine = recorderProvider.getTimeLine();
+
+        if (userGeneratedTimeLine != null &&
+            userGeneratedTimeLine.last! - userGeneratedTimeLine.first! >
+                const Duration(milliseconds: 200)) {
+          // convert into remix
+          RemixModel remix = RemixModel(
+            'new',
+            scrolls: widget.scrollsCache.scrollsModel,
+            timeline: userGeneratedTimeLine,
+          );
+
+          recorderProvider.saveRemix(remix);
+        }
       }
 
       // snap to the next scrolls
@@ -368,10 +409,31 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
           timeline: recordedTimeline,
         );
 
-        Converter converter = Converter();
+        context.read<RecordedVideoManager>().saveRemix(remix);
+      }
 
-        converter.convertRemixToVideo(remix,
-            '/Users/jaekim/projects/mockingjae2_mobile/lib/src/Recorder/newOutput.mp4');
+      // User Controlled Recording Unit
+      // This interacts with RecorderProvider from main app runner
+
+      if (recorderProvider.isRecording) {
+        // Pop up to query the name of the user recorded video
+
+        recorderProvider.popUp(); // This gets info crutial for generated video
+        recorderProvider.stopRecording();
+        IndexTimeLine? userGeneratedTimeLine = recorderProvider.getTimeLine();
+
+        if (userGeneratedTimeLine != null &&
+            userGeneratedTimeLine.last! - userGeneratedTimeLine.first! >
+                const Duration(milliseconds: 200)) {
+          // convert into remix
+          RemixModel remix = RemixModel(
+            'new',
+            scrolls: widget.scrollsCache.scrollsModel,
+            timeline: userGeneratedTimeLine,
+          );
+
+          recorderProvider.saveRemix(remix);
+        }
       }
 
       // snap to the last scrolls if one exists
@@ -391,18 +453,18 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
       }
       if (!widget.scrollsCache.isMemoryCached ||
           widget.scrollsCache.scrollsImages == null) {
-        return Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          decoration: const BoxDecoration(
-            color: scrollsBackgroundColor,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 103),
-            child: Center(
-              child: JaeIcon(55, 55, mainBackgroundColor),
-            ),
-          ),
+        return IndexChangeHandler(
+          parentScrollController: widget.parentScrollController,
+          index: widget.index,
+          child: const LoadingView(),
+        );
+      }
+      if (widget.scrollsCache.isMemoryCached &&
+          widget.scrollsCache.scrollsModel.isRestricted) {
+        return IndexChangeHandler(
+          parentScrollController: widget.parentScrollController,
+          index: widget.index,
+          child: RestrictedView(),
         );
       }
       return Container(
@@ -502,54 +564,19 @@ class BytesSource extends StreamAudioSource {
 
 Future<ScrollsModel> _loadImages(String path, BuildContext context) async {
   Directory testDir =
-      await _testImageLoader('newDir', 'sample_scrolls/scrolls1', 824);
+      await _testImageLoader('newDir1', 'sample_scrolls/scrolls1', 699);
 
-  List<String> imageFiles = testDir
-      .listSync()
-      .whereType<File>()
-      .cast<File>()
-      .map((f) => f.path)
-      .toList();
-
-  imageFiles.sort((a, b) {
-    final aFileName = a.split("/").last.split(".").first;
-    final bFileName = b.split("/").last.split(".").first;
-    return int.parse(aFileName).compareTo(int.parse(bFileName));
-  });
-
-  final images = await Future.wait(imageFiles.map(
-    (imagePath) async {
-      final data = await rootBundle.load(imagePath);
-      return Image.memory(
-        Uint8List.view(data.buffer),
-        gaplessPlayback: true,
-        fit: BoxFit.fitHeight,
-        height: MediaQuery.of(context).size.height,
-      );
-    },
-  ));
-
-  ScrollsModel scrollsModel =
-      ScrollsModel(imagePath: testDir, scrollsName: 'Scrolls1');
+  ScrollsModel scrollsModel = ScrollsModel(
+      imagePath: getDirectory(testDir, 'scrolls')!,
+      scrollsName: 'Scrolls1',
+      highlightIndexList: [440]);
 
   return scrollsModel;
 }
 
-class Highlight {
-  final int index;
-  final Uint8List forwardAudioBuffer;
-  final Uint8List reverseAudioBuffer;
-
-  const Highlight({
-    required this.index,
-    required this.forwardAudioBuffer,
-    required this.reverseAudioBuffer,
-  });
-}
-
 Future<List<Uint8List>> _loadAudios(String path) async {
   Directory testDir =
-      await _testAudioLoader('audioDirectory10', 'audios/audios7', 51);
+      await _testAudioLoader('audioDirectory', 'audios/audios7', 51);
 
   List<String> audioFiles = testDir
       .listSync()
@@ -566,7 +593,8 @@ Future<List<Uint8List>> _loadAudios(String path) async {
 
   final audios = await Future.wait(audioFiles.map(
     (audioPath) async {
-      final data = await rootBundle.load(audioPath);
+      Uint8List data;
+      data = await fileRead(audioPath);
       return Uint8List.view(data.buffer);
     },
   ));
@@ -576,7 +604,7 @@ Future<List<Uint8List>> _loadAudios(String path) async {
 
 Future<List<String>> _loadAudiosAsDir(String path) async {
   Directory testDir =
-      await _testAudioLoader('audioDirectory10', 'audios/audios7', 51);
+      await _testAudioLoader('audioDirectory', 'audios/audios7', 51);
 
   List<String> audioFiles = testDir
       .listSync()
@@ -600,6 +628,30 @@ Future<List<String>> _loadAudiosAsDir(String path) async {
   return audios;
 }
 
+// Test Loaders
+// These loaders are only used for protyping and testing purposes
+
+// Audio Loaders
+
+Future<Directory> _testAudioLoader(
+    String newDir, String assetDir, int assetLength) async {
+  String newFullDir = await getOrCreateFolder(newDir);
+
+  for (int i = 1; i <= assetLength; i++) {
+    String filePath = newFullDir + '/$i.mp3';
+    File audioFile = File(filePath);
+    Uint8List data;
+    if (!await audioFile.exists()) {
+      data = await fileRead('$assetDir/$i.mp3');
+      await audioFile.writeAsBytes(data.buffer.asUint8List());
+    }
+  }
+
+  return Directory(newFullDir);
+}
+
+// Image Loaders
+
 Future<Directory> _testImageLoader(
     String newDir, String assetDir, int assetLength) async {
   String newFullDir = await getOrCreateFolder('scrolls/cached/Scrolls1');
@@ -612,22 +664,7 @@ Future<Directory> _testImageLoader(
       await imageFile.writeAsBytes(data.buffer.asUint8List());
     }
   }
-
-  return Directory(newFullDir);
-}
-
-Future<Directory> _testAudioLoader(
-    String newDir, String assetDir, int assetLength) async {
-  String newFullDir = await getOrCreateFolder(newDir);
-
-  for (int i = 1; i <= assetLength; i++) {
-    String filePath = newFullDir + '/$i.mp3';
-    File imageFile = File(filePath);
-    if (!await imageFile.exists()) {
-      final data = await rootBundle.load('$assetDir/$i.mp3');
-      await imageFile.writeAsBytes(data.buffer.asUint8List());
-    }
-  }
+  print(newFullDir);
 
   return Directory(newFullDir);
 }

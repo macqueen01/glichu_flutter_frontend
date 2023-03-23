@@ -5,12 +5,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:mockingjae2_mobile/src/Recorder/RecorderProvider.dart';
 import 'package:mockingjae2_mobile/src/bodyWidget/audioUnit.dart';
 import 'package:mockingjae2_mobile/src/components/snackbars.dart';
 
 import 'package:mockingjae2_mobile/utils/colors.dart';
 import 'package:mockingjae2_mobile/src/components/icons.dart';
 import 'package:mockingjae2_mobile/utils/functions.dart';
+import 'package:provider/provider.dart';
 
 // Bottom Nav Bar
 
@@ -81,7 +84,13 @@ class _MJBottomNavBar extends State<MJBottomNavBar> {
                       child:
                           widget.items[0].activeDetect(_currentIndex == 1, 1))),
             ),
-            Positioned(right: 30, top: -30, child: recordingButton()),
+            Positioned(
+                right: 30,
+                top: -30,
+                child: recordingButton(
+                  onStart: context.read<RecorderProvider>().startRecording,
+                  onEnd: context.read<RecorderProvider>().stopRecording,
+                )),
           ],
         ),
       );
@@ -147,7 +156,10 @@ class _MJAppBarState extends State<MJAppBar> {
 }
 
 class recordingButton extends StatefulWidget {
-  const recordingButton({super.key});
+  final void Function()? onStart;
+  final void Function()? onEnd;
+
+  const recordingButton({super.key, this.onStart, this.onEnd});
 
   @override
   State<recordingButton> createState() => _recordingButtonState();
@@ -166,6 +178,7 @@ class _recordingButtonState extends State<recordingButton> {
       state = 0;
       _color = mainBackgroundColor;
     });
+    (widget.onEnd == null) ? null : widget.onEnd!();
   }
 
   void setRecordingState() {
@@ -173,6 +186,7 @@ class _recordingButtonState extends State<recordingButton> {
       state = 2;
       _color = const Color.fromARGB(255, 241, 76, 64);
     });
+    (widget.onStart == null) ? null : widget.onStart!();
   }
 
   @override
