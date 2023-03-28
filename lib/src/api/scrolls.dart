@@ -40,7 +40,9 @@ class ScrollsContentFetcher {
 
     // final browseUrl = Uri.parse(backendUrls.scrollsBrowseUrl + '?id=$scrollsId');
     final browseUrl = Uri.parse(scrollsUrl);
+    print(browseUrl);
     final response = await get(browseUrl);
+    print(response);
 
     if (response.statusCode == HttpStatus.ok) {
       final tarBytes = response.bodyBytes;

@@ -71,7 +71,6 @@ class ScrollsBody extends StatefulWidget {
 
 class _ScrollsBodyState extends State<ScrollsBody>
     with DragUpdatable<ScrollsBody> {
-  Highlight? highlight;
   late MainScrollsController _scrollController;
 
   @override
@@ -140,7 +139,7 @@ class _ScrollsBodyState extends State<ScrollsBody>
   @override
   Widget build(BuildContext context) {
     return Consumer<ScrollsManager>(builder: (context, scrollsManager, child) {
-      if (scrollsManager.isEmpty() || highlight == null) {
+      if (scrollsManager.isEmpty()) {
         return Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
@@ -152,23 +151,15 @@ class _ScrollsBodyState extends State<ScrollsBody>
           ),
         );
       }
-      return ScrollsListViewBuilder(highlights: [
-        highlight!,
-        highlight!,
-        highlight!,
-        highlight!,
-        highlight!
-      ], scrollController: _scrollController);
+      return ScrollsListViewBuilder(scrollController: _scrollController);
     });
   }
 }
 
 class ScrollsListViewBuilder extends StatefulWidget {
-  final List<Highlight> highlights;
   final MainScrollsController scrollController;
 
-  const ScrollsListViewBuilder(
-      {super.key, required this.highlights, required this.scrollController});
+  const ScrollsListViewBuilder({super.key, required this.scrollController});
 
   @override
   State<ScrollsListViewBuilder> createState() => _ScrollsListViewBuilderState();
@@ -191,7 +182,6 @@ class _ScrollsListViewBuilderState extends State<ScrollsListViewBuilder> {
                   // need to implement the highlight adding...
                   scrollsCache:
                       context.read<ScrollsManager>().getScrollsCache(index),
-                  highlight: widget.highlights[0],
                   parentScrollController: widget.scrollController,
                   index: index);
             },
@@ -648,24 +638,6 @@ Future<Directory> _testAudioLoader(
     if (!await audioFile.exists()) {
       data = await fileRead('$assetDir/$i.mp3');
       await audioFile.writeAsBytes(data.buffer.asUint8List());
-    }
-  }
-
-  return Directory(newFullDir);
-}
-
-// Image Loaders
-
-Future<Directory> _testImageLoader(
-    String newDir, String assetDir, int assetLength) async {
-  String newFullDir = await getOrCreateFolder('scrolls/cached/Scrolls1');
-
-  for (int i = 1; i <= assetLength; i++) {
-    String filePath = newFullDir + '/$i.jpeg';
-    File imageFile = File(filePath);
-    if (!await imageFile.exists()) {
-      final data = await rootBundle.load('$assetDir/$i.jpeg');
-      await imageFile.writeAsBytes(data.buffer.asUint8List());
     }
   }
 
