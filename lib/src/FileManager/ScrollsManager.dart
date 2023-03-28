@@ -183,10 +183,19 @@ class ScrollsManager extends ChangeNotifier {
       3; // Index bound (total range be [currentIndex - indexBound, currentIndex + indexBound])
   final BuildContext context;
   final Future<String> cachedPath = getOrCreateFolder('scrolls/cached');
-  late ScrollsFetcher scrollsFetcher;
+  ScrollsContentFetcher? _scrollsFetcher;
 
   ScrollsIndexImageCache getScrollsCache(int index) {
     return _scrollsCache[index];
+  }
+
+  Future<ScrollsContentFetcher?> getScrollsFetcher() async {
+    if (_scrollsFetcher == null) {
+      _scrollsFetcher =
+          ScrollsContentFetcher(baseDir: Directory(await cachedPath));
+      await _scrollsFetcher!.init();
+    }
+    return _scrollsFetcher;
   }
 
   void setIndex(int index) {
@@ -344,10 +353,10 @@ class ScrollsManager extends ChangeNotifier {
       return scrollsImages;
     }
 
-    Directory scrollsAudioDirectory =
+    Directory scrollsWithAudioDirectory =
         getDirectory(Directory(await cachedPath), scrollsName)!;
     Directory scrollsDirectory =
-        getDirectory(scrollsAudioDirectory, 'scrolls')!;
+        getDirectory(scrollsWithAudioDirectory, 'scrolls')!;
     List<String> cachedImagePaths = filePathList(scrollsDirectory);
     scrollsPathSort(cachedImagePaths);
     scrollsImages = await Future.wait(cachedImagePaths.map(
@@ -381,7 +390,10 @@ class ScrollsManager extends ChangeNotifier {
     return scrollsImages;
   }
 
-  Future<void> downloadScrolls(String scrollsName) async {}
+  Future<void> downloadScrolls(String scrollsName) async {
+    // need to convert scrollsName to id if fetching from network
+    await (await getScrollsFetcher())!.fetch(scrollsName);
+  }
 
   void scrollsPathSort(List<String> scrollsPaths) {
     return scrollsPaths.sort((a, b) {

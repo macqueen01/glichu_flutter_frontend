@@ -14,20 +14,20 @@ class Scrolls {
 */
 
 class ScrollsModel {
-  late Directory imagePath;
+  Directory? imagePath;
   late Uri scrollsUrl;
   late String scrollsName;
   late bool isRestricted;
   late List<int> highlightIndexList;
 
   ScrollsModel(
-      {required this.imagePath,
-      required this.scrollsName,
+      {required this.scrollsName,
       required this.highlightIndexList,
       this.isRestricted = false});
 
   ScrollsModel.fromMap(Map<String, dynamic> map) {
-    scrollsName = map['scrollsName'];
+    scrollsName = map[
+        'scrollsName']; // scrollsName is combination of original id + name (ex. '1_text')
     highlightIndexList = map['highlightIndexList'];
     isRestricted = map['isRestricted'];
     scrollsUrl = map['url'];
@@ -63,12 +63,23 @@ class AudioDirectory {
   AudioDirectory(this.scrollsDirectory, {this.index = 0});
 
   Directory get forward =>
-      Directory(scrollsDirectory.path + '/audio/${index}_forward_.mp3');
+      Directory('${scrollsDirectory.path}/audio/${index}_forward_.mp3');
 
   Directory get backward =>
-      Directory(scrollsDirectory.path + '/audio/${index}_backward_.mp3');
+      Directory('${scrollsDirectory.path}/audio/${index}_backward_.mp3');
 
   AudioDirectory indexedAt(int index) {
     return AudioDirectory(scrollsDirectory, index: index);
   }
+}
+
+// Utility methods for ScrollsModel
+
+int getScrollsId(String scrollsName) {
+  return int.parse(scrollsName.split('_').first);
+}
+
+String getScrollsName(String scrollsName) {
+  // returns the rest of the scrollsName without 'number_' in front
+  return scrollsName.split('_').sublist(1).join('_');
 }

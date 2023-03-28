@@ -170,5 +170,3 @@ String fileExtension(File file) {
 
   return path.split('/').last.split('.').last;
 }
-
-class FileReader {}

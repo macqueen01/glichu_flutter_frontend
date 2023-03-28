@@ -13,6 +13,8 @@ class EncodingSettings {
 }
 
 class Converter {
+  final Future<String> cachedPath = getOrCreateFolder('scrolls/cached');
+
   Converter();
 
   Future<String?> convertVideoToScrolls(
@@ -31,7 +33,16 @@ class Converter {
     String command = "";
     List<String> imagePaths = [];
 
-    remix.scrolls.imagePath.listSync().forEach((element) {
+    Directory? scrollsDir =
+        getDirectory(Directory(await cachedPath), remix.scrolls.scrollsName);
+
+    if (scrollsDir == null) {
+      throw Exception("Scrolls directory not found");
+    }
+
+    Directory? scrollsImageDir = getDirectory(scrollsDir, 'scrolls');
+
+    scrollsImageDir!.listSync().forEach((element) {
       imagePaths.add(element.path);
     });
 
@@ -42,12 +53,11 @@ class Converter {
     });
 
     IndexTimestamp currentTimestamp = remix.timeline.first!;
-    print(remix.timeline.getLength());
 
     final filesTxt = await getOrCreateFolder('ffmpegTemp');
     final file = await File('$filesTxt/file.txt').create(recursive: true);
 
-    final sink = await file.openWrite();
+    final sink = file.openWrite();
 
     for (int i = 0; i < remix.timeline.getLength() - 1; i++) {
       String imagePath = imagePaths[currentTimestamp.index];
@@ -55,19 +65,15 @@ class Converter {
           (currentTimestamp.next! - currentTimestamp).inMilliseconds /
               1000.0; // Convert time gap from milliseconds to seconds
 
-      sink.writeln('file \'${imagePath}\'');
-      sink.writeln('duration ${timeGap}');
+      sink.writeln('file \'$imagePath\'');
+      sink.writeln('duration $timeGap');
       currentTimestamp = currentTimestamp.next!;
     }
 
     await sink.close();
     command += " -f concat -safe 0 -i ${file.path} $outputFilePath";
 
-    final log = File(
-        '/Users/jaekim/projects/mockingjae2_mobile/lib/src/Recorder/ffmpeg.txt');
-
     FFmpegSession result = await FFmpegKit.execute(command);
-    log.writeAsString((await result.getOutput())!);
     file.deleteSync();
   }
 }

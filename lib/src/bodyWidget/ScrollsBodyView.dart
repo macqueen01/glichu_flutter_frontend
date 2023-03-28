@@ -2,6 +2,7 @@ import 'dart:io';
 
 // Packages imports
 
+import 'package:audio_session/audio_session.dart';
 import 'package:flutter/rendering.dart';
 
 import 'package:just_audio/just_audio.dart';
@@ -78,6 +79,7 @@ class _ScrollsBodyState extends State<ScrollsBody>
     super.initState();
     _scrollController = MainScrollsController(
         onIndexChange: context.read<ScrollsManager>().setIndex);
+    /*
     _loadAudios('').then((audios) {
       setState(() {
         this.highlight = Highlight(
@@ -86,6 +88,7 @@ class _ScrollsBodyState extends State<ScrollsBody>
             reverseAudioBuffer: audios[24]);
       });
     });
+    */
     _scrollController.setRefresh(_refresh);
     _refresh();
   }
@@ -105,9 +108,7 @@ class _ScrollsBodyState extends State<ScrollsBody>
 
     Future<List<ScrollsModel>> newModels({int num = 1}) async {
       List<ScrollsModel> dummyResult = [];
-      var value = await _loadImages(
-          '/Users/jaekim/projects/mockingjae2_mobile/sample_scrolls/Scrolls1/',
-          context);
+      var value = await _loadImages();
 
       for (int i = 0; i < num; i++) {
         dummyResult.add(value);
@@ -225,7 +226,7 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
   late SingleScrollsController _scrollController;
   int currentIndex = 0;
   double scrollDelta = 0;
-  final double _height = 10000;
+  final double _height = 3000;
   // Each scroll has seperate audio player
   final AudioPlayer player = AudioPlayer();
   // Whether scrubbing has been recorded
@@ -238,6 +239,11 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
     }
 
     await player.setAudioSource(BytesSource(audioData));
+    await player.setAndroidAudioAttributes(AndroidAudioAttributes(
+        contentType: AndroidAudioContentType.music,
+        usage: AndroidAudioUsage.media,
+        flags: AndroidAudioFlags.none));
+
     await player.play();
   }
 
@@ -334,6 +340,7 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
     // Highlight position audio play
     // defines the scroll direction to play forward audio and backward audio in
     // according situation
+
     var scrollDirection = _scrollController.position.userScrollDirection;
     if (widget.scrollsCache.hasHighlights() &&
         currentIndex - 10 <= 440 &&
@@ -562,14 +569,11 @@ class BytesSource extends StreamAudioSource {
   }
 }
 
-Future<ScrollsModel> _loadImages(String path, BuildContext context) async {
-  Directory testDir =
-      await _testImageLoader('newDir1', 'sample_scrolls/scrolls1', 699);
-
-  ScrollsModel scrollsModel = ScrollsModel(
-      imagePath: getDirectory(testDir, 'scrolls')!,
-      scrollsName: 'Scrolls1',
-      highlightIndexList: [440]);
+Future<ScrollsModel> _loadImages() async {
+  // Imagine a http call to server has been made to get the list of images
+  // this will return a scrollsModel of the following:
+  ScrollsModel scrollsModel =
+      ScrollsModel(scrollsName: '1_sample_scrolls2', highlightIndexList: [440]);
 
   return scrollsModel;
 }
@@ -664,7 +668,6 @@ Future<Directory> _testImageLoader(
       await imageFile.writeAsBytes(data.buffer.asUint8List());
     }
   }
-  print(newFullDir);
 
   return Directory(newFullDir);
 }
