@@ -26,6 +26,7 @@ import 'package:mockingjae2_mobile/src/UiComponents.dart/StaticLoading.dart';
 import 'package:mockingjae2_mobile/src/controller/scrollsControllers.dart';
 import 'package:mockingjae2_mobile/src/models/Remix.dart';
 import 'package:mockingjae2_mobile/src/models/Scrolls.dart';
+import 'package:mockingjae2_mobile/src/settings.dart';
 
 // Utility local imports
 
@@ -115,7 +116,7 @@ class _ScrollsBodyState extends State<ScrollsBody>
       return dummyResult;
     }
 
-    List<ScrollsModel> toBeAdded = await newModels(num: 10);
+    List<ScrollsModel> toBeAdded = await newModels(num: 2);
 
     addAllScrolls(toBeAdded);
   }
@@ -347,7 +348,7 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
       }
     }
 
-    if (currentIndex / images.length > 0.88) {
+    if (currentIndex / images.length > 0.96) {
       recording = false;
       IndexTimeLine recordedTimeline = recorder.stopRecording()!;
 
@@ -562,8 +563,14 @@ class BytesSource extends StreamAudioSource {
 Future<ScrollsModel> _loadImages() async {
   // Imagine a http call to server has been made to get the list of images
   // this will return a scrollsModel of the following:
+
+  // Only under debugging!
+  // This will pick random scrolls and display it
+
+  String scrollsName = SampleScrolls().getSampleScrolls();
+
   ScrollsModel scrollsModel =
-      ScrollsModel(scrollsName: '1_sample_scrolls2', highlightIndexList: [440]);
+      ScrollsModel(scrollsName: scrollsName, highlightIndexList: [440]);
 
   return scrollsModel;
 }

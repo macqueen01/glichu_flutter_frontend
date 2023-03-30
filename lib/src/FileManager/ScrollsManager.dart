@@ -358,6 +358,8 @@ class ScrollsManager extends ChangeNotifier {
     Directory scrollsDirectory =
         getDirectory(scrollsWithAudioDirectory, 'scrolls')!;
     List<String> cachedImagePaths = filePathList(scrollsDirectory);
+
+    scrollsSanityCheck(cachedImagePaths);
     scrollsPathSort(cachedImagePaths);
     scrollsImages = await Future.wait(cachedImagePaths.map(
       (imagePath) async {
@@ -401,6 +403,19 @@ class ScrollsManager extends ChangeNotifier {
       final bFileName = b.split("/").last.split(".").first;
       return int.parse(aFileName).compareTo(int.parse(bFileName));
     });
+  }
+
+  void scrollsSanityCheck(List<String> scrollsPaths) {
+    // Deletes any misformatted files inside the folder
+    for (String filePath in scrollsPaths) {
+      try {
+        String fileName = filePath.split("/").last.split(".").first;
+        int.parse(fileName);
+      } catch (e) {
+        File fileObj = File(filePath);
+        fileObj.deleteSync();
+      }
+    }
   }
 
   Future<bool> isCached(String scrollsName) async {
