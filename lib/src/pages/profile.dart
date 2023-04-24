@@ -14,6 +14,7 @@ import 'package:mockingjae2_mobile/src/UiComponents.dart/Buttons.dart';
 import 'package:mockingjae2_mobile/src/components/modals/modalForm.dart';
 import 'package:mockingjae2_mobile/src/components/snackbars.dart';
 import 'package:mockingjae2_mobile/src/models/User.dart';
+import 'package:mockingjae2_mobile/src/pages/ScrollsUploader/VideoEditingPage.dart';
 import 'package:mockingjae2_mobile/src/pages/likes.dart';
 
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -35,6 +36,8 @@ import 'package:mockingjae2_mobile/src/components/navbars/topBars.dart';
 import 'package:mockingjae2_mobile/utils/functions.dart';
 import 'package:mockingjae2_mobile/utils/ui.dart';
 import 'package:mockingjae2_mobile/utils/utils.dart';
+
+import 'package:mockingjae2_mobile/src/api/scrolls.dart' as api;
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -542,7 +545,9 @@ class ProfilePageHeader extends StatelessWidget {
                 ),
                 // Set alarm at update action button
                 FlatButtonSmall(
-                  onPressed: () {},
+                  onPressed: () {
+                    pickVideo(context);
+                  },
                   icon: const Icon(
                     CupertinoIcons.bell,
                     color: scrollsBackgroundColor,

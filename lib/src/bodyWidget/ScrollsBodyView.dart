@@ -108,10 +108,9 @@ class _ScrollsBodyState extends State<ScrollsBody>
 
     Future<List<ScrollsModel>> newModels({int num = 1}) async {
       List<ScrollsModel> dummyResult = [];
-      var value = await _loadImages();
 
       for (int i = 0; i < num; i++) {
-        dummyResult.add(value);
+        dummyResult.add(await _loadImages());
       }
       return dummyResult;
     }

@@ -9,12 +9,29 @@ class BaseUrl {
   final String scrollsUrl = 'https://storage.memehouses.com/scrolls';
   final String scrollsBrowseUrl =
       'https://scrollsbucket01.s3.ap-northeast-2.amazonaws.com/scrolls/';
+  final ScrollsUploadUrls scrollsUploadUrls = ScrollsUploadUrls();
+}
+
+class ScrollsUploadUrls {
+  final String baseUrl = 'https://storage.memehouses.com/scrolls/upload';
+  late final String videoUpload = '$baseUrl/video';
+  late final String scrollify = '$baseUrl/scrollify';
+  late final String scrollsUpload = '$baseUrl/post';
+  late final String getTaskStatus = '$baseUrl/task';
 }
 
 // Below should only be used under debugging flag
 
 class SampleScrolls {
-  final List<String> sampleScrolls = ['1_sample_scrolls2', '16_Poop_squr'];
+  final List<String> sampleScrolls = [
+    '1_sample_scrolls2',
+    '16_Poop_squr',
+    '19_Reverse_Spill',
+    '18_Tokatoka_pig',
+    '17_Comic_fuck',
+    '21_Infinite_Zoom',
+    '22_Reversed_Boat_Ride'
+  ];
 
   String getSampleScrolls() {
     // pick random choices in sampleScrolls and return the string value

@@ -52,7 +52,7 @@ class MockingJaeMain extends StatelessWidget {
         LikesPage.routeName: (context) => const LikesPage(),
         ProfileScrollsPage.routeName: (context) => const ProfileScrollsPage(),
       },
-      debugShowCheckedModeBanner: true,
+      debugShowCheckedModeBanner: false,
       title: "mockingJae 2.0",
       theme: ThemeData(
         brightness: Brightness.light,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:mockingjae2_mobile/src/bodyWidget/main.dart';
+import 'package:mockingjae2_mobile/src/pages/ScrollsUploader/VideoEditingPage.dart';
 
 import 'package:mockingjae2_mobile/utils/colors.dart';
 import 'package:mockingjae2_mobile/src/components/icons.dart';
@@ -22,9 +23,13 @@ class _MainPageState extends State<MainPage> {
   final ValueNotifier<int> selectedIndex = ValueNotifier<int>(0);
 
   void _onIconTap(int index) {
-    setState(() {
-      selectedIndex.value = index;
-    });
+    if (index == 2) {
+      pickVideo(context);
+    } else {
+      setState(() {
+        selectedIndex.value = index;
+      });
+    }
   }
 
   Color _NavBarColor(ValueNotifier<int> selectedIndex) {

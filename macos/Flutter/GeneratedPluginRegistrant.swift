@@ -7,7 +7,7 @@ import Foundation
 
 import audio_session
 import audioplayers_darwin
-import ffmpeg_kit_flutter
+import ffmpeg_kit_flutter_min_gpl
 import just_audio
 import path_provider_foundation
 import sqflite
