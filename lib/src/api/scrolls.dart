@@ -38,7 +38,7 @@ class ScrollsContentFetcher {
     }
 
     final int scrollsId = getScrollsId(scrollsName);
-    final String scrollsUrl = '${backendUrls.scrollsBrowseUrl}id$scrollsId.tar';
+    final String scrollsUrl = '${backendUrls.scrollsFetchUrl}id$scrollsId.tar';
 
     // final browseUrl = Uri.parse(backendUrls.scrollsBrowseUrl + '?id=$scrollsId');
     final browseUrl = Uri.parse(scrollsUrl);
@@ -78,15 +78,18 @@ Future<void> unpackTarToDir(Directory baseDir, Uint8List bytes) async {
 class ScrollsHeaderFetcher {
   BaseUrl backendUrls = BaseUrl();
 
-  ScrollsHeaderFetcher() {}
-
-  Future<List<ScrollsModel>> fetch() async {
-    final browseUrl = Uri.parse(backendUrls.scrollsBrowseUrl);
+  Future<ScrollsModel> singleFetch() async {
+    final browseUrl = Uri.parse(backendUrls.scrollsBrowseUrls.baseUrl);
     final response = await get(browseUrl);
 
     if (response.statusCode == HttpStatus.ok) {
-      final List<dynamic> scrollsList = json.decode(response.body);
-      return scrollsList.map((e) => ScrollsModel.fromMap(e)).toList();
+      final dynamic scrolls = json.decode(response.body);
+
+      ScrollsModel scrollsModel = ScrollsModel(
+          highlightIndexList: [],
+          isRestricted: false,
+          scrollsName: '${scrolls['id']}_${scrolls['title']}');
+      return scrollsModel;
     } else {
       throw Exception('Failed to download tar file: ${response.statusCode}');
     }

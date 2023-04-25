@@ -22,6 +22,7 @@ import 'package:mockingjae2_mobile/src/Recorder/recorder.dart';
 import 'package:mockingjae2_mobile/src/StateMixins/frameworks.dart';
 import 'package:mockingjae2_mobile/src/UiComponents.dart/Restricted.dart';
 import 'package:mockingjae2_mobile/src/UiComponents.dart/StaticLoading.dart';
+import 'package:mockingjae2_mobile/src/api/scrolls.dart';
 
 import 'package:mockingjae2_mobile/src/controller/scrollsControllers.dart';
 import 'package:mockingjae2_mobile/src/models/Remix.dart';
@@ -109,8 +110,13 @@ class _ScrollsBodyState extends State<ScrollsBody>
     Future<List<ScrollsModel>> newModels({int num = 1}) async {
       List<ScrollsModel> dummyResult = [];
 
+      ScrollsHeaderFetcher headerFetcher = ScrollsHeaderFetcher();
+
       for (int i = 0; i < num; i++) {
-        dummyResult.add(await _loadImages());
+        // dummyResult.add(await _loadImages());
+        ScrollsModel newModel = await headerFetcher.singleFetch();
+        print(newModel);
+        dummyResult.add(newModel);
       }
       return dummyResult;
     }

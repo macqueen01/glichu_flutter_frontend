@@ -7,9 +7,15 @@ import 'dart:math';
 class BaseUrl {
   final String baseUrl = 'https://storage.memehouses.com';
   final String scrollsUrl = 'https://storage.memehouses.com/scrolls';
-  final String scrollsBrowseUrl =
+  final String scrollsFetchUrl =
       'https://scrollsbucket01.s3.ap-northeast-2.amazonaws.com/scrolls/';
   final ScrollsUploadUrls scrollsUploadUrls = ScrollsUploadUrls();
+  final ScrollsBrowseUrls scrollsBrowseUrls = ScrollsBrowseUrls();
+}
+
+class ScrollsBrowseUrls {
+  final String baseUrl = 'https://storage.memehouses.com/scrolls/browse';
+  final String testUrl = 'http://0.0.0.0:8000/scrolls/browse';
 }
 
 class ScrollsUploadUrls {
