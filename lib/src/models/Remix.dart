@@ -32,4 +32,12 @@ class RemixModel {
       {required this.timeline, required this.scrolls, this.jector}) {
     this._title = title;
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'title': this._title,
+      'timeline': this.timeline.toJson(),
+      'scrolls': this.scrolls.scrollsName,
+    };
+  }
 }

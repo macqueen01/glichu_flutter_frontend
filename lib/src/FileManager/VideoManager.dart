@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:mockingjae2_mobile/src/FileManager/AbstractManager.dart';
 import 'package:mockingjae2_mobile/src/FileManager/lowestActions.dart';
 import 'package:mockingjae2_mobile/src/Recorder/testConverter.dart';
+import 'package:mockingjae2_mobile/src/api/remix.dart';
 import 'package:mockingjae2_mobile/src/models/Remix.dart';
 import 'package:provider/provider.dart';
 
@@ -62,6 +63,7 @@ class RecordedVideoManager extends ChangeNotifier {
   // Converter should be managed by its parent
   Converter? converter;
   VideoPlayerController? videoPlayerController;
+  AutoRecorderApi autoRecorderApi = AutoRecorderApi();
 
   void saveRemix(RemixModel remixModel) async {
     if (remixModel.getPath() != null) {
@@ -76,7 +78,8 @@ class RecordedVideoManager extends ChangeNotifier {
     String remixTitle = remixPath.split('/').last;
     remixModel.setPath(remixPath);
     remixModel.setTitle(remixTitle);
-    converter!.convertRemixToVideo(remixModel, remixPath);
+    autoRecorderApi.uploadRemix(remixModel);
+    // converter!.convertRemixToVideo(remixModel, remixPath);
   }
 
   Future<List<File>> getAllRemixes() async {

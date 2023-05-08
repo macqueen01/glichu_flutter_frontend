@@ -131,7 +131,8 @@ class _ScrollsInfoButtonState extends State<ScrollsInfoButton> {
 }
 
 class FlatButton extends StatefulWidget {
-  final Color color;
+  final Color? color;
+  final LinearGradient? gradient;
   final Text? content;
   final Widget? icon;
   final double radius;
@@ -143,8 +144,9 @@ class FlatButton extends StatefulWidget {
       {super.key,
       this.icon,
       this.content,
+      this.color,
+      this.gradient,
       required this.onPressed,
-      required this.color,
       required this.width,
       required this.height,
       required this.radius});
@@ -156,6 +158,63 @@ class FlatButton extends StatefulWidget {
 class _FlatButtonState extends State<FlatButton> {
   @override
   Widget build(BuildContext context) {
+    if (widget.gradient != null) {
+      if (widget.icon == null && widget.content == null) {
+        return CupertinoButton(
+            onPressed: widget.onPressed,
+            padding: EdgeInsets.all(0),
+            child: BoxContainer(
+                context: context,
+                child: Container(),
+                gradient: widget.gradient,
+                height: widget.height,
+                width: widget.width,
+                radius: widget.radius));
+      } else if (widget.icon == null) {
+        return CupertinoButton(
+            onPressed: widget.onPressed,
+            padding: EdgeInsets.all(0),
+            child: BoxContainer(
+                context: context,
+                child: widget.content!,
+                gradient: widget.gradient,
+                height: widget.height,
+                width: widget.width,
+                radius: widget.radius));
+      } else if (widget.content == null) {
+        return CupertinoButton(
+            onPressed: widget.onPressed,
+            padding: EdgeInsets.all(0),
+            child: BoxContainer(
+                context: context,
+                child: widget.icon!,
+                gradient: widget.gradient,
+                height: widget.height,
+                width: widget.width,
+                radius: widget.radius));
+      }
+
+      return CupertinoButton(
+          onPressed: widget.onPressed,
+          padding: EdgeInsets.all(0),
+          child: BoxContainer(
+              context: context,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: widget.icon!,
+                  ),
+                  widget.content!,
+                ],
+              ),
+              gradient: widget.gradient,
+              height: widget.height,
+              width: widget.width,
+              radius: widget.radius));
+    }
     if (widget.icon == null && widget.content == null) {
       return CupertinoButton(
           onPressed: widget.onPressed,

@@ -11,11 +11,19 @@ class BaseUrl {
       'https://scrollsbucket01.s3.ap-northeast-2.amazonaws.com/scrolls/';
   final ScrollsUploadUrls scrollsUploadUrls = ScrollsUploadUrls();
   final ScrollsBrowseUrls scrollsBrowseUrls = ScrollsBrowseUrls();
+  final AutoRecordingUrls autoRecordingUrls = AutoRecordingUrls();
 }
 
 class ScrollsBrowseUrls {
   final String baseUrl = 'https://storage.memehouses.com/scrolls/browse';
   final String testUrl = 'http://0.0.0.0:8000/scrolls/browse';
+}
+
+class AutoRecordingUrls {
+  final String baseUrl =
+      'https://storage.memehouses.com/scrolls/auto-recording';
+  final String testUrl = 'http://';
+  late final remixUploadUrl = '$baseUrl/upload';
 }
 
 class ScrollsUploadUrls {

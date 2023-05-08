@@ -115,13 +115,13 @@ class _ScrollsBodyState extends State<ScrollsBody>
       for (int i = 0; i < num; i++) {
         // dummyResult.add(await _loadImages());
         ScrollsModel newModel = await headerFetcher.singleFetch();
-        print(newModel);
+        print(newModel.scrollsName);
         dummyResult.add(newModel);
       }
       return dummyResult;
     }
 
-    List<ScrollsModel> toBeAdded = await newModels(num: 2);
+    List<ScrollsModel> toBeAdded = await newModels(num: 6);
 
     addAllScrolls(toBeAdded);
   }
@@ -399,44 +399,24 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
       _scrollController.fastScrubToStart();
     }
 
+    // Auto Recorder Unit
+
     if (notification.metrics.pixels <= -35 && widget.index != 0) {
       recording = false;
       IndexTimeLine recordedTimeline = recorder.stopRecording()!;
 
       if (recordedTimeline.last! - recordedTimeline.first! >
           const Duration(seconds: 2)) {
+        String createdDate = DateTime.now().toString();
+        ScrollsModel scrollsModel = widget.scrollsCache.scrollsModel;
         // convert into remix
         RemixModel remix = RemixModel(
-          'new',
-          scrolls: widget.scrollsCache.scrollsModel,
+          '${createdDate}_${scrollsModel.scrollsName}',
+          scrolls: scrollsModel,
           timeline: recordedTimeline,
         );
 
         context.read<RecordedVideoManager>().saveRemix(remix);
-      }
-
-      // User Controlled Recording Unit
-      // This interacts with RecorderProvider from main app runner
-
-      if (recorderProvider.isRecording) {
-        // Pop up to query the name of the user recorded video
-
-        recorderProvider.popUp(); // This gets info crutial for generated video
-        recorderProvider.stopRecording();
-        IndexTimeLine? userGeneratedTimeLine = recorderProvider.getTimeLine();
-
-        if (userGeneratedTimeLine != null &&
-            userGeneratedTimeLine.last! - userGeneratedTimeLine.first! >
-                const Duration(milliseconds: 200)) {
-          // convert into remix
-          RemixModel remix = RemixModel(
-            'new',
-            scrolls: widget.scrollsCache.scrollsModel,
-            timeline: userGeneratedTimeLine,
-          );
-
-          recorderProvider.saveRemix(remix);
-        }
       }
 
       // snap to the last scrolls if one exists
@@ -488,6 +468,19 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
                     Positioned(
                       top: (scrollDelta >= 0) ? scrollDelta : 0,
                       child: GestureDetector(
+                        // this calls _scrollController.switchToNextScrolls() if swiped from right to left
+                        onHorizontalDragEnd: (dragEndDetails) {
+                          if (dragEndDetails.primaryVelocity! < 0) {
+                            // Page forwards
+                            widget.parentScrollController
+                                .switchToNextScrolls(context);
+                          } else if (dragEndDetails.primaryVelocity! > 0) {
+                            // Page backwards
+                            widget.parentScrollController
+                                .switchToLastScrolls(context);
+                          }
+                        },
+
                         onLongPressStart: (LongPressStartDetails detail) {
                           // this auto scrolls at velocity (_height / widget.duration)
                           // works alongside with onLongPressEnd

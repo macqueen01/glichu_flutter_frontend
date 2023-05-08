@@ -125,6 +125,7 @@ class _VideoEditingPageState extends State<VideoEditingPage> {
   late final ScrollsUploader uploader;
 
   bool _uploadFinished = false;
+  bool _loading = false;
 
   @override
   void initState() {
@@ -186,7 +187,9 @@ class _VideoEditingPageState extends State<VideoEditingPage> {
       print('failed uploading scrolls');
     }
 
-    _uploadFinished = true;
+    setState(() {
+      _uploadFinished = true;
+    });
 
     await Future.delayed(Duration(milliseconds: 6000), () {
       Navigator.pop(context);
@@ -209,7 +212,12 @@ class _VideoEditingPageState extends State<VideoEditingPage> {
       // format: VideoExportFormat.gif,
       // preset: VideoExportPreset.medium,
       // customInstruction: "-crf 17",
-      onProgress: (stats, value) => _exportingProgress.value = value,
+      onProgress: (stats, value) {
+        _exportingProgress.value = value;
+        setState(() {
+          _loading = true;
+        });
+      },
       onError: (e, s) => _showErrorSnackBar("Error on export video :("),
       onCompleted: (file) {
         _isExporting.value = false;
@@ -251,7 +259,7 @@ class _VideoEditingPageState extends State<VideoEditingPage> {
       onWillPop: () async => false,
       child: Scaffold(
         backgroundColor: scrollsBackgroundColor,
-        body: _controller.initialized
+        body: _controller.initialized & !_loading
             ? SafeArea(
                 child: Stack(
                   children: [
@@ -363,7 +371,10 @@ class _VideoEditingPageState extends State<VideoEditingPage> {
                   ],
                 ),
               )
-            : const Center(child: CircularProgressIndicator()),
+            : const Center(
+                child: CircularProgressIndicator(
+                color: mainBackgroundColor,
+              )),
       ),
     );
   }

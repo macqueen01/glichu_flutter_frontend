@@ -14,7 +14,6 @@ const iconFilledColor = Colors.black87;
 const lensFlareMain = Color.fromRGBO(85, 61, 244, 1);
 const lensFlareSub = Color.fromARGB(255, 134, 118, 238);
 
-
 const buttonHue = Color.fromARGB(255, 222, 222, 222);
 
 const warmGradient = LinearGradient(colors: [
@@ -33,7 +32,12 @@ const lensFlareGradient = LinearGradient(colors: [
   Color.fromRGBO(25, 23, 69, 1),
 ], begin: Alignment.topLeft, end: Alignment.bottomRight);
 
-// background theme
+const minimizedLensFlareGradient = LinearGradient(colors: [
+  Color.fromRGBO(53, 48, 191, 1),
+  Color.fromRGBO(125, 111, 215, 1),
+], begin: Alignment.topLeft, end: Alignment.bottomRight);
 
-
-
+const minimizedWarmGradient = LinearGradient(colors: [
+  Color.fromRGBO(229, 209, 134, 1),
+  Color.fromRGBO(160, 71, 66, 1),
+], begin: Alignment.topLeft, end: Alignment.bottomRight);

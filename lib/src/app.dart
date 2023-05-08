@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:mockingjae2_mobile/src/bodyWidget/main.dart';
+import 'package:mockingjae2_mobile/src/pages/Authentication/mainPage.dart';
 import 'package:mockingjae2_mobile/src/pages/ScrollsUploader/VideoEditingPage.dart';
 
 import 'package:mockingjae2_mobile/utils/colors.dart';
@@ -25,6 +26,12 @@ class _MainPageState extends State<MainPage> {
   void _onIconTap(int index) {
     if (index == 2) {
       pickVideo(context);
+    }
+    if (index == 3) {
+      Navigator.push(
+          context,
+          MaterialPageRoute<void>(
+              builder: (BuildContext context) => AuthenticationCenterPage()));
     } else {
       setState(() {
         selectedIndex.value = index;

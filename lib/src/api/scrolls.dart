@@ -8,7 +8,6 @@ import 'package:http/http.dart';
 import 'package:mockingjae2_mobile/src/FileManager/lowestActions.dart';
 import 'package:mockingjae2_mobile/src/models/Scrolls.dart';
 import 'package:tar/tar.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:dio/dio.dart' as dio;
 
 import 'package:mockingjae2_mobile/src/settings.dart';
@@ -25,9 +24,6 @@ class ScrollsContentFetcher {
   }
 
   Future<void> init() async {
-    if (!FlutterDownloader.initialized) {
-      await FlutterDownloader.initialize(debug: true);
-    }
     fetchReady = true;
   }
 

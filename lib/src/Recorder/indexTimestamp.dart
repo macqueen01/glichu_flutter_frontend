@@ -30,6 +30,12 @@ class IndexTimestamp {
   Duration operator -(IndexTimestamp other) {
     return time.difference(other.time);
   }
+
+  Map<String, dynamic> toJson() => {
+        'time': time,
+        'index': index,
+        'next': next == null ? 'null' : next!.toJson(),
+      };
 }
 
 class IndexTimeLine {
@@ -150,4 +156,19 @@ class IndexTimeLine {
 
     return false;
   }
+
+  Map<String, dynamic> toJson() => {
+        // first is detined by the timeline json, which is recursively defined:
+        // {
+        //    time: 2023-04-26 11:11:28.953328,
+        //    index: 0,
+        //    next: {
+        //              time: 2023-04-26 11:11:28.979564,
+        //              index: 0,
+        //              next: { ...
+        //            }
+        // }
+        'first': first == null ? 'null' : first!.toJson(),
+        'length': _length,
+      };
 }

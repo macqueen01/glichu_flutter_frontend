@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:mockingjae2_mobile/src/Recorder/RecorderProvider.dart';
+import 'package:mockingjae2_mobile/src/pages/Authentication/mainPage.dart';
 import 'package:mockingjae2_mobile/src/pages/likes.dart';
 import 'package:mockingjae2_mobile/src/pages/profile.dart';
 import 'package:mockingjae2_mobile/src/pages/profileScrolls.dart';
@@ -41,10 +42,11 @@ class MockingJaeMain extends StatelessWidget {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
 
     return MaterialApp(
-      initialRoute: '/',
+      initialRoute: '/authenticationCenter',
       // route with navigation arguments should be imported, and added to routes
       // this will break the dependancy policy... need to find a way to fix this
       routes: {
+        '/authenticationCenter': (context) => const AuthenticationCenterPage(),
         '/': (context) => ChangeNotifierProvider(
             create: (context) => RecorderProvider(context: context),
             child: const MainPage()),
