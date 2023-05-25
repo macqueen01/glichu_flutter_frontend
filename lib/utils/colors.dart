@@ -41,3 +41,21 @@ const minimizedWarmGradient = LinearGradient(colors: [
   Color.fromRGBO(229, 209, 134, 1),
   Color.fromRGBO(160, 71, 66, 1),
 ], begin: Alignment.topLeft, end: Alignment.bottomRight);
+
+const instagramGradient = LinearGradient(
+  colors: [
+    Color(0xFF833AB4), // top color
+    Color(0xFFDD2A7B), // bottom color
+  ],
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+);
+
+const autoRecorderGradient = LinearGradient(
+  colors: [
+    Color.fromARGB(255, 210, 33, 33), // top color
+    Color.fromARGB(255, 209, 122, 161), // bottom color
+  ],
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+);

@@ -120,7 +120,7 @@ class _VideoEditingPageState extends State<VideoEditingPage> {
   late final VideoEditorController _controller = VideoEditorController.file(
     widget.file,
     minDuration: const Duration(seconds: 1),
-    maxDuration: const Duration(seconds: 10),
+    maxDuration: const Duration(seconds: 3),
   );
   late final ScrollsUploader uploader;
 
@@ -168,7 +168,7 @@ class _VideoEditingPageState extends State<VideoEditingPage> {
 
     try {
       await uploader.scrollifyVideo(
-          uploader.hashedVideoFile.toString(), 7000, 5, 25);
+          uploader.hashedVideoFile.toString(), 7000, 3, 25);
     } catch (e) {
       // Escape from the page if errors occur
       Navigator.pop(context);

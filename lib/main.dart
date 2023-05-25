@@ -1,8 +1,12 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
+import 'package:mockingjae2_mobile/src/pages/followers.dart';
+import 'package:nfc_manager/nfc_manager.dart';
+import 'package:sqflite/sqflite.dart';
+
 import 'package:mockingjae2_mobile/src/Recorder/RecorderProvider.dart';
+import 'package:mockingjae2_mobile/src/db/TokenDB.dart';
 import 'package:mockingjae2_mobile/src/pages/Authentication/mainPage.dart';
 import 'package:mockingjae2_mobile/src/pages/likes.dart';
 import 'package:mockingjae2_mobile/src/pages/profile.dart';
@@ -21,20 +25,27 @@ import 'package:provider/provider.dart';
 
 import 'package:mockingjae2_mobile/src/pages/example.dart';
 
-void main() {
+Future<void> main() async {
   // This prevents landscape view
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
-  // Running App
+  // Initialize the database
+  final database = await TokenDatabase.instance.database;
+  // Initialize the Nfc Manager
+  final NfcManager nfcManager = NfcManager.instance;
 
-  //runApp(const MyApp());
-  runApp(const MockingJaeMain());
+  // Running App
+  runApp(MockingJaeMain(
+    database: database,
+  ));
 }
 
 class MockingJaeMain extends StatelessWidget {
-  const MockingJaeMain({Key? key}) : super(key: key);
+  final Database database;
+
+  const MockingJaeMain({required this.database});
 
   @override
   Widget build(BuildContext context) {
@@ -50,9 +61,12 @@ class MockingJaeMain extends StatelessWidget {
         '/': (context) => ChangeNotifierProvider(
             create: (context) => RecorderProvider(context: context),
             child: const MainPage()),
-        '/profile': (context) => const ProfilePage(),
+        RelationsPage.routeName: (context) => const RelationsPage(),
+        ProfilePage.routeName: (context) => const ProfilePage(),
         LikesPage.routeName: (context) => const LikesPage(),
-        ProfileScrollsPage.routeName: (context) => const ProfileScrollsPage(),
+        ProfileScrollsPage.routeName: (context) => ChangeNotifierProvider(
+            create: (context) => RecorderProvider(context: context),
+            child: const ProfileScrollsPage()),
       },
       debugShowCheckedModeBanner: false,
       title: "mockingJae 2.0",

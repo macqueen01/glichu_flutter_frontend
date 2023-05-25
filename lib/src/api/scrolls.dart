@@ -81,13 +81,30 @@ class ScrollsHeaderFetcher {
     if (response.statusCode == HttpStatus.ok) {
       final dynamic scrolls = json.decode(response.body);
 
-      ScrollsModel scrollsModel = ScrollsModel(
-          highlightIndexList: [],
-          isRestricted: false,
-          scrollsName: '${scrolls['id']}_${scrolls['title']}');
+      ScrollsModel scrollsModel = ScrollsModel.fromMap(scrolls);
       return scrollsModel;
     } else {
       throw Exception('Failed to download tar file: ${response.statusCode}');
+    }
+  }
+
+  Future<List<ScrollsModel>> fetchScrollsOfUser(String userId) async {
+    final browseUrl =
+        Uri.parse(backendUrls.scrollsBrowseUrls.baseUrl + '/user?id=$userId');
+    final response = await get(browseUrl);
+
+    if (response.statusCode == HttpStatus.ok) {
+      final List<dynamic> scrollsMap = json.decode(response.body)['results'];
+      final List<ScrollsModel> scrollsModels = [];
+
+      scrollsMap.forEach((scrolls) {
+        scrollsModels.add(ScrollsModel.fromMap(scrolls));
+      });
+
+      return scrollsModels;
+    } else {
+      throw Exception(
+          'Failed to load scrolls from backend: ${response.statusCode}');
     }
   }
 }

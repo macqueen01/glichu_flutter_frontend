@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:mockingjae2_mobile/src/FileManager/lowestActions.dart';
+import 'package:mockingjae2_mobile/src/models/User.dart';
 
 /*
 
@@ -15,10 +16,15 @@ class Scrolls {
 
 class ScrollsModel {
   Directory? imagePath;
-  late Uri scrollsUrl;
+  late String scrollsUrl;
   late String scrollsName;
   late bool isRestricted;
   late List<int> highlightIndexList;
+  late String thumbnailUrl;
+  late UserMin user;
+  late int id;
+  late String videoUrl;
+  late String createdAt;
 
   ScrollsModel(
       {required this.scrollsName,
@@ -26,11 +32,25 @@ class ScrollsModel {
       this.isRestricted = false});
 
   ScrollsModel.fromMap(Map<String, dynamic> map) {
-    scrollsName = map[
-        'scrollsName']; // scrollsName is combination of original id + name (ex. '1_text')
-    highlightIndexList = map['highlightIndexList'];
-    isRestricted = map['isRestricted'];
-    scrollsUrl = map['url'];
+    Map unparsedUser = map['created_by'];
+    id = map['id'];
+    videoUrl =
+        'https://mockingjae-test-bucket.s3.ap-northeast-2.amazonaws.com/' +
+            map['video_url'];
+    scrollsName =
+        '${map['id']}_${map['title']}'; // scrollsName is combination of original id + name (ex. '1_text')
+    highlightIndexList =
+        map['highlight_index_list'] != null ? map['highlight_index_list'] : [];
+    isRestricted = map['is_restricted'] != null ? map['is_restricted'] : false;
+    scrollsUrl = map['scrolls_url'].split('?')[0];
+    thumbnailUrl = map['thumbnail_url'];
+    createdAt = map['created_at'];
+    user = UserMin(
+        userName: unparsedUser['username'],
+        userId: '${unparsedUser['id']}',
+        profileImagePath: unparsedUser['profile_image'] != null
+            ? unparsedUser['profile_image'].split('?')[0]
+            : null);
   }
 }
 

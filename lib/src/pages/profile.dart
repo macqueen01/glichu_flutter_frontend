@@ -15,6 +15,7 @@ import 'package:mockingjae2_mobile/src/components/modals/modalForm.dart';
 import 'package:mockingjae2_mobile/src/components/snackbars.dart';
 import 'package:mockingjae2_mobile/src/models/User.dart';
 import 'package:mockingjae2_mobile/src/pages/ScrollsUploader/VideoEditingPage.dart';
+import 'package:mockingjae2_mobile/src/pages/followers.dart';
 import 'package:mockingjae2_mobile/src/pages/likes.dart';
 
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -39,8 +40,16 @@ import 'package:mockingjae2_mobile/utils/utils.dart';
 
 import 'package:mockingjae2_mobile/src/api/scrolls.dart' as api;
 
+class ProfilePageArguments {
+  final UserMin user;
+
+  ProfilePageArguments({required this.user});
+}
+
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
+
+  static const routeName = '/profile';
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -66,6 +75,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final args =
+        ModalRoute.of(context)!.settings.arguments as ProfilePageArguments?;
+
     return WillPopScope(
         child: ValueListenableBuilder(
           builder: ((context, value, child) {
@@ -74,8 +86,8 @@ class _ProfilePageState extends State<ProfilePage> {
               resizeToAvoidBottomInset: true,
               extendBody: false,
               appBar: ProfileAppBar(
-                  title: const Text(
-                "mocking_jae_^.^",
+                  title: Text(
+                args!.user.userName,
                 style: TextStyle(
                     decoration: TextDecoration.none,
                     fontSize: 22,
@@ -85,9 +97,10 @@ class _ProfilePageState extends State<ProfilePage> {
               )),
               body: ChangeNotifierProvider(
                   create: (BuildContext context) {
-                    return ScrollsPreviewManager(context: context);
+                    return ScrollsPreviewManager(
+                        context: context, user: args.user);
                   },
-                  child: ProfileBody()),
+                  child: const ProfileBodyWrapper()),
             );
           }),
           valueListenable: selectedIndex,
@@ -98,8 +111,25 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
+class ProfileBodyWrapper extends StatelessWidget {
+  const ProfileBodyWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ScrollsPreviewManager>(
+      builder: (context, provider, child) {
+        return ProfileBody(
+          user: provider.user,
+        );
+      },
+    );
+  }
+}
+
 class ProfileBody extends StatefulWidget {
-  const ProfileBody({super.key});
+  UserMin user;
+
+  ProfileBody({super.key, required this.user});
 
   @override
   State<ProfileBody> createState() => _ProfileBodyState();
@@ -109,6 +139,8 @@ class _ProfileBodyState extends State<ProfileBody>
     with DragUpdatable<ProfileBody> {
   @override
   int _duration = 2;
+  @override
+  bool _load = false;
 
   @override
   void initState() {
@@ -118,7 +150,12 @@ class _ProfileBodyState extends State<ProfileBody>
 
   @override
   void reload() {
-    super.reload();
+    // this should recieve all data from the server,
+    // then refreshed all contents of the page
+    setLoadingTrue();
+    context.read<ScrollsPreviewManager>().updateUser().then((value) => {
+          updateCallback(),
+        });
   }
 
   @override
@@ -137,7 +174,9 @@ class _ProfileBodyState extends State<ProfileBody>
         child: Column(
           children: [
             AnimatedLoader(context),
-            const ProfilePageHeader(),
+            ProfilePageHeader(
+              user: widget.user,
+            ),
             Padding(
               padding: const EdgeInsets.only(top: 4),
               child: ScrollsMenu(
@@ -166,7 +205,7 @@ class _ScrollsMenuState extends State<ScrollsMenu> {
 
   void indexChange(int index) {
     moveToTop();
-    Timer(const Duration(milliseconds: 250), () {
+    Timer(const Duration(milliseconds: 200), () {
       moveToIndexedMenu(index);
       setState(() {
         currentIndex = index;
@@ -190,7 +229,7 @@ class _ScrollsMenuState extends State<ScrollsMenu> {
 
   void moveToIndexedMenu(int index) {
     menuScrollController.animateTo(_indexToPosition(index),
-        duration: const Duration(milliseconds: 200), curve: Curves.ease);
+        duration: const Duration(milliseconds: 500), curve: Curves.ease);
   }
 
   @override
@@ -206,7 +245,7 @@ class _ScrollsMenuState extends State<ScrollsMenu> {
           width: 330,
           alignment: Alignment.centerLeft,
           child: CategorySelect(
-            categories: ['Scrolls', 'Videos', 'Favorates'],
+            categories: const ['Scrolls', 'Videos', 'Favorites'],
             onPressed: indexChange,
           ),
         ),
@@ -306,10 +345,33 @@ class _CategorySelectState extends State<CategorySelect> {
   }
 }
 
+Future showProfileImage(UserMin user, BuildContext context) {
+  return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          width: 10,
+          height: 10,
+          child: Hero(
+            tag: 'profile_${user.userId}',
+            child: Image.network(
+              user.profileImagePath!,
+              width: 10,
+              height: 10,
+              fit: BoxFit.scaleDown,
+            ),
+          ),
+          clipBehavior: Clip.hardEdge,
+          decoration:
+              BoxDecoration(shape: BoxShape.circle, color: mainBackgroundColor),
+        );
+      });
+}
+
 class ProfilePageHeader extends StatelessWidget {
-  const ProfilePageHeader({
-    super.key,
-  });
+  UserMin user;
+
+  ProfilePageHeader({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -328,12 +390,11 @@ class ProfilePageHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Profile(
-                  image: Image.asset(
-                    'assets/icons/dalli.jpg',
-                    width: 90,
-                    height: 90,
-                  ),
+                  user: user,
                   size: 1,
+                  onTap: () {
+                    showProfileImage(user, context);
+                  },
                 ),
                 Container(
                   width: 190,
@@ -345,7 +406,7 @@ class ProfilePageHeader extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "mocking_jae_^.^",
+                        user.userName,
                         style: TextStyle(
                             fontSize: 17,
                             color: mainBackgroundColor,
@@ -399,91 +460,11 @@ class ProfilePageHeader extends StatelessWidget {
                       textColor: Colors.black87,
                       textSize: 13,
                       onPressed: () {
-                        Navigator.pushNamed(context, LikesPage.routeName,
-                            arguments: LikePageArguments(
-                              user: User(
-                                  userName: "JaeKim",
-                                  userId: "mockingjae_^.^",
-                                  followers: 35134,
-                                  followed: 2344523,
-                                  scrolled: 1235,
-                                  likes: 45145,
-                                  remixed: 54627),
-                              likes: <User>[
-                                User(
-                                    userName: "JaeKim",
-                                    userId: "mockingjae_^.^",
-                                    followers: 35134,
-                                    followed: 2344523,
-                                    scrolled: 1235,
-                                    likes: 45145,
-                                    remixed: 54627),
-                                User(
-                                    userName: "JaeKim",
-                                    userId: "mockingjae_^.^",
-                                    followers: 35134,
-                                    followed: 2344523,
-                                    scrolled: 1235,
-                                    likes: 45145,
-                                    remixed: 54627),
-                                User(
-                                    userName: "JaeKim",
-                                    userId: "mockingjae_^.^",
-                                    followers: 35134,
-                                    followed: 2344523,
-                                    scrolled: 1235,
-                                    likes: 45145,
-                                    remixed: 54627),
-                                User(
-                                    userName: "JaeKim",
-                                    userId: "mockingjae_^.^",
-                                    followers: 35134,
-                                    followed: 2344523,
-                                    scrolled: 1235,
-                                    likes: 45145,
-                                    remixed: 54627),
-                                User(
-                                    userName: "JaeKim",
-                                    userId: "mockingjae_^.^",
-                                    followers: 35134,
-                                    followed: 2344523,
-                                    scrolled: 1235,
-                                    likes: 45145,
-                                    remixed: 54627),
-                                User(
-                                    userName: "JaeKim",
-                                    userId: "mockingjae_^.^",
-                                    followers: 35134,
-                                    followed: 2344523,
-                                    scrolled: 1235,
-                                    likes: 45145,
-                                    remixed: 54627),
-                                User(
-                                    userName: "JaeKim",
-                                    userId: "mockingjae_^.^",
-                                    followers: 35134,
-                                    followed: 2344523,
-                                    scrolled: 1235,
-                                    likes: 45145,
-                                    remixed: 54627),
-                                User(
-                                    userName: "JaeKim",
-                                    userId: "mockingjae_^.^",
-                                    followers: 35134,
-                                    followed: 2344523,
-                                    scrolled: 1235,
-                                    likes: 45145,
-                                    remixed: 54627),
-                                User(
-                                    userName: "JaeKim",
-                                    userId: "mockingjae_^.^",
-                                    followers: 35134,
-                                    followed: 2344523,
-                                    scrolled: 1235,
-                                    likes: 45145,
-                                    remixed: 54627)
-                              ],
-                            ));
+                        RelationsPageArguments arguments =
+                            RelationsPageArguments(user: user);
+
+                        Navigator.pushNamed(context, RelationsPage.routeName,
+                            arguments: arguments);
                       },
                     ),
                     VerticalDivider(

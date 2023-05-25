@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:mockingjae2_mobile/src/bodyWidget/ScrollsBodyView.dart';
 import 'package:mockingjae2_mobile/src/bodyWidget/main.dart';
+import 'package:mockingjae2_mobile/src/components/navbars/bottomBars.dart';
 import 'package:mockingjae2_mobile/src/pages/Authentication/mainPage.dart';
 import 'package:mockingjae2_mobile/src/pages/ScrollsUploader/VideoEditingPage.dart';
 
@@ -21,7 +23,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  final ValueNotifier<int> selectedIndex = ValueNotifier<int>(0);
+  final ValueNotifier<int> selectedIndex = ValueNotifier<int>(1);
 
   void _onIconTap(int index) {
     if (index == 2) {
@@ -59,8 +61,11 @@ class _MainPageState extends State<MainPage> {
                 resizeToAvoidBottomInset: false,
                 extendBody: (selectedIndex.value == 1) ? true : false,
                 appBar: MJAppBar(backgroundColor: _NavBarColor(selectedIndex)),
-                body: MainViewGenerator(context, selectedIndex.value),
-                bottomNavigationBar: MJBottomNavBar(
+                body: const ScrollsBodyView(),
+                bottomNavigationBar: MainBottomNavbar()
+
+                /*
+                MJBottomNavBar(
                   onTap: _onIconTap,
                   items: [
                     MJIconItem(
@@ -95,7 +100,8 @@ class _MainPageState extends State<MainPage> {
                             height: 28,
                             width: 28)),
                   ],
-                ));
+                )*/
+                );
           }),
           valueListenable: selectedIndex,
         ),

@@ -18,7 +18,7 @@ class LoadingView extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.only(bottom: 103),
         child: Center(
-          child: JaeIcon(55, 55, mainBackgroundColor),
+          child: GlichuIcon(80, 80),
         ),
       ),
     );

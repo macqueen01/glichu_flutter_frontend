@@ -125,6 +125,9 @@ class BigAppBar extends StatefulWidget implements PreferredSizeWidget {
   final void Function(BuildContext)? onForwardButtonPressed;
   final bool forward = false;
 
+  final backButtonActivate;
+  final forwardButtonActivate;
+
   void defaultCallback(BuildContext context) {
     ScaffoldMessenger.of(context).removeCurrentMaterialBanner();
     ScaffoldMessenger.of(context).removeCurrentSnackBar();
@@ -138,6 +141,8 @@ class BigAppBar extends StatefulWidget implements PreferredSizeWidget {
       required this.title,
       required this.preferredSize,
       this.onBackButtonPressed,
+      this.backButtonActivate = true,
+      this.forwardButtonActivate = false,
       required this.onForwardButtonPressed})
       : super(key: key);
 
@@ -191,7 +196,9 @@ class _BigAppBarState extends State<BigAppBar> {
                                 alignment: Alignment.center,
                                 child: Icon(
                                   CupertinoIcons.left_chevron,
-                                  color: mainBackgroundColor,
+                                  color: widget.backButtonActivate
+                                      ? mainBackgroundColor
+                                      : scrollsBackgroundColor,
                                   size: 28,
                                   weight: 600,
                                 ),

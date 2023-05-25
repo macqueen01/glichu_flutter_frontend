@@ -1,18 +1,23 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mockingjae2_mobile/src/UiComponents.dart/Buttons.dart';
 
 import 'package:mockingjae2_mobile/src/FileManager/ScrollsManager.dart';
+import 'package:mockingjae2_mobile/src/bodyWidget/ScrollsBodyView.dart';
 import 'package:mockingjae2_mobile/src/components/icons.dart';
 import 'package:mockingjae2_mobile/src/models/Scrolls.dart';
 import 'package:mockingjae2_mobile/src/models/ScrollsPreview.dart';
 import 'package:mockingjae2_mobile/src/models/User.dart';
 import 'package:mockingjae2_mobile/src/pages/profileScrolls.dart';
 import 'package:mockingjae2_mobile/utils/colors.dart';
+import 'package:mockingjae2_mobile/utils/ui.dart';
+
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ScrollsPreviewMenu extends StatefulWidget {
   const ScrollsPreviewMenu({super.key});
@@ -32,11 +37,8 @@ class _ScrollsPreviewMenuState extends State<ScrollsPreviewMenu> {
   Widget build(BuildContext context) {
     return Consumer<ScrollsPreviewManager>(
       builder: (context, scrollsPreviewManager, child) {
-        if (scrollsPreviewManager.isUpdateInProgress()) {
-          return Center(
-            child: Text('Updating Scrolls',
-                style: TextStyle(fontSize: 20, color: mainBackgroundColor)),
-          );
+        if (scrollsPreviewManager.updateInProgress) {
+          return const ScrollsPreviewShimmerLoadingWidget();
         } else if (scrollsPreviewManager.isEmpty()) {
           return Center(
             child: Text('No Scrolls',
@@ -46,6 +48,38 @@ class _ScrollsPreviewMenuState extends State<ScrollsPreviewMenu> {
         return ScrollsPreviewListBuilder(scrollsPreviewManager.previewModelList,
             MediaQuery.of(context).size.width / 2);
       },
+    );
+  }
+}
+
+class ScrollsPreviewShimmerLoadingWidget extends StatelessWidget {
+  const ScrollsPreviewShimmerLoadingWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width / 2;
+    double height = 1.5 * width;
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            ShimmerLoadingWidget.Rectangular(height: height, width: width - 1),
+            ShimmerLoadingWidget.Rectangular(height: height, width: width - 1)
+          ],
+        ),
+        Container(
+          height: 1,
+          width: width * 2,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            ShimmerLoadingWidget.Rectangular(height: height, width: width - 1),
+            ShimmerLoadingWidget.Rectangular(height: height, width: width - 1)
+          ],
+        ),
+      ],
     );
   }
 }
@@ -129,19 +163,16 @@ class _ScrollsPreviewState extends State<ScrollsPreview> {
         : null;
   }
 
-  void _secondTap({required String scrollsName}) {
+  void _secondTap() {
     // navigate to profile scrolls page
+    ScrollsModel scrolls = widget.scrollsPreviewModel.scrollsModel;
+    UserMin user = scrolls.user;
+
+    ProfileScrollsPageArguments arguments =
+        ProfileScrollsPageArguments(user: user, scrollsModels: [scrolls]);
+
     Navigator.pushNamed(context, ProfileScrollsPage.routeName,
-        arguments: ProfileScrollsPageArguments(
-            user: User(
-                userName: "JaeKim",
-                userId: "mockingjae_^.^",
-                followers: 35134,
-                followed: 2344523,
-                scrolled: 1235,
-                likes: 45145,
-                remixed: 54627),
-            scrollsModels: []));
+        arguments: arguments);
   }
 
   @override
@@ -151,7 +182,7 @@ class _ScrollsPreviewState extends State<ScrollsPreview> {
         if (!_tapped) {
           _setFirstTap();
         } else {
-          _secondTap(scrollsName: widget.scrollsPreviewModel.scrollsName);
+          _secondTap();
         }
       },
       child: Container(
@@ -161,14 +192,13 @@ class _ScrollsPreviewState extends State<ScrollsPreview> {
           // because we are animating the image opacity blending to
           // scrollsBackgroundColor, in white background, the icons (ScrollsInfoButton) might not visible
           AnimatedOpacity(
-            opacity: _tapped ? 0.6 : 1,
-            duration: const Duration(milliseconds: 100),
-            child: Image.file(
-              widget.scrollsPreviewModel.previewFile,
-              fit: BoxFit.fitWidth,
-              width: widget.width - 2,
-            ),
-          ),
+              opacity: _tapped ? 0.6 : 1,
+              duration: const Duration(milliseconds: 100),
+              child: Image.network(
+                widget.scrollsPreviewModel.scrollsModel.thumbnailUrl,
+                fit: BoxFit.fitWidth,
+                width: widget.width - 2,
+              )),
           Positioned(
             right: 15,
             bottom: 15,

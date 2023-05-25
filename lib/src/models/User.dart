@@ -1,3 +1,5 @@
+import 'package:flutter_launcher_icons/constants.dart';
+
 class User {
   String userName;
   String userId;
@@ -7,6 +9,7 @@ class User {
   int likes;
   int remixed;
   bool followedByUser;
+  String? profileImagePath;
 
   User(
       {required this.userName,
@@ -16,7 +19,8 @@ class User {
       required this.scrolled,
       required this.likes,
       required this.remixed,
-      this.followedByUser = false});
+      this.followedByUser = false,
+      this.profileImagePath});
 
   void updateFollowedByUser(bool followedByUser) {
     this.followedByUser = followedByUser;
@@ -40,5 +44,35 @@ class User {
         likes: json['liked'],
         remixed: json['remixed'],
         followedByUser: json['followedByUser']);
+  }
+}
+
+class UserMin {
+  String userName;
+  String userId;
+  String? profileImagePath;
+  bool? isFollowedByUser;
+  bool? isFollowingUser;
+
+  UserMin(
+      {required this.userName,
+      required this.userId,
+      this.profileImagePath,
+      this.isFollowedByUser,
+      this.isFollowingUser});
+
+  static fromJson(json) {
+    return UserMin(
+      userName: json['username'],
+      userId: '${json['id']}',
+      profileImagePath: json['profile_image'] != null
+          ? json['profile_image'].split('?')[0]
+          : 'https://mockingjae-test-bucket.s3.amazonaws.com/profile_image/default.png',
+      isFollowedByUser: json['is_followed_by_user'] == null
+          ? null
+          : json['is_followed_by_user'],
+      isFollowingUser:
+          json['is_following_user'] == null ? null : json['is_following_user'],
+    );
   }
 }

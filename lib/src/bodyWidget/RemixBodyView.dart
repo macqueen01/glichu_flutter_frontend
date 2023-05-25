@@ -190,9 +190,9 @@ class _RemixPlayViewState extends State<RemixPlayView>
   @override
   void initState() {
     videoControllerSetup(
-        context,
-        context.read<RemixPlayManager>().getRemix(widget.index),
-        context.read<RemixPlayManager>());
+        context: context,
+        videoFile: context.read<RemixPlayManager>().getRemix(widget.index),
+        manager: context.read<RemixPlayManager>());
     super.initState();
   }
 

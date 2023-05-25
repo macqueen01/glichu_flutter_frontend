@@ -210,6 +210,7 @@
 			files = (
 			);
 			inputPaths = (
+				"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}",
 			);
 			name = "Thin Binary";
 			outputPaths = (
@@ -379,6 +380,70 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACH_O_TYPE = mh_execute;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"bz2\"",
+					"-l\"c++\"",
+					"-l\"iconv\"",
+					"-l\"sqlite3\"",
+					"-l\"z\"",
+					"-framework",
+					"\"AVFoundation\"",
+					"-framework",
+					"\"AudioToolbox\"",
+					"-framework",
+					"\"CoreMedia\"",
+					"-framework",
+					"\"FMDB\"",
+					"-framework",
+					"\"VideoToolbox\"",
+					"-framework",
+					"\"audio_session\"",
+					"-framework",
+					"\"audioplayers_darwin\"",
+					"-framework",
+					"\"ffmpeg_kit_flutter_min_gpl\"",
+					"-framework",
+					"\"ffmpegkit\"",
+					"-framework",
+					"\"flutter_downloader\"",
+					"-framework",
+					"\"flutter_native_splash\"",
+					"-framework",
+					"\"image_picker_ios\"",
+					"-framework",
+					"\"just_audio\"",
+					"-framework",
+					"\"libavcodec\"",
+					"-framework",
+					"\"libavdevice\"",
+					"-framework",
+					"\"libavfilter\"",
+					"-framework",
+					"\"libavformat\"",
+					"-framework",
+					"\"libavutil\"",
+					"-framework",
+					"\"libswresample\"",
+					"-framework",
+					"\"libswscale\"",
+					"-framework",
+					"\"libwebp\"",
+					"-framework",
+					"\"nfc_manager\"",
+					"-framework",
+					"\"path_provider_foundation\"",
+					"-framework",
+					"\"sqflite\"",
+					"-framework",
+					"\"video_player_avfoundation\"",
+					"-framework",
+					"\"video_thumbnail\"",
+					"-framework",
+					"\"webview_flutter_wkwebview\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.mockingjae2Mobile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -389,6 +454,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
+				trash = "";
 			};
 			name = Profile;
 		};
@@ -522,6 +588,70 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACH_O_TYPE = mh_execute;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"bz2\"",
+					"-l\"c++\"",
+					"-l\"iconv\"",
+					"-l\"sqlite3\"",
+					"-l\"z\"",
+					"-framework",
+					"\"AVFoundation\"",
+					"-framework",
+					"\"AudioToolbox\"",
+					"-framework",
+					"\"CoreMedia\"",
+					"-framework",
+					"\"FMDB\"",
+					"-framework",
+					"\"VideoToolbox\"",
+					"-framework",
+					"\"audio_session\"",
+					"-framework",
+					"\"audioplayers_darwin\"",
+					"-framework",
+					"\"ffmpeg_kit_flutter_min_gpl\"",
+					"-framework",
+					"\"ffmpegkit\"",
+					"-framework",
+					"\"flutter_downloader\"",
+					"-framework",
+					"\"flutter_native_splash\"",
+					"-framework",
+					"\"image_picker_ios\"",
+					"-framework",
+					"\"just_audio\"",
+					"-framework",
+					"\"libavcodec\"",
+					"-framework",
+					"\"libavdevice\"",
+					"-framework",
+					"\"libavfilter\"",
+					"-framework",
+					"\"libavformat\"",
+					"-framework",
+					"\"libavutil\"",
+					"-framework",
+					"\"libswresample\"",
+					"-framework",
+					"\"libswscale\"",
+					"-framework",
+					"\"libwebp\"",
+					"-framework",
+					"\"nfc_manager\"",
+					"-framework",
+					"\"path_provider_foundation\"",
+					"-framework",
+					"\"sqflite\"",
+					"-framework",
+					"\"video_player_avfoundation\"",
+					"-framework",
+					"\"video_thumbnail\"",
+					"-framework",
+					"\"webview_flutter_wkwebview\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.mockingjae2Mobile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -533,6 +663,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
+				trash = "";
 			};
 			name = Debug;
 		};
@@ -559,6 +690,70 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACH_O_TYPE = mh_execute;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"bz2\"",
+					"-l\"c++\"",
+					"-l\"iconv\"",
+					"-l\"sqlite3\"",
+					"-l\"z\"",
+					"-framework",
+					"\"AVFoundation\"",
+					"-framework",
+					"\"AudioToolbox\"",
+					"-framework",
+					"\"CoreMedia\"",
+					"-framework",
+					"\"FMDB\"",
+					"-framework",
+					"\"VideoToolbox\"",
+					"-framework",
+					"\"audio_session\"",
+					"-framework",
+					"\"audioplayers_darwin\"",
+					"-framework",
+					"\"ffmpeg_kit_flutter_min_gpl\"",
+					"-framework",
+					"\"ffmpegkit\"",
+					"-framework",
+					"\"flutter_downloader\"",
+					"-framework",
+					"\"flutter_native_splash\"",
+					"-framework",
+					"\"image_picker_ios\"",
+					"-framework",
+					"\"just_audio\"",
+					"-framework",
+					"\"libavcodec\"",
+					"-framework",
+					"\"libavdevice\"",
+					"-framework",
+					"\"libavfilter\"",
+					"-framework",
+					"\"libavformat\"",
+					"-framework",
+					"\"libavutil\"",
+					"-framework",
+					"\"libswresample\"",
+					"-framework",
+					"\"libswscale\"",
+					"-framework",
+					"\"libwebp\"",
+					"-framework",
+					"\"nfc_manager\"",
+					"-framework",
+					"\"path_provider_foundation\"",
+					"-framework",
+					"\"sqflite\"",
+					"-framework",
+					"\"video_player_avfoundation\"",
+					"-framework",
+					"\"video_thumbnail\"",
+					"-framework",
+					"\"webview_flutter_wkwebview\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.mockingjae2Mobile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -569,6 +764,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
+				trash = "";
 			};
 			name = Release;
 		};

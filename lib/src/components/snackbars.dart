@@ -12,10 +12,10 @@ SnackBar coloredSnackbar(BuildContext context, String content, Color textColor,
     case 1:
       break;
     case 2:
-      width = 260;
+      width = 230;
       break;
     default:
-      width = 300;
+      width = 260;
   }
   return SnackBar(
       dismissDirection: DismissDirection.none,

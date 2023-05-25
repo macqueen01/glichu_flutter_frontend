@@ -1,5 +1,4 @@
 import 'dart:io';
-
 // Packages imports
 
 import 'package:audio_session/audio_session.dart';
@@ -25,8 +24,10 @@ import 'package:mockingjae2_mobile/src/UiComponents.dart/StaticLoading.dart';
 import 'package:mockingjae2_mobile/src/api/scrolls.dart';
 
 import 'package:mockingjae2_mobile/src/controller/scrollsControllers.dart';
+import 'package:mockingjae2_mobile/src/db/TokenDB.dart';
 import 'package:mockingjae2_mobile/src/models/Remix.dart';
 import 'package:mockingjae2_mobile/src/models/Scrolls.dart';
+import 'package:mockingjae2_mobile/src/pages/Authentication/mainPage.dart';
 import 'package:mockingjae2_mobile/src/settings.dart';
 
 // Utility local imports
@@ -42,6 +43,7 @@ import 'package:mockingjae2_mobile/src/controller/scrollPhysics.dart';
 import 'package:mockingjae2_mobile/src/bodyWidget/ScrollsWidget/StatusBar.dart';
 import 'package:mockingjae2_mobile/src/Recorder/testConverter.dart';
 import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
 
 // Scrolls Button related local import
 
@@ -113,15 +115,13 @@ class _ScrollsBodyState extends State<ScrollsBody>
       ScrollsHeaderFetcher headerFetcher = ScrollsHeaderFetcher();
 
       for (int i = 0; i < num; i++) {
-        // dummyResult.add(await _loadImages());
         ScrollsModel newModel = await headerFetcher.singleFetch();
-        print(newModel.scrollsName);
         dummyResult.add(newModel);
       }
       return dummyResult;
     }
 
-    List<ScrollsModel> toBeAdded = await newModels(num: 6);
+    List<ScrollsModel> toBeAdded = await newModels(num: 10);
 
     addAllScrolls(toBeAdded);
   }
@@ -153,7 +153,7 @@ class _ScrollsBodyState extends State<ScrollsBody>
             color: scrollsBackgroundColor,
           ),
           child: Center(
-            child: JaeIcon(55, 55, mainBackgroundColor),
+            child: GlichuIcon(80, 80),
           ),
         );
       }
@@ -227,7 +227,7 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
   final AudioPlayer player = AudioPlayer();
   // Whether scrubbing has been recorded
   bool recording = false;
-  Recorder recorder = Recorder();
+  SingletonRecorder recorder = SingletonRecorder.instance;
 
   Future<void> playAudioFromMemory(Uint8List audioData) async {
     if (player.playing == true) {
@@ -254,6 +254,7 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
 
   @override
   void dispose() {
+    SingletonRecorder.instance.endRecording();
     _controller.dispose();
     super.dispose();
   }
@@ -281,8 +282,7 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
     return false;
   }
 
-  bool scrollsIndexChangeManager(
-      ScrollNotification notification, List<Image> images) {
+  bool scrollsIndexChangeManager(ScrollNotification notification) {
     // Buisness manager to scrolls item
     // this method manages actions related to image index changes
     // on scroll position change
@@ -293,14 +293,18 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
     // Stack-Position widget (Minor utility)
     scrollDelta = notification.metrics.pixels;
 
+    // defines image length by video controller
+    int imageLength =
+        widget.scrollsCache.videoController!.value.duration.inSeconds * 25;
+
     // defines the _controller value by calculating current scroll position in percent
     _controller.value = 1 - _scrollController.remaining();
 
     // defines how image index is going to be displayed as in relationship to current scroll position
-    int candidateIndex = (_controller.value * images.length).floor();
-    if (!scrollsUpperBound(candidateIndex, images.length)) {
+    int candidateIndex = (_controller.value * imageLength).floor();
+    if (!scrollsUpperBound(candidateIndex, imageLength)) {
       // set index to image's last index if index exceeds upper bound
-      currentIndex = images.length - 1;
+      currentIndex = imageLength - 1;
     } else if (!scrollsLowerBound(candidateIndex)) {
       // set index to images's first index if index exceeds lower bound
       currentIndex = 0;
@@ -316,9 +320,8 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
     // Auto scroll position-time recording functionality
     // This should be imported from Recording Module
 
-    if (!recording) {
-      recorder.startRecording();
-      recording = true;
+    if (!recorder.isRecording()) {
+      recorder.startRecording(widget.scrollsCache.scrollsModel);
     }
 
     recorder.updateRecording(currentIndex);
@@ -353,21 +356,8 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
       }
     }
 
-    if (currentIndex / images.length > 0.96) {
-      recording = false;
-      IndexTimeLine recordedTimeline = recorder.stopRecording()!;
-
-      if (recordedTimeline.last! - recordedTimeline.first! >
-          const Duration(seconds: 2)) {
-        // convert into remix
-        RemixModel remix = RemixModel(
-          'new',
-          scrolls: widget.scrollsCache.scrollsModel,
-          timeline: recordedTimeline,
-        );
-
-        context.read<RecordedVideoManager>().saveRemix(remix);
-      }
+    if (currentIndex / imageLength > 0.96) {
+      recorder.endRecording();
 
       // User Controlled Recording Unit
       // This interacts with RecorderProvider from main app runner
@@ -384,7 +374,7 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
                 const Duration(milliseconds: 200)) {
           // convert into remix
           RemixModel remix = RemixModel(
-            'new',
+            '${userGeneratedTimeLine.hashCode}',
             scrolls: widget.scrollsCache.scrollsModel,
             timeline: userGeneratedTimeLine,
           );
@@ -397,27 +387,13 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
       widget.parentScrollController.switchToNextScrolls(context);
       // reset the scrolls at start
       _scrollController.fastScrubToStart();
+      // reset video controller
     }
 
     // Auto Recorder Unit
 
     if (notification.metrics.pixels <= -35 && widget.index != 0) {
-      recording = false;
-      IndexTimeLine recordedTimeline = recorder.stopRecording()!;
-
-      if (recordedTimeline.last! - recordedTimeline.first! >
-          const Duration(seconds: 2)) {
-        String createdDate = DateTime.now().toString();
-        ScrollsModel scrollsModel = widget.scrollsCache.scrollsModel;
-        // convert into remix
-        RemixModel remix = RemixModel(
-          '${createdDate}_${scrollsModel.scrollsName}',
-          scrolls: scrollsModel,
-          timeline: recordedTimeline,
-        );
-
-        context.read<RecordedVideoManager>().saveRemix(remix);
-      }
+      recorder.endRecording();
 
       // snap to the last scrolls if one exists
       widget.parentScrollController.switchToLastScrolls(context);
@@ -429,19 +405,14 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Consumer<ScrollsManager>(builder: (context, scrollsManager, child) {
-      if (widget.index ==
-              widget.parentScrollController.getCurrentScrollsIndex() &&
-          widget.parentScrollController.isIndexChanged()) {
-        scrollsManager.setIndex(widget.index);
-      }
-      if (!widget.scrollsCache.isMemoryCached ||
-          widget.scrollsCache.scrollsImages == null) {
+      if (!scrollsManager.memoryCacheIndexRange().contains(widget.index)) {
         return IndexChangeHandler(
           parentScrollController: widget.parentScrollController,
           index: widget.index,
           child: const LoadingView(),
         );
       }
+      /*
       if (widget.scrollsCache.isMemoryCached &&
           widget.scrollsCache.scrollsModel.isRestricted) {
         return IndexChangeHandler(
@@ -450,90 +421,168 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
           child: RestrictedView(),
         );
       }
-      return Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        decoration: const BoxDecoration(color: scrollsBackgroundColor),
-        child: NotificationListener<ScrollNotification>(
-            onNotification: (notification) => scrollsIndexChangeManager(
-                notification, widget.scrollsCache.scrollsImages!),
-            child: SingleChildScrollView(
-                controller: _scrollController,
-                physics: const DampedScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                child: SizedBox(
-                  height: _height,
-                  width: MediaQuery.of(context).size.width,
-                  child: Stack(fit: StackFit.expand, children: [
-                    Positioned(
-                      top: (scrollDelta >= 0) ? scrollDelta : 0,
-                      child: GestureDetector(
-                        // this calls _scrollController.switchToNextScrolls() if swiped from right to left
-                        onHorizontalDragEnd: (dragEndDetails) {
-                          if (dragEndDetails.primaryVelocity! < 0) {
-                            // Page forwards
-                            widget.parentScrollController
-                                .switchToNextScrolls(context);
-                          } else if (dragEndDetails.primaryVelocity! > 0) {
-                            // Page backwards
-                            widget.parentScrollController
-                                .switchToLastScrolls(context);
-                          }
-                        },
+      */
 
-                        onLongPressStart: (LongPressStartDetails detail) {
-                          // this auto scrolls at velocity (_height / widget.duration)
-                          // works alongside with onLongPressEnd
-                          _scrollController.scrubToEnd();
-                        },
-                        onLongPressEnd: (LongPressEndDetails detail) {
-                          // this auto scrolls at velocity (_height / widget.duration)
-                          // works alongside with onLongPressStart
-                          _scrollController.scrubStop();
-                        },
-                        onDoubleTap: () {
-                          // this animates back to beginning of the scrolls
-                          _scrollController.fastScrubToStart();
-                        },
-                        onHorizontalDragStart: (details) {
-                          // for test utilities only
-                          // used only in test pipeline
-                          widget.parentScrollController.refreshScroll();
-                        },
-                        child: BoxContainer(
-                            context: context,
-                            backgroundColor: scrollsBackgroundColor,
-                            height: MediaQuery.of(context).size.height,
-                            width: MediaQuery.of(context).size.width,
-                            child: Stack(
-                              alignment: AlignmentDirectional.topStart,
-                              children: ([
-                                widget
-                                    .scrollsCache.scrollsImages![currentIndex],
-                                // status bar
-                                StatusBar(
-                                    currentIndex: currentIndex,
-                                    length: widget
-                                        .scrollsCache.scrollsImages!.length),
-                                // remix number
-                                Positioned(
-                                  right: 2.5,
-                                  top: 20,
-                                  child: ScrollsRelatedInfoButtonWrap(),
-                                ),
-                                Positioned(
-                                  left: 10,
-                                  top: 15,
-                                  width: 250,
-                                  child: ScrollsHeader(),
-                                )
-                              ]),
-                            )),
-                      ),
-                    )
-                  ]),
-                ))),
-      );
+      if (widget.index ==
+              widget.parentScrollController.getCurrentScrollsIndex() &&
+          widget.parentScrollController.isIndexChanged()) {
+        scrollsManager.setIndex(widget.index);
+
+        //initializeVideoController(
+        //    'https://mockingjae-test-bucket.s3.ap-northeast-2.amazonaws.com/auto-recording/7/1020524228.mp4');
+      }
+
+      return Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          decoration: const BoxDecoration(color: scrollsBackgroundColor),
+          child: NotificationListener<ScrollNotification>(
+              onNotification: (notification) =>
+                  scrollsIndexChangeManager(notification),
+              child: SingleChildScrollView(
+                  controller: _scrollController,
+                  physics: const DampedScrollPhysics(),
+                  scrollDirection: Axis.vertical,
+                  child: SizedBox(
+                    height: _height,
+                    width: MediaQuery.of(context).size.width,
+                    child: Stack(fit: StackFit.expand, children: [
+                      Positioned(
+                        top: (scrollDelta >= 0) ? scrollDelta : 0,
+                        child: GestureDetector(
+                          // this calls _scrollController.switchToNextScrolls() if swiped from right to left
+                          onHorizontalDragEnd: (dragEndDetails) {
+                            if (dragEndDetails.primaryVelocity! < 0) {
+                              // Page forwards
+                              widget.parentScrollController
+                                  .switchToNextScrolls(context);
+                            } else if (dragEndDetails.primaryVelocity! > 0) {
+                              // Page backwards
+                              widget.parentScrollController
+                                  .switchToLastScrolls(context);
+                            }
+                          },
+
+                          onLongPressStart: (LongPressStartDetails detail) {
+                            // this auto scrolls at velocity (_height / widget.duration)
+                            // works alongside with onLongPressEnd
+                            _scrollController.scrubToEnd();
+                          },
+                          onLongPressEnd: (LongPressEndDetails detail) {
+                            // this auto scrolls at velocity (_height / widget.duration)
+                            // works alongside with onLongPressStart
+                            _scrollController.scrubStop();
+                          },
+                          onDoubleTap: () {
+                            // this animates back to beginning of the scrolls
+                            _scrollController.fastScrubToStart();
+                          },
+                          onHorizontalDragStart: (details) {},
+                          child: BoxContainer(
+                              context: context,
+                              backgroundColor: scrollsBackgroundColor,
+                              height: MediaQuery.of(context).size.height,
+                              width: MediaQuery.of(context).size.width,
+                              child: (widget.scrollsCache.videoController ==
+                                      null)
+                                  ? const LoadingView()
+                                  : LayoutBuilder(builder:
+                                      (BuildContext context,
+                                          BoxConstraints constraints) {
+                                      double videoWidth =
+                                          constraints.maxHeight *
+                                              widget
+                                                  .scrollsCache
+                                                  .videoController!
+                                                  .value
+                                                  .aspectRatio;
+                                      return Stack(
+                                        alignment:
+                                            AlignmentDirectional.topStart,
+                                        children: (widget.index ==
+                                                widget.parentScrollController
+                                                    .getCurrentScrollsIndex())
+                                            ? ([
+                                                Positioned(
+                                                  left: (constraints.maxWidth -
+                                                          videoWidth) /
+                                                      2,
+                                                  top: 0,
+                                                  width: videoWidth,
+                                                  height: constraints.maxHeight,
+                                                  child: VideoPlayer(widget
+                                                      .scrollsCache
+                                                      .videoController!
+                                                    ..seekTo(Duration(
+                                                        milliseconds:
+                                                            ((currentIndex /
+                                                                            25) *
+                                                                        1000 +
+                                                                    3)
+                                                                .floor()))),
+                                                ),
+                                                //widget.scrollsCache
+                                                //    .scrollsImages![currentIndex],
+                                                // status bar
+                                                //StatusBar(
+                                                //    currentIndex: currentIndex,
+                                                //    length: widget.scrollsCache
+                                                //        .scrollsImages!.length),
+                                                // remix number
+
+                                                // facad gradient on top of the video
+                                                Positioned(
+                                                  left: 0,
+                                                  top: 0,
+                                                  width: constraints.maxWidth,
+                                                  height: 100,
+                                                  child: Container(
+                                                    height: 100,
+                                                    decoration: const BoxDecoration(
+                                                        gradient: LinearGradient(
+                                                            begin: Alignment
+                                                                .topCenter,
+                                                            end: Alignment
+                                                                .bottomCenter,
+                                                            colors: [
+                                                          Color.fromARGB(
+                                                              142, 20, 20, 20),
+                                                          Colors.transparent
+                                                        ])),
+                                                  ),
+                                                ),
+                                                Positioned(
+                                                  right: 2.5,
+                                                  top: 20,
+                                                  child:
+                                                      ScrollsRelatedInfoButtonWrap(
+                                                    scrollsId: widget
+                                                        .scrollsCache
+                                                        .scrollsModel
+                                                        .id,
+                                                  ),
+                                                ),
+                                                Positioned(
+                                                  left: 10,
+                                                  top: 15,
+                                                  width: 250,
+                                                  child: ScrollsHeader(
+                                                    createdAt: widget
+                                                        .scrollsCache
+                                                        .scrollsModel
+                                                        .createdAt,
+                                                    user: widget.scrollsCache
+                                                        .scrollsModel.user,
+                                                  ),
+                                                )
+                                              ])
+                                            : [],
+                                      );
+                                    })),
+                        ),
+                      )
+                    ]),
+                  ))));
     });
   }
 }

@@ -9,12 +9,56 @@ class AnimatedTextField extends StatefulWidget {
   final double width;
   final bool hidden;
 
+  final Color placeholderColor;
+  final Color placeholderColorFocused;
+  final Color mainTextColor;
+  final Color borderColor;
+
   const AnimatedTextField(
       {super.key,
+      this.placeholderColor = Colors.black38,
+      this.placeholderColorFocused = Colors.black87,
+      this.mainTextColor = Colors.black38,
+      this.borderColor = mainThemeColor,
       required String this.placeholder,
       required Function this.callBack,
       required double this.width,
       required bool this.hidden});
+
+  double textSize(String text) {
+    if (text == '') {
+      return 18;
+    }
+    return 14;
+  }
+
+  Color textColor(String text) {
+    if (text == '') {
+      return placeholderColor;
+    }
+    return placeholderColorFocused;
+  }
+
+  double textTopPadding(String text) {
+    if (text == '') {
+      return 10;
+    }
+    return 0;
+  }
+
+  double textFieldTopPadding(String text) {
+    if (text == '') {
+      return 12;
+    }
+    return 20;
+  }
+
+  double textFieldBottomPadding(text) {
+    if (text == '') {
+      return 13;
+    }
+    return 5;
+  }
 
   @override
   State<AnimatedTextField> createState() => AnimatedTextFieldState();
@@ -27,7 +71,7 @@ class AnimatedTextFieldState extends State<AnimatedTextField> {
   double _textFieldPaddingTop = 12;
   double _textFieldPaddingBottom = 13;
   double _textSize = 18;
-  Color _textColor = Colors.black38;
+  Color? _textColor;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +82,7 @@ class AnimatedTextFieldState extends State<AnimatedTextField> {
         height: 55,
         decoration: BoxDecoration(
             border: Border.all(
-              color: mainThemeColor,
+              color: widget.borderColor,
               width: 1.5,
               style: BorderStyle.solid,
             ),
@@ -50,23 +94,31 @@ class AnimatedTextFieldState extends State<AnimatedTextField> {
               Container(
                 padding: EdgeInsets.fromLTRB(0, _textPaddingTop, 0, 10),
                 child: AnimatedDefaultTextStyle(
-                    style: TextStyle(fontSize: _textSize, color: _textColor),
+                    style: TextStyle(
+                        fontSize: _textSize,
+                        color: _textColor != null
+                            ? _textColor
+                            : widget.textColor(_text)),
                     duration: const Duration(milliseconds: 150),
                     child: Text(widget.placeholder)),
               ),
               Container(
                 padding: EdgeInsets.fromLTRB(0, 0, 0, _textFieldPaddingBottom),
                 child: TextField(
-                  style: const TextStyle(fontSize: 16),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
                   obscureText: !widget.hidden,
                   onChanged: (text) {
                     setState(() {
                       widget.callBack(text);
-                      _textSize = textSize(text);
-                      _textPaddingTop = textTopPadding(text);
-                      _textFieldPaddingTop = textFieldTopPadding(text);
-                      _textFieldPaddingBottom = textFieldBottomPadding(text);
-                      _textColor = textColor(text);
+                      _textSize = widget.textSize(text);
+                      _textPaddingTop = widget.textTopPadding(text);
+                      _textFieldPaddingTop = widget.textFieldTopPadding(text);
+                      _textFieldPaddingBottom =
+                          widget.textFieldBottomPadding(text);
+                      _textColor = widget.textColor(text);
                     });
                   },
                   decoration: const InputDecoration(
@@ -79,39 +131,4 @@ class AnimatedTextFieldState extends State<AnimatedTextField> {
           ),
         ));
   }
-}
-
-double textSize(String text) {
-  if (text == '') {
-    return 18;
-  }
-  return 14;
-}
-
-Color textColor(String text) {
-  if (text == '') {
-    return Colors.black38;
-  }
-  return Colors.black87;
-}
-
-double textTopPadding(String text) {
-  if (text == '') {
-    return 10;
-  }
-  return 0;
-}
-
-double textFieldTopPadding(String text) {
-  if (text == '') {
-    return 12;
-  }
-  return 20;
-}
-
-double textFieldBottomPadding(text) {
-  if (text == '') {
-    return 13;
-  }
-  return 5;
 }

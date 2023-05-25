@@ -69,10 +69,10 @@ class _FlatButtonLargeState extends State<FlatButtonLarge> {
 class ScrollsInfoButton extends StatefulWidget {
   final IconData iconData;
   final int statistic;
-  final Function? callBack;
+  void Function()? callBack;
   final int size;
 
-  const ScrollsInfoButton({
+  ScrollsInfoButton({
     super.key,
     required this.iconData,
     required this.statistic,
@@ -133,7 +133,7 @@ class _ScrollsInfoButtonState extends State<ScrollsInfoButton> {
 class FlatButton extends StatefulWidget {
   final Color? color;
   final LinearGradient? gradient;
-  final Text? content;
+  final Widget? content;
   final Widget? icon;
   final double radius;
   final double height;

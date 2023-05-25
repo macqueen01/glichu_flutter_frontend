@@ -89,8 +89,15 @@ class MainScrollsController extends ScrollController {
       _lastScrollsIndex = _currentIndex;
       _currentIndex = _currentIndex! + 1;
       _indexChanged = true;
+      if (_currentIndex == _lastIndex! - 3) {
+        // Preload more scrolls near the end of the list
+        reloadTimeout = false;
+        refreshScroll().then((value) {
+          reloadTimeout = true;
+        });
+      }
       animateTo((_currentIndex!) * MediaQuery.of(context).size.height,
-          duration: const Duration(milliseconds: 230), curve: Curves.ease);
+          duration: const Duration(milliseconds: 400), curve: Curves.ease);
       (onIndexChange != null) ? onIndexChange!(_currentIndex!) : null;
     } else {
       // if onScrollsRequest exists, request more scrolls into the view.
@@ -107,7 +114,7 @@ class MainScrollsController extends ScrollController {
       _currentIndex = _currentIndex! - 1;
       _indexChanged = true;
       animateTo((_currentIndex!) * MediaQuery.of(context).size.height,
-          duration: const Duration(milliseconds: 200), curve: Curves.ease);
+          duration: const Duration(milliseconds: 400), curve: Curves.ease);
       (onIndexChange != null) ? onIndexChange!(_currentIndex!) : null;
     }
     return;
@@ -135,7 +142,7 @@ class SingleScrollsController extends ScrollController {
   // for a single scrolls item.
 
   // duration is the playtime of the entire scrolls estimated to integer milliseconds
-  // default playtime is 15 seconds.
+  // default playtime is 10 seconds.
   int duration;
   // height is an entire height of the scrolls item. this value should be passed inside
   // the scrolls widget this controller is called.

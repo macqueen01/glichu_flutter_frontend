@@ -21,11 +21,22 @@ mixin VideoPlayerMixin<T extends StatefulWidget> on State<T> {
   }
 
   void videoControllerSetup(
-      BuildContext context, File videoFile, RecordedVideoManager manager) {
+      {required BuildContext context,
+      File? videoFile,
+      String? videoUrl,
+      required ChangeNotifier manager}) {
     // Mendatory function for initializing video play view
     //manager.videoPlayerController = VideoPlayerController.file(videoFile);
     //controller = manager.videoPlayerController!;
-    controller = VideoPlayerController.file(videoFile);
+
+    if (videoFile != null) {
+      controller = VideoPlayerController.file(videoFile);
+    } else if (videoUrl != null) {
+      controller = VideoPlayerController.network(videoUrl);
+    } else {
+      controller = VideoPlayerController.network(
+          'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4');
+    }
     initializeVideoPlayerFuture = controller.initialize();
   }
 

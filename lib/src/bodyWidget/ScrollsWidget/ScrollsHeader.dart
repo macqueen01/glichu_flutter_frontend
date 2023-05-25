@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mockingjae2_mobile/src/models/User.dart';
+import 'package:mockingjae2_mobile/src/pages/profile.dart';
 
 // Utility local imports
 
@@ -22,8 +24,13 @@ import 'package:mockingjae2_mobile/src/bodyWidget/ScrollsWidget/StatusBar.dart';
 // Scrolls Button related local import
 
 class ScrollsHeader extends StatelessWidget {
-  const ScrollsHeader({
+  UserMin user;
+  String createdAt;
+
+  ScrollsHeader({
     super.key,
+    required this.user,
+    required this.createdAt,
   });
 
   @override
@@ -33,13 +40,7 @@ class ScrollsHeader extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(right: 10),
-          child: Profile(
-            image: Image.asset(
-              'assets/icons/dalli.jpg',
-              width: 50,
-              height: 50,
-            ),
-          ),
+          child: Profile(user: user),
         ),
         Expanded(
           child: Column(
@@ -48,20 +49,25 @@ class ScrollsHeader extends StatelessWidget {
             children: [
               GestureDetector(
                   onTap: () {
-                    Navigator.pushNamed(context, '/profile');
+                    ProfilePageArguments arguments =
+                        ProfilePageArguments(user: user);
+
+                    Navigator.pushNamed(context, ProfilePage.routeName,
+                        arguments: arguments);
                   },
-                  child: idTextParser(id: 'mocking_jae_^.^', maxLength: 17)),
+                  child: idTextParser(id: user.userName, maxLength: 17)),
               const SizedBox(
                 height: 8,
               ),
-              const Expanded(
+              Expanded(
                 flex: 0,
                 child: Text(
-                  '7h ago',
+                  parseRelativeTime(createdAt),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: mainBackgroundColor,
-                      fontWeight: FontWeight.w300,
+                      decoration: TextDecoration.none,
+                      fontWeight: FontWeight.w500,
                       fontSize: 12),
                 ),
               )
@@ -74,10 +80,23 @@ class ScrollsHeader extends StatelessWidget {
 }
 
 class Profile extends StatefulWidget {
-  final Image image;
+  final UserMin user;
   final int size;
+  final void Function()? onTap;
+  Image? image;
 
-  const Profile({super.key, required this.image, this.size = 0});
+  Profile({super.key, required this.user, this.size = 0, this.onTap = null}) {
+    if (user.profileImagePath == null) {
+      image = Image.asset(
+        'assets/icons/dalli.jpg',
+        width: 50,
+        height: 50,
+      );
+    } else {
+      image = Image.network(user.profileImagePath!,
+          fit: BoxFit.fill, width: 100, height: 100);
+    }
+  }
 
   List<double> sizeConvert(int size) {
     switch (size) {
@@ -99,32 +118,39 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // check if current route starts with '/profile'
-        // if not, activate the following pushNamed
-        Navigator.pushNamed(context, '/profile');
-      },
-      child: Container(
-        width: widget.sizeConvert(widget.size)[0],
-        height: widget.sizeConvert(widget.size)[0],
-        alignment: Alignment.center,
-        decoration: const BoxDecoration(
-            shape: BoxShape.circle, gradient: lensFlareGradient),
+    return Hero(
+      tag: 'profile_${widget.user.userId}',
+      child: GestureDetector(
+        onTap: widget.onTap != null
+            ? widget.onTap
+            : () {
+                ProfilePageArguments arguments =
+                    ProfilePageArguments(user: widget.user);
+
+                Navigator.pushNamed(context, ProfilePage.routeName,
+                    arguments: arguments);
+              },
         child: Container(
-          width: widget.sizeConvert(widget.size)[1],
-          height: widget.sizeConvert(widget.size)[1],
+          width: widget.sizeConvert(widget.size)[0],
+          height: widget.sizeConvert(widget.size)[0],
           alignment: Alignment.center,
           decoration: const BoxDecoration(
-              shape: BoxShape.circle, color: mainBackgroundColor),
+              shape: BoxShape.circle, gradient: lensFlareGradient),
           child: Container(
-              width: widget.sizeConvert(widget.size)[2],
-              height: widget.sizeConvert(widget.size)[2],
-              decoration: const BoxDecoration(
-                  shape: BoxShape.circle, color: mainBackgroundColor),
-              clipBehavior: Clip.antiAlias,
-              alignment: Alignment.center,
-              child: widget.image),
+            width: widget.sizeConvert(widget.size)[1],
+            height: widget.sizeConvert(widget.size)[1],
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+                shape: BoxShape.circle, color: mainBackgroundColor),
+            child: Container(
+                width: widget.sizeConvert(widget.size)[2],
+                height: widget.sizeConvert(widget.size)[2],
+                decoration: const BoxDecoration(
+                    shape: BoxShape.circle, color: mainBackgroundColor),
+                clipBehavior: Clip.antiAlias,
+                alignment: Alignment.center,
+                child: widget.image),
+          ),
         ),
       ),
     );

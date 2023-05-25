@@ -7,29 +7,42 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mockingjae2_mobile/src/FileManager/AbstractManager.dart';
 import 'package:mockingjae2_mobile/src/FileManager/lowestActions.dart';
+import 'package:mockingjae2_mobile/src/api/profile.dart';
 import 'package:mockingjae2_mobile/src/api/scrolls.dart';
 import 'package:mockingjae2_mobile/src/models/Remix.dart';
 import 'package:mockingjae2_mobile/src/models/Scrolls.dart';
 import 'package:mockingjae2_mobile/src/models/ScrollsPreview.dart';
+import 'package:mockingjae2_mobile/src/models/User.dart';
+import 'package:video_player/video_player.dart';
 
 // ScrollsPreviewManager to be used under Profile page.
 // Interacts as a state manager
 class ScrollsPreviewManager extends ScrollsManager {
+  UserMin user;
+
   List<ScrollsPreviewModel> _previewModelList = [];
   bool updateInProgress = false;
 
-  ScrollsPreviewManager({required super.context});
+  ScrollsPreviewManager({required super.context, required this.user});
 
   /// An unmodifiable view of the items in the cart.
   UnmodifiableListView<ScrollsPreviewModel> get previewModelList =>
       UnmodifiableListView(_previewModelList);
 
+  // Api fetchers
+  ScrollsHeaderFetcher scrollsHeaderFetcher = ScrollsHeaderFetcher();
+  RelationsFetcher relationsFetcher = RelationsFetcher();
+
   Future<void> update() async {
-    // dummy updater
     updateInProgress = true;
-    await dummyUpdate();
+    await scrollsPreviewUpdate();
+    await Future.delayed(const Duration(seconds: 1));
     updateInProgress = false;
-    return null;
+    notifyListeners();
+  }
+
+  void initializeList() {
+    _previewModelList = [];
   }
 
   bool isEmpty() {
@@ -54,17 +67,28 @@ class ScrollsPreviewManager extends ScrollsManager {
     return thumbnail;
   }
 
-  Future<void> dummyUpdate() async {
-    File? dummyFile = await getScrollsPreviewFromCache('Scrolls1');
+  Future<void> updateUser() async {
+    UserMin? updatedUser = await relationsFetcher.fetchUserMin(user.userId);
 
-    if (dummyFile == null) {
-      return null;
+    if (updatedUser == null) {
+      return;
     }
 
-    for (int i = 0; i < 1; i++) {
-      _previewModelList.add(
-          ScrollsPreviewModel(scrollsName: 'Scrolls1', previewFile: dummyFile));
-    }
+    user = updatedUser;
+    notifyListeners();
+  }
+
+  Future<void> scrollsPreviewUpdate() async {
+    List<ScrollsModel> scrollsModels =
+        await scrollsHeaderFetcher.fetchScrollsOfUser(user.userId);
+
+    initializeList();
+
+    scrollsModels.forEach(
+      (scrollsModel) {
+        _previewModelList.add(ScrollsPreviewModel(scrollsModel: scrollsModel));
+      },
+    );
   }
 }
 
@@ -74,18 +98,30 @@ class ScrollsIndexImageCache {
   // Other memory caches should not be reproduced to take extra memory.
   bool isDiskCached = true;
   bool isMemoryCached = false;
-  List<Image>? scrollsImages;
   ScrollsModel scrollsModel;
   List<Highlight>? highlights;
+  VideoPlayerController? videoController;
 
   ScrollsIndexImageCache({required this.scrollsModel}) {
-    if (this.scrollsImages == null) {
-      this.scrollsImages = [];
-    }
-
     if (this.highlights == null) {
       this.highlights = [];
     }
+  }
+
+  Future<void> _initializeVideoController() async {
+    if (videoController != null) {
+      return;
+    }
+    videoController = VideoPlayerController.network(scrollsModel.videoUrl);
+    await videoController!.initialize();
+  }
+
+  void _disposeVideoController() {
+    if (videoController == null) {
+      return;
+    }
+    videoController!.dispose();
+    videoController = null;
   }
 
   bool hasHighlights() {
@@ -103,7 +139,7 @@ class ScrollsIndexImageCache {
     isDiskCached = true;
   }
 
-  void setMemoryCache(List<Image> images) {
+  Future<void> setMemoryCache() async {
     if (isMemoryCached) {
       return null;
     }
@@ -112,7 +148,8 @@ class ScrollsIndexImageCache {
       throw Error();
     }
 
-    scrollsImages = images;
+    await _initializeVideoController();
+
     isMemoryCached = true;
   }
 
@@ -170,9 +207,9 @@ class ScrollsIndexImageCache {
       return null;
     }
 
-    scrollsImages!.clear();
     highlights!.clear();
     isMemoryCached = false;
+    _disposeVideoController();
   }
 }
 
@@ -319,23 +356,18 @@ class ScrollsManager extends ChangeNotifier {
     ScrollsIndexImageCache currentCache = _scrollsCache[index];
 
     if (!currentCache.isMemoryCached) {
-      currentCache.setMemoryCache(await getScrollsImageFromNetwork(
-          currentCache.scrollsModel.scrollsName));
+      await currentCache.setMemoryCache();
+      /*
       await currentCache.setAllAudios(getDirectory(
           Directory(await cachedPath), currentCache.scrollsModel.scrollsName)!);
+          */
     }
 
     // Feed images of the scrolls and highlights within range into memory
     // Syncronous manner
     for (ScrollsIndexImageCache scrollsCache in getScrollsWithInBound()) {
       if (!scrollsCache.isMemoryCached) {
-        getScrollsImageFromNetwork(scrollsCache.scrollsModel.scrollsName)
-            .then((images) async {
-          scrollsCache.setMemoryCache(images);
-          // wait for audio loading since this won't take so long
-          scrollsCache.setAllAudios(getDirectory(Directory(await cachedPath),
-              scrollsCache.scrollsModel.scrollsName)!);
-        });
+        await scrollsCache.setMemoryCache();
       }
     }
 
@@ -369,6 +401,7 @@ class ScrollsManager extends ChangeNotifier {
             isAndroid: isAndroid);
       },
     ));
+
     return scrollsImages;
   }
 
@@ -378,10 +411,13 @@ class ScrollsManager extends ChangeNotifier {
     List<Image> scrollsImages = [];
 
     if (callback != null) {
+      /*
       scrollsImages = await getScrollsImageFromCache(scrollsName);
+      */
       callback(scrollsImages);
       return scrollsImages;
     }
+    /*
 
     if (await isCached(scrollsName)) {
       scrollsImages = await getScrollsImageFromCache(scrollsName);
@@ -389,6 +425,7 @@ class ScrollsManager extends ChangeNotifier {
       await downloadScrolls(scrollsName);
       scrollsImages = await getScrollsImageFromCache(scrollsName);
     }
+    */
     return scrollsImages;
   }
 

@@ -71,7 +71,11 @@ class LikeTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-        leading: Profile(image: Image.asset('assets/icons/dalli.jpg')),
+        leading: Profile(
+            user: UserMin(
+                userId: user.userId,
+                userName: user.userName,
+                profileImagePath: user.profileImagePath)),
         title: Text(
           user.userId,
           style: TextStyle(color: mainBackgroundColor),

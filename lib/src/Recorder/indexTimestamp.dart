@@ -2,8 +2,8 @@ import 'dart:core';
 
 // IndexTimestamp should not be accessed directly, but only through IndexTimeLine class
 class IndexTimestamp {
-  final DateTime time;
-  final int index;
+  late final DateTime time;
+  late final int index;
   IndexTimestamp? next;
   IndexTimestamp? previous;
 
@@ -32,17 +32,24 @@ class IndexTimestamp {
   }
 
   Map<String, dynamic> toJson() => {
-        'time': time,
+        'time': time.toString(),
         'index': index,
         'next': next == null ? 'null' : next!.toJson(),
       };
+
+  IndexTimestamp.fromMap(Map<String, dynamic> json) {
+    this.time = DateTime.parse(json['time']);
+    this.index = json['index'];
+    this.next =
+        json['next'] == 'null' ? null : IndexTimestamp.fromMap(json['next']);
+  }
 }
 
 class IndexTimeLine {
   IndexTimestamp? first;
   IndexTimestamp? last;
   int? _length;
-  Duration timeout;
+  late Duration timeout;
 
   IndexTimeLine({this.first, this.timeout = const Duration(seconds: 10)}) {
     if (this.first == null) {
@@ -171,4 +178,11 @@ class IndexTimeLine {
         'first': first == null ? 'null' : first!.toJson(),
         'length': _length,
       };
+
+  IndexTimeLine.fromMap(Map<String, dynamic> json) {
+    this.first =
+        json['first'] == 'null' ? null : IndexTimestamp.fromMap(json['first']);
+    this._length = json['length'];
+    this.timeout = const Duration(seconds: 10);
+  }
 }

@@ -25,7 +25,7 @@ class MJBottomNavBar extends StatefulWidget {
   const MJBottomNavBar(
       {super.key,
       required this.items,
-      this.initialIndex = 0,
+      this.initialIndex = 1,
       required this.onTap});
 
   @override
@@ -40,8 +40,8 @@ class _MJBottomNavBar extends State<MJBottomNavBar> {
   @override
   void initState() {
     super.initState();
-    _currentIndex = 0;
-    _mode = 0;
+    _currentIndex = 1;
+    _mode = 1;
     _backgroundColor = mainSubThemeColor;
   }
 
@@ -84,13 +84,14 @@ class _MJBottomNavBar extends State<MJBottomNavBar> {
                       child:
                           widget.items[0].activeDetect(_currentIndex == 1, 1))),
             ),
+            /*
             Positioned(
                 right: 30,
                 top: -30,
                 child: recordingButton(
                   onStart: context.read<RecorderProvider>().startRecording,
                   onEnd: context.read<RecorderProvider>().stopRecording,
-                )),
+                )),*/
           ],
         ),
       );

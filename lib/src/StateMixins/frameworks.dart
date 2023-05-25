@@ -21,15 +21,23 @@ mixin DragUpdatable<T extends StatefulWidget> on State<T> {
   void reload() {
     // this should recieve all data from the server,
     // then refreshed all contents of the page
+    setLoadingTrue();
+    setState(() {
+      Timer(Duration(seconds: _duration), updateCallback);
+    });
+  }
+
+  void updateCallback() {
+    (mounted)
+        ? setState(() {
+            _load = false;
+          })
+        : null;
+  }
+
+  void setLoadingTrue() {
     setState(() {
       _load = true;
-      Timer(Duration(seconds: _duration), () {
-        (mounted)
-            ? setState(() {
-                _load = false;
-              })
-            : null;
-      });
     });
   }
 
@@ -38,7 +46,8 @@ mixin DragUpdatable<T extends StatefulWidget> on State<T> {
     return NotificationListener<ScrollNotification>(
       onNotification: (ScrollNotification notification) {
         if (notification.metrics.pixels <
-            -MediaQuery.of(context).size.height * 0.065) {
+                -MediaQuery.of(context).size.height * 0.065 &&
+            !_load) {
           reload();
         }
         return true;
