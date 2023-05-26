@@ -13,7 +13,7 @@ import 'package:dio/dio.dart' as dio;
 import 'package:mockingjae2_mobile/src/settings.dart';
 
 class ScrollsContentFetcher {
-  BaseUrl backendUrls = BaseUrl();
+  BaseUrlGenerator backendUrls = BaseUrl().baseUrl;
   bool fetchReady = false;
 
   final Directory baseDir;
@@ -72,7 +72,7 @@ Future<void> unpackTarToDir(Directory baseDir, Uint8List bytes) async {
 }
 
 class ScrollsHeaderFetcher {
-  BaseUrl backendUrls = BaseUrl();
+  BaseUrlGenerator backendUrls = BaseUrl().baseUrl;
 
   Future<ScrollsModel> singleFetch() async {
     final browseUrl = Uri.parse(backendUrls.scrollsBrowseUrls.baseUrl);
@@ -110,7 +110,7 @@ class ScrollsHeaderFetcher {
 }
 
 class ScrollsUploader {
-  BaseUrl backendUrls = BaseUrl();
+  BaseUrlGenerator backendUrls = BaseUrl().baseUrl;
 
   dio.Dio dioClient = dio.Dio();
 

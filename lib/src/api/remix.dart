@@ -15,7 +15,7 @@ import 'package:dio/dio.dart' as dio;
 import 'package:mockingjae2_mobile/src/settings.dart';
 
 class AutoRecorderApi {
-  BaseUrl backendUrls = BaseUrl();
+  BaseUrlGenerator backendUrls = BaseUrl().baseUrl;
   AuthenticationHeader header = AuthenticationHeader();
   dio.Dio dioClient = dio.Dio();
 
@@ -34,7 +34,7 @@ class AutoRecorderApi {
   Future<List<RemixViewModel>> fetchRemixFromScrollsId(int scrollsId) async {
     try {
       dio.Response response = await dioClient.get(
-          '${backendUrls.autoRecordingUrls.remixBrowseUrl}?id=$scrollsId',
+          '${backendUrls.autoRecordingUrls.remixBrowseUrl}?id=$scrollsId&mp4=False',
           options: dio.Options(headers: await header.getHeader()));
 
       List<RemixViewModel> remixList = [];
@@ -52,7 +52,7 @@ class AutoRecorderApi {
       int scrollsId, int page) async {
     try {
       dio.Response response = await dioClient.get(
-          '${backendUrls.autoRecordingUrls.remixBrowseUrl}?id=$scrollsId&recent=true&page=$page',
+          '${backendUrls.autoRecordingUrls.remixBrowseUrl}?id=$scrollsId&recent=true&mp4=False&page=$page',
           options: dio.Options(headers: await header.getHeader()));
 
       List<RemixViewModel> remixList = [];
@@ -70,7 +70,7 @@ class AutoRecorderApi {
       int scrollsId, int page) async {
     try {
       dio.Response response = await dioClient.get(
-          '${backendUrls.autoRecordingUrls.remixBrowseUrl}?id=$scrollsId&most-scrolled=true&page=$page',
+          '${backendUrls.autoRecordingUrls.remixBrowseUrl}?id=$scrollsId&most-scrolled=true&mp4=False&page=$page',
           options: dio.Options(headers: await header.getHeader()));
 
       List<RemixViewModel> remixList = [];
@@ -88,7 +88,7 @@ class AutoRecorderApi {
       int scrollsId, int page) async {
     try {
       dio.Response response = await dioClient.get(
-          '${backendUrls.autoRecordingUrls.remixBrowseUrl}?id=$scrollsId&followers=true&page=$page',
+          '${backendUrls.autoRecordingUrls.remixBrowseUrl}?id=$scrollsId&followers=true&mp4=False&page=$page',
           options: dio.Options(headers: await header.getHeader()));
 
       List<RemixViewModel> remixList = [];

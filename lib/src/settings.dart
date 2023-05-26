@@ -4,54 +4,102 @@
 
 import 'dart:math';
 
+import 'package:flutter/material.dart';
+import 'package:mockingjae2_mobile/src/bodyWidget/ScrollsBodyView.dart';
+
 String mainUrl = 'https://storage.memehouses.com/scrolls';
 String testUrl = 'http://localhost:8000/scrolls';
 
 class BaseUrl {
-  final String baseUrl = mainUrl;
-  final String scrollsUrl = mainUrl;
-  final String scrollsFetchUrl =
+  BaseUrlGenerator baseUrl = BaseUrlGenerator(mainUrl: testUrl);
+}
+
+class BaseUrlGenerator {
+  late final String baseUrl;
+  late final String scrollsUrl;
+  late final String scrollsFetchUrl =
       'https://mockingjae-test-bucket.s3.ap-northeast-2.amazonaws.com/scrolls/';
-  final ScrollsUploadUrls scrollsUploadUrls = ScrollsUploadUrls();
-  final ScrollsBrowseUrls scrollsBrowseUrls = ScrollsBrowseUrls();
-  final AutoRecordingUrls autoRecordingUrls = AutoRecordingUrls();
-  final AuthenticationUrls authenticationUrls = AuthenticationUrls();
-  final ProfileUrls profileUrls = ProfileUrls();
+  late final ScrollsUploadUrls scrollsUploadUrls;
+  late final ScrollsBrowseUrls scrollsBrowseUrls;
+  late final AutoRecordingUrls autoRecordingUrls;
+  late final AuthenticationUrls authenticationUrls;
+  late final ProfileUrls profileUrls;
+
+  BaseUrlGenerator({required mainUrl}) {
+    baseUrl = mainUrl;
+    scrollsUrl = mainUrl;
+    scrollsUploadUrls = ScrollsUploadUrls(mainUrl: mainUrl);
+    scrollsBrowseUrls = ScrollsBrowseUrls(mainUrl: mainUrl);
+    autoRecordingUrls = AutoRecordingUrls(mainUrl: mainUrl);
+    authenticationUrls = AuthenticationUrls(mainUrl: mainUrl);
+    profileUrls = ProfileUrls(mainUrl: mainUrl);
+  }
 }
 
 class ScrollsBrowseUrls {
-  final String baseUrl = '$mainUrl/browse';
-  final String testUrl = 'http://localhost:8000/scrolls/browse';
+  late final String baseUrl;
+
+  ScrollsBrowseUrls({required mainUrl}) {
+    baseUrl = '$mainUrl/browse';
+  }
 }
 
 class AutoRecordingUrls {
-  final String baseUrl = '$mainUrl/auto-recording';
-  final String testUrl = 'http://0.0.0.0:8000';
-  late final remixUploadUrl = '$baseUrl/upload';
-  late final remixBrowseUrl = '$baseUrl/browse';
+  late final String baseUrl;
+  late final remixUploadUrl;
+  late final remixBrowseUrl;
+
+  AutoRecordingUrls({required mainUrl}) {
+    baseUrl = '$mainUrl/auto-recording';
+    remixUploadUrl = '$baseUrl/upload';
+    remixBrowseUrl = '$baseUrl/browse';
+  }
 }
 
 class ScrollsUploadUrls {
-  final String baseUrl = '$mainUrl/upload';
-  late final String videoUpload = '$baseUrl/video';
-  late final String scrollify = '$baseUrl/scrollify';
-  late final String scrollsUpload = '$baseUrl/post';
-  late final String getTaskStatus = '$baseUrl/task';
+  late final String baseUrl;
+  late final String videoUpload;
+  late final String scrollify;
+  late final String scrollsUpload;
+  late final String getTaskStatus;
+
+  ScrollsUploadUrls({required mainUrl}) {
+    baseUrl = '$mainUrl/upload';
+    videoUpload = '$baseUrl/video';
+    scrollify = '$baseUrl/scrollify';
+    scrollsUpload = '$baseUrl/post';
+    getTaskStatus = '$baseUrl/task';
+  }
 }
 
 class AuthenticationUrls {
-  final String baseUrl = '$mainUrl/auth';
-  late final String doesUserExist = '$baseUrl/user-exists';
-  late final String loginUser = '$baseUrl/login';
-  late final String createUser = '$baseUrl/join';
-  late final String logoutUser = '$baseUrl/logout';
-  late final String MJLoginUser = '$baseUrl/login/token';
+  late final String baseUrl;
+  late final String doesUserExist;
+  late final String loginUser;
+  late final String createUser;
+  late final String logoutUser;
+  late final String MJLoginUser;
+
+  AuthenticationUrls({required mainUrl}) {
+    baseUrl = '$mainUrl/auth';
+    doesUserExist = '$baseUrl/user-exists';
+    loginUser = '$baseUrl/login';
+    createUser = '$baseUrl/join';
+    logoutUser = '$baseUrl/logout';
+    MJLoginUser = '$baseUrl/login/token';
+  }
 }
 
 class ProfileUrls {
-  final String baseUrl = '$mainUrl/scrolls/user';
-  late final String followingsUrl = '$baseUrl/following';
-  late final String followersUrl = '$baseUrl/follower';
+  late final String baseUrl;
+  late final String followingsUrl;
+  late final String followersUrl;
+
+  ProfileUrls({required mainUrl}) {
+    baseUrl = '$mainUrl/user';
+    followingsUrl = '$baseUrl/following';
+    followersUrl = '$baseUrl/follower';
+  }
 }
 
 // Below should only be used under debugging flag

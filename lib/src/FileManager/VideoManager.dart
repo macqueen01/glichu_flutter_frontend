@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:mockingjae2_mobile/src/AutoRecordingPlayer/controller.dart';
 import 'package:mockingjae2_mobile/src/FileManager/AbstractManager.dart';
 import 'package:mockingjae2_mobile/src/FileManager/lowestActions.dart';
 import 'package:mockingjae2_mobile/src/Recorder/testConverter.dart';
@@ -129,8 +130,6 @@ class AutoRecordingPlayManager extends ChangeNotifier {
         }
       }
     }
-    print(
-        "Scroll callback received with data: {direction: $direction, success: $success and index: ${currentIndex ?? 'not given'}}");
   }
 
   void _reset() {

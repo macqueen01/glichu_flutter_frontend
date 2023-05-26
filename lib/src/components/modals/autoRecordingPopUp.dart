@@ -7,6 +7,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mockingjae2_mobile/main.dart';
+import 'package:mockingjae2_mobile/src/AutoRecordingPlayer/controller.dart';
 import 'package:mockingjae2_mobile/src/FileManager/AbstractManager.dart';
 import 'package:mockingjae2_mobile/src/FileManager/VideoManager.dart';
 import 'package:mockingjae2_mobile/src/StateMixins/VideoPlayStateMixin.dart';
@@ -14,6 +15,7 @@ import 'package:mockingjae2_mobile/src/UiComponents.dart/Buttons.dart';
 import 'package:mockingjae2_mobile/src/UiComponents.dart/Profiles.dart';
 import 'package:mockingjae2_mobile/src/components/icons.dart';
 import 'package:mockingjae2_mobile/src/components/inputs.dart';
+import 'package:mockingjae2_mobile/src/models/Remix.dart';
 import 'package:mockingjae2_mobile/utils/colors.dart';
 import 'package:mockingjae2_mobile/utils/ui.dart';
 import 'package:mockingjae2_mobile/utils/utils.dart';
@@ -21,6 +23,7 @@ import 'package:provider/provider.dart';
 
 import 'package:tiktoklikescroller/tiktoklikescroller.dart';
 import 'package:video_player/video_player.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class AutoRecordingPopUpView extends StatefulWidget {
   final int scrollsId;
@@ -269,18 +272,27 @@ Widget AutoRecordingMessagingMainView(
             child: TikTokStyleFullPageScroller(
               contentSize: provider.length,
               swipePositionThreshold: 0.2,
-              // ^ the fraction of the screen needed to scroll
               swipeVelocityThreshold: 900,
-              // ^ the velocity threshold for smaller scrolls
               animationDuration: const Duration(milliseconds: 100),
-              // ^ how long the animation will take
               controller: provider.controller,
-              // ^ registering our own function to listen to page changes
               builder: (BuildContext context, int index) {
-                return AutoRecordingMessagingWidget(
-                  videoUrl: provider.getRemix(index),
-                  manager: provider,
-                  index: index,
+                return VisibilityDetector(
+                  key: Key(
+                      index.toString()), // Provide a unique key for each widget
+                  onVisibilityChanged: (VisibilityInfo info) {
+                    if (info.visibleFraction == 0) {
+                      // Widget is no longer visible, dispose it
+                      provider.disposeRemixViewModel(index);
+                    } else if (info.visibleFraction == 1) {
+                      // Widget is fully visible, initialize it
+                      provider.initializeRemixViewModel(index);
+                    }
+                  },
+                  child: AutoRecordingMessagingWidget(
+                    remix: provider.getRemixViewModel(index),
+                    manager: provider,
+                    index: index,
+                  ),
                 );
               },
             ),
@@ -347,13 +359,13 @@ Widget AutoRecordingMessagingMainView(
 }
 
 class AutoRecordingMessagingWidget extends StatefulWidget {
-  String videoUrl;
+  RemixViewModel remix;
   AutoRecordingPlayManager manager;
   int index = 0;
 
   AutoRecordingMessagingWidget(
       {super.key,
-      required this.videoUrl,
+      required this.remix,
       required this.manager,
       required this.index});
 
@@ -366,47 +378,78 @@ class _AutoRecordingMessagingWidgetState
     extends State<AutoRecordingMessagingWidget>
     with VideoPlayerMixin<AutoRecordingMessagingWidget> {
   bool isPlaying = true;
+  late AutoRecordingController autoRecordingController;
+  late VideoPlayerController videoController;
+  int playedAmount = 0;
 
   @override
   void initState() {
     videoControllerSetup(
-        context: context, videoUrl: widget.videoUrl, manager: widget.manager);
+        context: context,
+        videoUrl: widget.remix.scrollsVideoUrl,
+        manager: widget.manager);
     super.initState();
+    print('init: ${widget.index}');
+  }
+
+  @override
+  void dispose() {
+    print('disposed ${widget.index}');
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     Widget ExtendedBody;
-    if ((widget.index - widget.manager.currentIndex).abs() >= 3) {
-      ExtendedBody = Container(
-        child: JaeIcon(40, 40, mainBackgroundColor),
-      );
-    } else {
-      ExtendedBody = FutureBuilder(
-          future: initializeVideoPlayerFuture,
-          builder: (context, snapshot) {
-            controller.seekTo(Duration(seconds: 0));
-            if (snapshot.connectionState == ConnectionState.done &&
-                widget.index == widget.manager.currentIndex) {
-              return Stack(
-                alignment: Alignment.center,
-                children: <Widget>[
-                  BoxContainer(
-                      context: context,
-                      width: 178,
-                      height: 178 * 16 / 9,
-                      child: VideoPlayer(controller
-                        ..play()
-                        ..setPlaybackSpeed(0.6)))
-                ],
-              );
-            } else {
-              return const Center(
-                  child: CupertinoActivityIndicator(
-                      color: mainSubThemeColor, radius: 10.0, animating: true));
+
+    ExtendedBody = FutureBuilder(
+        future: initializeVideoPlayerFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done &&
+              widget.index == widget.manager.currentIndex) {
+            autoRecordingController = AutoRecordingController(
+                videoController: controller,
+                remixViewModel: widget.remix,
+                callback: () {
+                  if (mounted) {
+                    setState(() {});
+                  }
+                });
+            if (autoRecordingController.isFinished && playedAmount == 0) {
+              autoRecordingController.init().then((value) {
+                print('init called ${widget.index}');
+                autoRecordingController.play(playCallback: () {
+                  if (mounted) {
+                    setState(
+                      () {
+                        playedAmount = 0;
+                        autoRecordingController.init();
+                        print('finished ${widget.index}');
+                        print('here');
+                      },
+                    );
+                  }
+                });
+              });
+              playedAmount++;
             }
-          });
-    }
+            return Stack(
+              alignment: Alignment.center,
+              children: <Widget>[
+                BoxContainer(
+                    context: context,
+                    width: 178,
+                    height: 178 * 16 / 9,
+                    child: VideoPlayer(autoRecordingController.videoController))
+              ],
+            );
+          } else {
+            return const Center(
+                child: CupertinoActivityIndicator(
+                    color: mainSubThemeColor, radius: 10.0, animating: true));
+          }
+        });
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.7 - 60,
       width: MediaQuery.of(context).size.width,

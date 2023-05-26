@@ -59,7 +59,9 @@ class RemixViewModel {
   late final String videoUrl;
   late final String thumbnailUrl;
   late final int scrollsId;
+  late final String scrollsVideoUrl;
   late final UserMin uploader;
+  late final IndexTimeLine? timeline;
   late final AutoRecordingMessageModel? messageModel;
 
   RemixViewModel(
@@ -77,6 +79,11 @@ class RemixViewModel {
     this.thumbnailUrl = map['thumbnail_url'];
     this.videoUrl = "https://mockingjae-test-bucket.s3.amazonaws.com/" +
         map['remix_directory'];
+    this.timeline = (map['timeline'] == null)
+        ? null
+        : IndexTimeLine.fromMap(map['timeline']);
+    this.scrollsVideoUrl = "https://mockingjae-test-bucket.s3.amazonaws.com/" +
+        map['scrolls_video_url'];
   }
 }
 

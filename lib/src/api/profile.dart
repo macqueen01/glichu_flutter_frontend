@@ -16,7 +16,7 @@ import 'package:dio/dio.dart' as dio;
 import 'package:mockingjae2_mobile/src/settings.dart';
 
 class RelationsFetcher {
-  BaseUrl backendUrls = BaseUrl();
+  BaseUrlGenerator backendUrls = BaseUrl().baseUrl;
   AuthenticationHeader header = AuthenticationHeader();
 
   Future<UserMin?> fetchUserMin(String userId) async {

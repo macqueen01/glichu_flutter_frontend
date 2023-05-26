@@ -22,7 +22,7 @@ class AuthenticationHeader {
 }
 
 class AuthenticationAPI {
-  BaseUrl backendUrls = BaseUrl();
+  BaseUrlGenerator backendUrls = BaseUrl().baseUrl;
   dio.Dio dioClient = dio.Dio();
   AuthenticationHeader header = AuthenticationHeader();
 
