@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 
@@ -276,23 +277,10 @@ Widget AutoRecordingMessagingMainView(
               animationDuration: const Duration(milliseconds: 100),
               controller: provider.controller,
               builder: (BuildContext context, int index) {
-                return VisibilityDetector(
-                  key: Key(
-                      index.toString()), // Provide a unique key for each widget
-                  onVisibilityChanged: (VisibilityInfo info) {
-                    if (info.visibleFraction == 0) {
-                      // Widget is no longer visible, dispose it
-                      provider.disposeRemixViewModel(index);
-                    } else if (info.visibleFraction == 1) {
-                      // Widget is fully visible, initialize it
-                      provider.initializeRemixViewModel(index);
-                    }
-                  },
-                  child: AutoRecordingMessagingWidget(
-                    remix: provider.getRemixViewModel(index),
-                    manager: provider,
-                    index: index,
-                  ),
+                return AutoRecordingMessagingWidget(
+                  remix: provider.getRemixViewModel(index),
+                  manager: provider,
+                  index: index,
                 );
               },
             ),
@@ -319,6 +307,12 @@ Widget AutoRecordingMessagingMainView(
                             padding: const EdgeInsets.only(
                                 bottom: 0, left: 16, right: 16, top: 17),
                             child: TextField(
+                              onChanged: (text) {
+                                /*
+                                provider.addMessage(
+                                    text, , commentee);
+                                    */
+                              },
                               style: TextStyle(color: mainBackgroundColor),
                               decoration: InputDecoration(
                                   hintStyle:
@@ -389,12 +383,10 @@ class _AutoRecordingMessagingWidgetState
         videoUrl: widget.remix.scrollsVideoUrl,
         manager: widget.manager);
     super.initState();
-    print('init: ${widget.index}');
   }
 
   @override
   void dispose() {
-    print('disposed ${widget.index}');
     super.dispose();
   }
 
@@ -410,22 +402,22 @@ class _AutoRecordingMessagingWidgetState
             autoRecordingController = AutoRecordingController(
                 videoController: controller,
                 remixViewModel: widget.remix,
+                index: widget.index,
+                manager: widget.manager,
                 callback: () {
                   if (mounted) {
                     setState(() {});
                   }
                 });
-            if (autoRecordingController.isFinished && playedAmount == 0) {
+            if (!autoRecordingController.isPlaying && playedAmount == 0) {
               autoRecordingController.init().then((value) {
-                print('init called ${widget.index}');
-                autoRecordingController.play(playCallback: () {
+                autoRecordingController.play().then((value) {
+                  playedAmount = 0;
                   if (mounted) {
                     setState(
                       () {
                         playedAmount = 0;
                         autoRecordingController.init();
-                        print('finished ${widget.index}');
-                        print('here');
                       },
                     );
                   }
@@ -488,7 +480,7 @@ class _AutoRecordingMessagingWidgetState
                                     .uploader
                                     .userName),
                             Text(
-                              '7h ago',
+                              parseRelativeTime(widget.remix.createdAt),
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   color: mainBackgroundColor,

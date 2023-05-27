@@ -23,54 +23,67 @@ class MainBottomNavbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassContainer(
-      height: 80,
+    return Container(
       width: MediaQuery.of(context).size.width,
-      blur: 4,
-      color: Colors.white.withOpacity(0.1),
-      gradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          Colors.white.withOpacity(0.2),
-          const Color.fromARGB(255, 119, 121, 122).withOpacity(0.3),
-        ],
-      ),
-      //--code to remove border
-      border: Border.fromBorderSide(BorderSide.none),
-      shadowStrength: 5,
-      borderRadius: BorderRadius.circular(16),
-      shadowColor: Colors.white.withOpacity(0.24),
-      child: Container(
-        width: MediaQuery.of(context).size.width,
-        height: 80,
-        alignment: Alignment.topCenter,
-        child: Padding(
-          padding: const EdgeInsets.only(top: 14),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              GestureDetector(
-                  onTap: () {},
-                  child: BottomNavIconFromAsset('assets/icons/Home.svg', 30, 30,
-                      color: mainBackgroundColor)),
-              GestureDetector(
-                  onTap: () {},
-                  child: BottomNavIconFromAsset(
-                      'assets/icons/Global.svg', 30, 30,
-                      color: mainBackgroundColor)),
-              GestureDetector(
-                  onTap: () => pickVideo(context),
-                  child: BottomNavIconFromAsset(
-                      'assets/icons/addWithOutBorder.svg', 30, 30,
-                      color: mainBackgroundColor)),
-              GestureDetector(
-                  onTap: () {},
-                  child: BottomNavIconFromAsset('assets/icons/Me.svg', 30, 30,
-                      color: mainBackgroundColor)),
-            ],
-          ),
+      height: 80,
+      alignment: Alignment.topCenter,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 6, left: 8, right: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            GestureDetector(
+                onTap: () {},
+                child: Container(
+                  child: BottomNavIconFromPngAsset('assets/icons/home.png', 38),
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color.fromARGB(145, 77, 77, 77),
+                        blurRadius: 20,
+                        offset: Offset(0, 0), // Shadow position
+                      ),
+                    ],
+                  ),
+                )),
+            GestureDetector(
+                onTap: () {},
+                child: Container(
+                  child:
+                      BottomNavIconFromPngAsset('assets/icons/globe.png', 38),
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color.fromARGB(95, 77, 77, 77),
+                        blurRadius: 16,
+                        offset: Offset(0, 0), // Shadow position
+                      ),
+                    ],
+                  ),
+                )),
+            GestureDetector(
+              onTap: () => pickVideo(context),
+              child: Container(
+                child: BottomNavIconFromPngAsset('assets/icons/plus.png', 38),
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color.fromARGB(95, 77, 77, 77),
+                      blurRadius: 16,
+                      offset: Offset(0, 0), // Shadow position
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

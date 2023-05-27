@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:http/http.dart';
 import 'package:mockingjae2_mobile/src/FileManager/lowestActions.dart';
+import 'package:mockingjae2_mobile/src/api/authentication.dart';
 import 'package:mockingjae2_mobile/src/models/Scrolls.dart';
 import 'package:tar/tar.dart';
 import 'package:dio/dio.dart' as dio;
@@ -73,10 +74,11 @@ Future<void> unpackTarToDir(Directory baseDir, Uint8List bytes) async {
 
 class ScrollsHeaderFetcher {
   BaseUrlGenerator backendUrls = BaseUrl().baseUrl;
+  AuthenticationHeader header = AuthenticationHeader();
 
   Future<ScrollsModel> singleFetch() async {
     final browseUrl = Uri.parse(backendUrls.scrollsBrowseUrls.baseUrl);
-    final response = await get(browseUrl);
+    final response = await get(browseUrl, headers: await header.getHeader());
 
     if (response.statusCode == HttpStatus.ok) {
       final dynamic scrolls = json.decode(response.body);
@@ -91,7 +93,7 @@ class ScrollsHeaderFetcher {
   Future<List<ScrollsModel>> fetchScrollsOfUser(String userId) async {
     final browseUrl =
         Uri.parse(backendUrls.scrollsBrowseUrls.baseUrl + '/user?id=$userId');
-    final response = await get(browseUrl);
+    final response = await get(browseUrl, headers: await header.getHeader());
 
     if (response.statusCode == HttpStatus.ok) {
       final List<dynamic> scrollsMap = json.decode(response.body)['results'];
@@ -111,6 +113,7 @@ class ScrollsHeaderFetcher {
 
 class ScrollsUploader {
   BaseUrlGenerator backendUrls = BaseUrl().baseUrl;
+  AuthenticationHeader header = AuthenticationHeader();
 
   dio.Dio dioClient = dio.Dio();
 
@@ -140,7 +143,8 @@ class ScrollsUploader {
     try {
       dio.Response response = await dioClient.post(
           backendUrls.scrollsUploadUrls.getTaskStatus,
-          data: {'task_id': taskId});
+          data: {'task_id': taskId},
+          options: dio.Options(headers: await header.getHeader()));
 
       if (int.parse(response.data['status']) == 1) {
         return true;
@@ -166,8 +170,10 @@ class ScrollsUploader {
 
     // Make the HTTP request
     try {
-      dio.Response response = await dioClient
-          .post(backendUrls.scrollsUploadUrls.videoUpload, data: formData);
+      dio.Response response = await dioClient.post(
+          backendUrls.scrollsUploadUrls.videoUpload,
+          data: formData,
+          options: dio.Options(headers: await header.getHeader()));
       print(response.data);
       return response.data;
     } catch (e) {
@@ -175,37 +181,20 @@ class ScrollsUploader {
     }
   }
 
-  Future<Map?> _scrollifyVideoAPI(String videoUploadTaskId, String title,
-      int height, int quality, int fps) async {
+  Future<Map?> _uploadScrollsAPI(
+      String videoUploadTaskId, String title, int height) async {
     dio.FormData formData = dio.FormData.fromMap({
       'task_id': videoUploadTaskId,
       'title': title,
       'height': height,
-      'quality': quality,
-      'fps': fps
     });
 
     // Make the HTTP request
     try {
-      dio.Response response = await dioClient
-          .post(backendUrls.scrollsUploadUrls.scrollify, data: formData);
-      print(response.data);
-      return response.data;
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  Future<Map?> _uploadScrollsAPI(String scrollifyTaskId, int scrollsId) async {
-    dio.FormData formData = dio.FormData.fromMap({
-      'task_id': scrollifyTaskId,
-      'scrolls_id': scrollsId,
-    });
-
-    // Make the HTTP request
-    try {
-      dio.Response response = await dioClient
-          .post(backendUrls.scrollsUploadUrls.scrollsUpload, data: formData);
+      dio.Response response = await dioClient.post(
+          backendUrls.scrollsUploadUrls.scrollsUpload,
+          data: formData,
+          options: dio.Options(headers: await header.getHeader()));
       print(response.data);
       return response.data;
     } catch (e) {
@@ -248,38 +237,15 @@ class ScrollsUploader {
     print(response);
   }
 
-  Future<void> scrollifyVideo(
-      String title, int height, int quality, int fps) async {
+  Future<void> uploadScrolls(String title, int height) async {
     if (videoUploadTaskId == '') {
       throw Exception('Video upload task id is not set');
     }
 
-    Map? response = await _scrollifyVideoAPI(
-        videoUploadTaskId, title, height, quality, fps);
+    Map? response = await _uploadScrollsAPI(videoUploadTaskId, title, height);
 
-    if (_isValidResponse(response!, ['task_id', 'scrolls_id'])) {
-      setScrollifyTaskId(response['task_id']);
-      setScrollsId(response['scrolls_id']);
-    }
-  }
-
-  Future<void> uploadScrolls() async {
-    if (videoUploadTaskId == '') {
-      throw Exception('Video upload task id is not set');
-    }
-
-    if (scrollifyTaskId == '') {
-      throw Exception('Scrollify task id is not set');
-    }
-
-    if (scrollsId == null) {
-      throw Exception('Scrolls id is not set');
-    }
-
-    Map? response = await _uploadScrollsAPI(scrollifyTaskId, scrollsId!);
-
-    if (_isValidResponse(response!, ['task_id'])) {
-      setScrollsUploadTaskId(response['task_id']);
+    if (_isValidResponse(response!, ['scrolls_id'])) {
+      print(response['scrolls_id']);
     }
   }
 }

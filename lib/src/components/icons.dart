@@ -8,9 +8,23 @@ Widget BottomNavIconFromAsset(String dir, double width, double height,
   return SvgPicture.asset(dir, width: width, height: height, color: color);
 }
 
+Widget BottomNavIconFromPngAsset(String dir, double height) {
+  return Image.asset(
+    dir,
+    height: height,
+  );
+}
+
 Widget LogoNavIcon(double width, double height, Color color) {
   return SvgPicture.asset('assets/icons/Jae.svg',
       width: width, height: height, color: color);
+}
+
+Widget GlichuLogoIcon(double height) {
+  return Image.asset(
+    'assets/icons/glichu!.png',
+    height: height,
+  );
 }
 
 Widget JaeIcon(double width, double height, Color color) {

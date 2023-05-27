@@ -167,24 +167,10 @@ class _VideoEditingPageState extends State<VideoEditingPage> {
     task_done = false;
 
     try {
-      await uploader.scrollifyVideo(
-          uploader.hashedVideoFile.toString(), 7000, 3, 25);
+      await uploader.uploadScrolls(uploader.hashedVideoFile.toString(), 7000);
     } catch (e) {
       // Escape from the page if errors occur
       Navigator.pop(context);
-    }
-
-    while (task_done != true) {
-      await Future.delayed(Duration(milliseconds: 1000), () async {
-        task_done = await uploader.isTaskComplete(uploader.scrollifyTaskId);
-      });
-    }
-
-    try {
-      await uploader.uploadScrolls();
-    } catch (e) {
-      // Show Error Message
-      print('failed uploading scrolls');
     }
 
     setState(() {

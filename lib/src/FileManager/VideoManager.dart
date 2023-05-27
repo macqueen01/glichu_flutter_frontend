@@ -3,12 +3,15 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:mockingjae2_mobile/src/AutoRecordingPlayer/autoRecordingMessage.dart';
 import 'package:mockingjae2_mobile/src/AutoRecordingPlayer/controller.dart';
 import 'package:mockingjae2_mobile/src/FileManager/AbstractManager.dart';
 import 'package:mockingjae2_mobile/src/FileManager/lowestActions.dart';
 import 'package:mockingjae2_mobile/src/Recorder/testConverter.dart';
+import 'package:mockingjae2_mobile/src/api/message.dart';
 import 'package:mockingjae2_mobile/src/api/remix.dart';
 import 'package:mockingjae2_mobile/src/models/Remix.dart';
+import 'package:mockingjae2_mobile/src/models/User.dart';
 import 'package:provider/provider.dart';
 import 'package:tiktoklikescroller/tiktoklikescroller.dart';
 
@@ -55,11 +58,11 @@ class RemixPlayManager extends RecordedVideoManager {
 }
 
 class AutoRecordingPlayManager extends ChangeNotifier {
-  List<String> _remixVideos = [];
   List<RemixViewModel> _remixViewModels = [];
   int scrollsId;
   Controller? controller;
   AutoRecorderApi autoRecorderApi = AutoRecorderApi();
+  MessageApi messageApi = MessageApi();
   int currentIndex = 0;
   int length = 0;
   bool isLoading = false;
@@ -71,13 +74,40 @@ class AutoRecordingPlayManager extends ChangeNotifier {
   // category == 2 -> callByFollowers
   int category = 0;
 
-  String getRemix(int index) {
+  RemixViewModel getRemix(int index) {
     // assume index is in range
-    return _remixVideos[index];
+    return _remixViewModels[index];
   }
 
   RemixViewModel getRemixViewModel(int index) {
     return _remixViewModels[index];
+  }
+
+  void addMessage(String message, UserMin commenter, UserMin commentee) {
+    RemixViewModel currentModel = getRemixViewModel(currentIndex);
+
+    if (currentModel.messageModel == null) {
+      currentModel.messageModel = AutoRecordingMessage(
+          remixId: currentModel.remixId,
+          commenter: commenter,
+          commentee: commentee);
+    }
+
+    currentModel.messageModel!.updateMessage(message);
+    notifyListeners();
+  }
+
+  Future<bool> pushMessage() async {
+    RemixViewModel currentModel = getRemixViewModel(currentIndex);
+
+    if (currentModel.messageModel == null) {
+      return false;
+    }
+
+    await messageApi.pushAutoRecordingMessage(currentModel.messageModel!);
+
+    notifyListeners();
+    return true;
   }
 
   void setIndex(int index) {
@@ -87,29 +117,27 @@ class AutoRecordingPlayManager extends ChangeNotifier {
   }
 
   bool isEmpty() {
-    return _remixVideos.isEmpty;
+    return _remixViewModels.isEmpty;
   }
 
   int? lastIndex() {
     if (isEmpty()) {
       return null;
     }
-    return _remixVideos.length - 1;
+    return _remixViewModels.length - 1;
   }
 
   int num_scrolls() {
-    return _remixVideos.length;
+    return _remixViewModels.length;
   }
 
   void addRemixVideo(RemixViewModel remix) {
     _remixViewModels.add(remix);
-    _remixVideos.add(remix.videoUrl);
   }
 
   void addAllRemixVideos(List<RemixViewModel> remixes) {
-    _remixVideos.addAll(remixes.map((remix) => remix.videoUrl));
     _remixViewModels.addAll(remixes);
-    length = _remixVideos.length;
+    length = _remixViewModels.length;
     isLoading = false;
     notifyListeners();
   }
@@ -133,7 +161,6 @@ class AutoRecordingPlayManager extends ChangeNotifier {
   }
 
   void _reset() {
-    _remixVideos = [];
     _remixViewModels = [];
     currentIndex = 0;
     page = 1;

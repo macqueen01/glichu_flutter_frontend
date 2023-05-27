@@ -76,3 +76,9 @@ class UserMin {
     );
   }
 }
+
+class UserSelfMin extends UserMin {
+  // static final UserSelfMin instance = UserSelfMin(userName: userName, userId: userId)
+
+  UserSelfMin({required super.userName, required super.userId});
+}

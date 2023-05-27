@@ -11,7 +11,7 @@ String mainUrl = 'https://storage.memehouses.com/scrolls';
 String testUrl = 'http://localhost:8000/scrolls';
 
 class BaseUrl {
-  BaseUrlGenerator baseUrl = BaseUrlGenerator(mainUrl: testUrl);
+  BaseUrlGenerator baseUrl = BaseUrlGenerator(mainUrl: mainUrl);
 }
 
 class BaseUrlGenerator {
@@ -24,6 +24,7 @@ class BaseUrlGenerator {
   late final AutoRecordingUrls autoRecordingUrls;
   late final AuthenticationUrls authenticationUrls;
   late final ProfileUrls profileUrls;
+  late final MessagingUrls messagingUrls;
 
   BaseUrlGenerator({required mainUrl}) {
     baseUrl = mainUrl;
@@ -33,6 +34,7 @@ class BaseUrlGenerator {
     autoRecordingUrls = AutoRecordingUrls(mainUrl: mainUrl);
     authenticationUrls = AuthenticationUrls(mainUrl: mainUrl);
     profileUrls = ProfileUrls(mainUrl: mainUrl);
+    messagingUrls = MessagingUrls(mainUrl: mainUrl);
   }
 }
 
@@ -99,6 +101,18 @@ class ProfileUrls {
     baseUrl = '$mainUrl/user';
     followingsUrl = '$baseUrl/following';
     followersUrl = '$baseUrl/follower';
+  }
+}
+
+class MessagingUrls {
+  late final String baseUrl;
+  late final String autoRecordingMessageUpload;
+  late final String autoRecordingMessage;
+
+  MessagingUrls({required mainUrl}) {
+    baseUrl = '$mainUrl/messaging';
+    autoRecordingMessageUpload = '$baseUrl/auto-recording/upload';
+    autoRecordingMessage = '$baseUrl/auto-recording';
   }
 }
 

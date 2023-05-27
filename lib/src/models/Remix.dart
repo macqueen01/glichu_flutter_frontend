@@ -1,3 +1,4 @@
+import 'package:mockingjae2_mobile/src/AutoRecordingPlayer/autoRecordingMessage.dart';
 import 'package:mockingjae2_mobile/src/Recorder/indexTimestamp.dart';
 
 // models
@@ -56,18 +57,17 @@ class RemixModel {
 class RemixViewModel {
   late final int remixId;
   late final String remixTitle;
-  late final String videoUrl;
   late final String thumbnailUrl;
   late final int scrollsId;
   late final String scrollsVideoUrl;
   late final UserMin uploader;
   late final IndexTimeLine? timeline;
-  late final AutoRecordingMessageModel? messageModel;
+  late final AutoRecordingMessage? messageModel;
+  late final String createdAt;
 
   RemixViewModel(
       {required this.remixId,
       required this.remixTitle,
-      required this.videoUrl,
       required this.thumbnailUrl,
       required this.scrollsId,
       required this.uploader});
@@ -77,18 +77,11 @@ class RemixViewModel {
     this.scrollsId = map['scrolls']['id'];
     this.uploader = UserMin.fromJson(map['user']);
     this.thumbnailUrl = map['thumbnail_url'];
-    this.videoUrl = "https://mockingjae-test-bucket.s3.amazonaws.com/" +
-        map['remix_directory'];
     this.timeline = (map['timeline'] == null)
         ? null
         : IndexTimeLine.fromMap(map['timeline']);
     this.scrollsVideoUrl = "https://mockingjae-test-bucket.s3.amazonaws.com/" +
         map['scrolls_video_url'];
+    this.createdAt = map['created_at'];
   }
-}
-
-class AutoRecordingMessageModel {
-  late final String? textInput;
-
-  AutoRecordingMessageModel();
 }

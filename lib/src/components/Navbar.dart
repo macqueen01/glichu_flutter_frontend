@@ -148,10 +148,7 @@ class _MJAppBarState extends State<MJAppBar> {
           child: Row(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                LogoNavIcon(60, 30, mainBackgroundColor),
-                PresentNavIcon(Colors.white)
-              ]),
+              children: [GlichuLogoIcon(30), PresentNavIcon(Colors.white)]),
         ));
   }
 }
