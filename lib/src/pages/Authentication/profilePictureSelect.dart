@@ -3,19 +3,13 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mockingjae2_mobile/src/Providers/authenticationPageProvider.dart';
 import 'package:mockingjae2_mobile/src/UiComponents.dart/Buttons.dart';
-import 'package:mockingjae2_mobile/src/components/icons.dart';
-import 'package:mockingjae2_mobile/src/components/inputs.dart';
 
 import 'package:mockingjae2_mobile/src/components/navbars/topBars.dart';
-import 'package:mockingjae2_mobile/src/components/snackbars.dart';
-import 'package:mockingjae2_mobile/src/pages/Authentication/mainPage.dart';
-import 'package:mockingjae2_mobile/src/pages/Authentication/signUpView.dart';
 import 'package:mockingjae2_mobile/utils/colors.dart';
-import 'package:mockingjae2_mobile/utils/ui.dart';
 import 'package:provider/provider.dart';
 
 Scaffold ProfileCreateView(BuildContext context) {

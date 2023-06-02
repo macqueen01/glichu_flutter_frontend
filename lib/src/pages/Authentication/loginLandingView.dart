@@ -1,18 +1,11 @@
-import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mockingjae2_mobile/src/Providers/authenticationPageProvider.dart';
 import 'package:mockingjae2_mobile/src/UiComponents.dart/Buttons.dart';
-import 'package:mockingjae2_mobile/src/api/authentication.dart';
 import 'package:mockingjae2_mobile/src/components/icons.dart';
 
 import 'package:mockingjae2_mobile/src/components/navbars/topBars.dart';
-import 'package:mockingjae2_mobile/src/pages/Authentication/idCreateView.dart';
-import 'package:mockingjae2_mobile/src/pages/Authentication/mainPage.dart';
-import 'package:mockingjae2_mobile/src/pages/Authentication/signUpView.dart';
 import 'package:mockingjae2_mobile/utils/colors.dart';
 import 'package:provider/provider.dart';
 

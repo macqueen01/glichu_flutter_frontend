@@ -2,6 +2,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mockingjae2_mobile/src/pages/followers.dart';
+import 'package:mockingjae2_mobile/src/pages/home.dart';
+import 'package:mockingjae2_mobile/src/pages/idEditPage.dart';
+import 'package:mockingjae2_mobile/src/pages/taggerEditPage.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -61,22 +64,21 @@ class MockingJaeMain extends StatelessWidget {
         '/': (context) => ChangeNotifierProvider(
             create: (context) => RecorderProvider(context: context),
             child: const MainPage()),
+        SelfProfilePage.routeName: (context) => SelfProfilePage(),
         RelationsPage.routeName: (context) => const RelationsPage(),
         ProfilePage.routeName: (context) => const ProfilePage(),
         LikesPage.routeName: (context) => const LikesPage(),
         ProfileScrollsPage.routeName: (context) => ChangeNotifierProvider(
             create: (context) => RecorderProvider(context: context),
             child: const ProfileScrollsPage()),
+        NameEditPage.routeName: (context) => const NameEditPage(),
+        TaggerEditPage.routeName: (context) => const TaggerEditPage(),
       },
       debugShowCheckedModeBanner: false,
       title: "mockingJae 2.0",
       theme: ThemeData(
         brightness: Brightness.light,
         primaryColor: mainBackgroundColor,
-        appBarTheme: const AppBarTheme(
-            backgroundColor: mainThemeColor,
-            elevation: 0,
-            titleTextStyle: TextStyle(color: Colors.black)),
         bottomNavigationBarTheme: const BottomNavigationBarThemeData(
             backgroundColor: mainSubThemeColor),
       ),

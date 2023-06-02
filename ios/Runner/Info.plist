@@ -16,7 +16,7 @@
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
-		<string>MockingJae</string>
+		<string>Glichu!</string>
 		<key>CFBundleExecutable</key>
 		<string>$(EXECUTABLE_NAME)</string>
 		<key>CFBundleIdentifier</key>
@@ -45,7 +45,7 @@
 			<true/>
 		</dict>
 		<key>NSCameraUsageDescription</key>
-		<string>Mocking Jae will be given access to the camera to help you create new scrolls contents</string>
+		<string>Glichu! will be given access to the camera to help you create new scrolls contents</string>
 		<key>NSMicrophoneUsageDescription</key>
 		<string>Your voice recording will be used to remix and dub the scrolls contents</string>
 		<key>UIApplicationSupportsIndirectInputEvents</key>

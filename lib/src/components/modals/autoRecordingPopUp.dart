@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 
+import 'package:dismissible_page/dismissible_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -16,6 +17,7 @@ import 'package:mockingjae2_mobile/src/UiComponents.dart/Buttons.dart';
 import 'package:mockingjae2_mobile/src/UiComponents.dart/Profiles.dart';
 import 'package:mockingjae2_mobile/src/components/icons.dart';
 import 'package:mockingjae2_mobile/src/components/inputs.dart';
+import 'package:mockingjae2_mobile/src/components/modals/autoRecordingMessagingView.dart';
 import 'package:mockingjae2_mobile/src/models/Remix.dart';
 import 'package:mockingjae2_mobile/utils/colors.dart';
 import 'package:mockingjae2_mobile/utils/ui.dart';
@@ -425,14 +427,35 @@ class _AutoRecordingMessagingWidgetState
               });
               playedAmount++;
             }
+            VideoPlayer videoPlayer =
+                VideoPlayer(autoRecordingController.videoController);
             return Stack(
               alignment: Alignment.center,
               children: <Widget>[
-                BoxContainer(
-                    context: context,
-                    width: 178,
-                    height: 178 * 16 / 9,
-                    child: VideoPlayer(autoRecordingController.videoController))
+                GestureDetector(
+                  onTap: () {
+                    context.pushTransparentRoute(AutoRecordingFullView(
+                      videoPlayer: videoPlayer,
+                      tag: '${widget.remix.remixId}_auto_recording',
+                    ));
+                  },
+                  child: Hero(
+                    tag: '${widget.remix.remixId}_auto_recording',
+                    child: BoxContainer(
+                        context: context,
+                        width: 178,
+                        height: 178 * 16 / 9,
+                        child: LayoutBuilder(builder: (context, constraints) {
+                          double videoWidth = constraints.maxHeight *
+                              autoRecordingController
+                                  .videoController.value.aspectRatio;
+                          return Container(
+                              width: videoWidth,
+                              height: constraints.maxHeight,
+                              child: videoPlayer);
+                        })),
+                  ),
+                )
               ],
             );
           } else {

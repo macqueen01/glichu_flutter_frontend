@@ -11,10 +11,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mockingjae2_mobile/src/FileManager/ScrollsManager.dart';
 import 'package:mockingjae2_mobile/src/StateMixins/frameworks.dart';
 import 'package:mockingjae2_mobile/src/UiComponents.dart/Buttons.dart';
+import 'package:mockingjae2_mobile/src/api/social_interactions.dart';
 import 'package:mockingjae2_mobile/src/components/modals/modalForm.dart';
 import 'package:mockingjae2_mobile/src/components/snackbars.dart';
 import 'package:mockingjae2_mobile/src/models/User.dart';
 import 'package:mockingjae2_mobile/src/pages/ScrollsUploader/VideoEditingPage.dart';
+import 'package:mockingjae2_mobile/src/pages/editProfile.dart';
 import 'package:mockingjae2_mobile/src/pages/followers.dart';
 import 'package:mockingjae2_mobile/src/pages/likes.dart';
 
@@ -118,9 +120,7 @@ class ProfileBodyWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ScrollsPreviewManager>(
       builder: (context, provider, child) {
-        return ProfileBody(
-          user: provider.user,
-        );
+        return ProfileBody(user: provider.user, isSelf: provider.isUserSelf);
       },
     );
   }
@@ -128,8 +128,9 @@ class ProfileBodyWrapper extends StatelessWidget {
 
 class ProfileBody extends StatefulWidget {
   UserMin user;
+  bool? isSelf = null;
 
-  ProfileBody({super.key, required this.user});
+  ProfileBody({super.key, required this.user, required this.isSelf});
 
   @override
   State<ProfileBody> createState() => _ProfileBodyState();
@@ -144,7 +145,9 @@ class _ProfileBodyState extends State<ProfileBody>
 
   @override
   void initState() {
+    reload();
     super.initState();
+
     //_reload();
   }
 
@@ -153,9 +156,9 @@ class _ProfileBodyState extends State<ProfileBody>
     // this should recieve all data from the server,
     // then refreshed all contents of the page
     setLoadingTrue();
-    context.read<ScrollsPreviewManager>().updateUser().then((value) => {
-          updateCallback(),
-        });
+    context.read<ScrollsPreviewManager>().updateUser().then((value) {
+      updateCallback();
+    });
   }
 
   @override
@@ -166,7 +169,8 @@ class _ProfileBodyState extends State<ProfileBody>
   @override
   Widget child(BuildContext context) {
     return SingleChildScrollView(
-      physics: const ScrollPhysics(),
+      clipBehavior: Clip.none,
+      physics: const AlwaysScrollableScrollPhysics(),
       controller: mainScrollController,
       child: Container(
         width: MediaQuery.of(context).size.width,
@@ -176,9 +180,10 @@ class _ProfileBodyState extends State<ProfileBody>
             AnimatedLoader(context),
             ProfilePageHeader(
               user: widget.user,
+              isSelf: widget.isSelf,
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 4),
+              padding: const EdgeInsets.only(top: 10),
               child: ScrollsMenu(
                 parentController: mainScrollController,
               ),
@@ -242,8 +247,8 @@ class _ScrollsMenuState extends State<ScrollsMenu> {
         height: 50,
         color: scrollsBackgroundColor,
         child: Container(
-          width: 330,
-          alignment: Alignment.centerLeft,
+          width: MediaQuery.of(context).size.width,
+          alignment: Alignment.center,
           child: CategorySelect(
             categories: const ['Scrolls', 'Videos', 'Favorites'],
             onPressed: indexChange,
@@ -254,6 +259,7 @@ class _ScrollsMenuState extends State<ScrollsMenu> {
         scrollDirection: Axis.horizontal,
         controller: menuScrollController,
         physics: const NeverScrollableScrollPhysics(),
+        clipBehavior: Clip.none,
         child: Row(children: [
           AnimatedContainer(
             duration: const Duration(seconds: 0),
@@ -264,18 +270,59 @@ class _ScrollsMenuState extends State<ScrollsMenu> {
                 child: const ScrollsPreviewMenu(),
                 width: MediaQuery.of(context).size.width,
                 backgroundColor: scrollsBackgroundColor,
-                radius: 15),
+                radius: 20),
           ),
           AnimatedContainer(
             duration: const Duration(seconds: 0),
             curve: Curves.ease,
             height: (currentIndex == 1) ? null : 0,
-            child: BoxContainer(
-                context: context,
-                child: const ScrollsPreviewMenu(),
-                width: MediaQuery.of(context).size.width,
-                backgroundColor: scrollsBackgroundColor,
-                radius: 15),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                      top: 10, right: 10, left: 10, bottom: 0),
+                  child: BoxContainer(
+                      context: context,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 13,
+                              height: 13,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  gradient: autoRecorderGradient),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 6.0),
+                              child: Text(
+                                "Auto Recordings",
+                                style: GoogleFonts.quicksand(
+                                    color: mainBackgroundColor,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                    decoration: TextDecoration.none),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      height: 50,
+                      width: MediaQuery.of(context).size.width - 40,
+                      backgroundColor: Colors.transparent,
+                      radius: 10),
+                ),
+                BoxContainer(
+                    context: context,
+                    child: const ScrollsPreviewMenu(),
+                    width: MediaQuery.of(context).size.width,
+                    backgroundColor: scrollsBackgroundColor,
+                    radius: 20),
+              ],
+            ),
           ),
           AnimatedContainer(
             duration: const Duration(seconds: 0),
@@ -286,7 +333,7 @@ class _ScrollsMenuState extends State<ScrollsMenu> {
                 child: const ScrollsPreviewMenu(),
                 width: MediaQuery.of(context).size.width,
                 backgroundColor: scrollsBackgroundColor,
-                radius: 15),
+                radius: 20),
           )
         ]),
       ),
@@ -370,59 +417,92 @@ Future showProfileImage(UserMin user, BuildContext context) {
 
 class ProfilePageHeader extends StatelessWidget {
   UserMin user;
-
-  ProfilePageHeader({super.key, required this.user});
+  bool? isSelf = null;
+  ProfilePageHeader({super.key, required this.user, required this.isSelf});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: 280,
+      padding: EdgeInsets.only(bottom: 10),
+      height: 315,
       alignment: Alignment.center,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Container(
-            padding: EdgeInsets.fromLTRB(10, 20, 10, 20),
-            height: 120,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Profile(
-                  user: user,
-                  size: 1,
-                  onTap: () {
-                    showProfileImage(user, context);
-                  },
-                ),
-                Container(
-                  width: 190,
-                  height: 50,
-                  padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
-                  alignment: Alignment.center,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        user.userName,
-                        style: TextStyle(
-                            fontSize: 17,
-                            color: mainBackgroundColor,
-                            fontWeight: FontWeight.w500),
-                      ),
-                      Text(
-                        "Master of Architect in JECT",
-                        style: TextStyle(
-                            color: Colors.white54,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700),
-                      )
-                    ],
+          Padding(
+            padding: const EdgeInsets.only(bottom: 15.0),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
+              height: 120,
+              width: 338,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 338 / 3,
+                    alignment: Alignment.center,
+                    child: Profile(
+                      user: user,
+                      size: 1,
+                      onTap: () {
+                        showProfileImage(user, context);
+                      },
+                    ),
                   ),
-                ),
-              ],
+                  Container(
+                    width: 338 / 3 * 2 - 10,
+                    height: 50,
+                    padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                    alignment: Alignment.centerLeft,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user.userName,
+                          style: TextStyle(
+                              fontSize: 17,
+                              color: mainBackgroundColor,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        Stack(
+                            alignment: Alignment.centerLeft,
+                            clipBehavior: Clip.none,
+                            children: [
+                              Container(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      user.tagger == null
+                                          ? 'loading tagger...'
+                                          : user.tagger!,
+                                      style: TextStyle(
+                                          color: Colors.white54,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                    /*
+                                    Container(
+                                      margin: EdgeInsets.only(left: 0),
+                                      child: Icon(
+                                        Icons.chevron_right,
+                                        color: Colors.white54,
+                                        size: 18,
+                                      ),
+                                    )
+                                    */
+                                  ],
+                                ),
+                              ),
+                            ])
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           Container(
@@ -434,7 +514,7 @@ class ProfilePageHeader extends StatelessWidget {
                 height: 80,
                 width: 338,
                 backgroundColor: mainBackgroundColor,
-                radius: 15,
+                radius: 10,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -484,121 +564,181 @@ class ProfilePageHeader extends StatelessWidget {
                   ],
                 )),
           ),
-          Container(
-            width: 338,
-            height: 80,
-            alignment: Alignment.center,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Follow action button
-                FlatButtonSmall(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        lensFlareSnackbar(
-                            context, "You are now following mockingjae"));
-                  },
-                  icon: SvgPicture.asset(
-                    'assets/icons/Me.svg',
-                    width: 16,
-                    height: 16,
-                    color: mainBackgroundColor,
-                  ),
-                  content: "Follow",
-                  backgroundColor: lensFlareMain,
-                  width: 135,
-                  textColor: mainBackgroundColor,
-                ),
-                // Send message action button
-                FlatButtonSmall(
-                  onPressed: () {},
-                  icon: SvgPicture.asset(
-                    'assets/icons/Dm.svg',
-                    width: 16,
-                    height: 16,
-                    color: scrollsBackgroundColor,
-                  ),
-                  content: "Send",
-                  backgroundColor: mainBackgroundColor,
-                  width: 90,
-                  textColor: scrollsBackgroundColor,
-                ),
-                // Set alarm at update action button
-                FlatButtonSmall(
-                  onPressed: () {
-                    pickVideo(context);
-                  },
-                  icon: const Icon(
-                    CupertinoIcons.bell,
-                    color: scrollsBackgroundColor,
-                    size: 20,
-                    weight: 600,
-                  ),
-                  backgroundColor: mainBackgroundColor,
-                  width: 40,
-                  textColor: scrollsBackgroundColor,
-                ),
-                // open more infos and actions button
-                // this opens up a bottom sheet modal
-                FlatButtonSmall(
-                  onPressed: () {
-                    showCupertinoModalBottomSheet(
-                        context: context,
-                        expand: false,
-                        barrierColor: Colors.black54,
-                        topRadius: const Radius.circular(20),
-                        backgroundColor: mainBackgroundColor,
-                        builder: (context) => ListModalBottomSheet(children: [
-                              ModalButton(
-                                  icon: const Icon(
-                                    CupertinoIcons.gear_solid,
-                                    size: 30,
-                                    color: scrollsBackgroundColor,
-                                  ),
-                                  text: "settings",
-                                  onPressed: () {}),
-                              ModalButton(
-                                  icon: const Icon(
-                                    CupertinoIcons.gear_solid,
-                                    size: 30,
-                                    color: scrollsBackgroundColor,
-                                  ),
-                                  text: "settings",
-                                  onPressed: () {}),
-                              ModalButton(
-                                  icon: const Icon(
-                                    CupertinoIcons.gear_solid,
-                                    size: 30,
-                                    color: scrollsBackgroundColor,
-                                  ),
-                                  text: "settings",
-                                  onPressed: () {}),
-                              ModalButton(
-                                  icon: const Icon(
-                                    CupertinoIcons.gear_solid,
-                                    size: 30,
-                                    color: scrollsBackgroundColor,
-                                  ),
-                                  text: "settings",
-                                  onPressed: () {}),
-                            ]));
-                  },
-                  icon: SvgPicture.asset(
-                    "assets/icons/more.svg",
-                    width: 16,
-                    height: 16,
-                    color: scrollsBackgroundColor,
-                  ),
-                  backgroundColor: mainBackgroundColor,
-                  width: 40,
-                  textColor: scrollsBackgroundColor,
-                ),
-              ],
-            ),
-          )
+          (isSelf == null)
+              ? const Center(
+                  child: CupertinoActivityIndicator(
+                      color: mainSubThemeColor, radius: 10.0, animating: true))
+              : ProfileButtonSets(user: user, isSelf: isSelf!)
         ],
       ),
     );
+  }
+}
+
+class ProfileButtonSets extends StatelessWidget {
+  ProfileButtonSets({super.key, required this.user, required this.isSelf});
+
+  final UserMin user;
+  bool isSelf;
+
+  @override
+  Widget build(BuildContext context) {
+    if (isSelf) {
+      return Container(
+        width: 338,
+        height: 80,
+        alignment: Alignment.center,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            FlatButton(
+              onPressed: () {
+                showCupertinoModalBottomSheet(
+                    expand: true,
+                    context: context,
+                    builder: (context) {
+                      return ProfileEditView(context);
+                    });
+              },
+              width: 195,
+              height: 38,
+              radius: 10,
+              color: Color.fromARGB(255, 217, 217, 217),
+              content: Text(
+                "Edit Profile",
+                style: TextStyle(
+                    color: scrollsBackgroundColor,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600),
+              ),
+            ),
+            FlatButton(
+              onPressed: () {},
+              width: 130,
+              height: 38,
+              radius: 10,
+              color: Color.fromARGB(255, 217, 217, 217),
+              content: Text(
+                "Tag User",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: scrollsBackgroundColor,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600),
+              ),
+            )
+          ],
+        ),
+      );
+    } else if (!isSelf) {
+      return Container(
+        width: 338,
+        height: 80,
+        alignment: Alignment.center,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Follow action button
+            ProfileFollowButton(
+              user: user,
+              onFollowCall: () async {
+                return await SocialInteractionsAPI().followUser(user.userId);
+              },
+              onUnfollowCall: () async {
+                return await SocialInteractionsAPI().unfollowUser(user.userId);
+              },
+            ),
+
+            // Send message action button
+            FlatButtonSmall(
+              onPressed: () {},
+              icon: SvgPicture.asset(
+                'assets/icons/Dm.svg',
+                width: 16,
+                height: 16,
+                color: scrollsBackgroundColor,
+              ),
+              content: "Send",
+              backgroundColor: mainBackgroundColor,
+              width: 90,
+              textColor: scrollsBackgroundColor,
+            ),
+            // Set alarm at update action button
+            FlatButtonSmall(
+              onPressed: () {
+                pickVideo(context);
+              },
+              icon: const Icon(
+                CupertinoIcons.bell,
+                color: scrollsBackgroundColor,
+                size: 20,
+                weight: 600,
+              ),
+              backgroundColor: mainBackgroundColor,
+              width: 40,
+              textColor: scrollsBackgroundColor,
+            ),
+            // open more infos and actions button
+            // this opens up a bottom sheet modal
+            FlatButtonSmall(
+              onPressed: () {
+                showCupertinoModalBottomSheet(
+                    context: context,
+                    expand: false,
+                    barrierColor: Colors.black54,
+                    topRadius: const Radius.circular(20),
+                    backgroundColor: mainBackgroundColor,
+                    builder: (context) => ListModalBottomSheet(children: [
+                          ModalButton(
+                              icon: const Icon(
+                                CupertinoIcons.gear_solid,
+                                size: 30,
+                                color: scrollsBackgroundColor,
+                              ),
+                              text: "settings",
+                              onPressed: () {}),
+                          ModalButton(
+                              icon: const Icon(
+                                CupertinoIcons.gear_solid,
+                                size: 30,
+                                color: scrollsBackgroundColor,
+                              ),
+                              text: "settings",
+                              onPressed: () {}),
+                          ModalButton(
+                              icon: const Icon(
+                                CupertinoIcons.gear_solid,
+                                size: 30,
+                                color: scrollsBackgroundColor,
+                              ),
+                              text: "settings",
+                              onPressed: () {}),
+                          ModalButton(
+                              icon: const Icon(
+                                CupertinoIcons.gear_solid,
+                                size: 30,
+                                color: scrollsBackgroundColor,
+                              ),
+                              text: "settings",
+                              onPressed: () {}),
+                        ]));
+              },
+              icon: SvgPicture.asset(
+                "assets/icons/more.svg",
+                width: 16,
+                height: 16,
+                color: scrollsBackgroundColor,
+              ),
+              backgroundColor: mainBackgroundColor,
+              width: 40,
+              textColor: scrollsBackgroundColor,
+            ),
+          ],
+        ),
+      );
+    }
+    return const Center(
+        child: CupertinoActivityIndicator(
+            color: mainSubThemeColor, radius: 10.0, animating: true));
   }
 }

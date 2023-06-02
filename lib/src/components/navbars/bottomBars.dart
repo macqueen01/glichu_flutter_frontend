@@ -7,9 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:mockingjae2_mobile/src/Recorder/RecorderProvider.dart';
+import 'package:mockingjae2_mobile/src/app.dart';
 import 'package:mockingjae2_mobile/src/bodyWidget/audioUnit.dart';
 import 'package:mockingjae2_mobile/src/components/snackbars.dart';
 import 'package:mockingjae2_mobile/src/pages/ScrollsUploader/VideoEditingPage.dart';
+import 'package:mockingjae2_mobile/src/pages/home.dart';
 
 import 'package:mockingjae2_mobile/utils/colors.dart';
 import 'package:mockingjae2_mobile/src/components/icons.dart';
@@ -34,9 +36,11 @@ class MainBottomNavbar extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  Navigator.pushNamed(context, SelfProfilePage.routeName);
+                },
                 child: Container(
-                  child: BottomNavIconFromPngAsset('assets/icons/home.png', 38),
+                  child: BottomNavIconFromPngAsset('assets/icons/home.png', 34),
                   decoration: BoxDecoration(
                     color: Colors.transparent,
                     borderRadius: BorderRadius.circular(20),
@@ -50,10 +54,12 @@ class MainBottomNavbar extends StatelessWidget {
                   ),
                 )),
             GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  Navigator.pushNamed(context, '/');
+                },
                 child: Container(
                   child:
-                      BottomNavIconFromPngAsset('assets/icons/globe.png', 38),
+                      BottomNavIconFromPngAsset('assets/icons/globe.png', 34),
                   decoration: BoxDecoration(
                     color: Colors.transparent,
                     borderRadius: BorderRadius.circular(20),
@@ -69,7 +75,7 @@ class MainBottomNavbar extends StatelessWidget {
             GestureDetector(
               onTap: () => pickVideo(context),
               child: Container(
-                child: BottomNavIconFromPngAsset('assets/icons/plus.png', 38),
+                child: BottomNavIconFromPngAsset('assets/icons/plus.png', 34),
                 decoration: BoxDecoration(
                   color: Colors.transparent,
                   borderRadius: BorderRadius.circular(20),

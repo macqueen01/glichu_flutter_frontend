@@ -109,6 +109,7 @@ class RelationsListManager extends ChangeNotifier {
     } else {
       tab = 0;
     }
+    refresh();
     notifyListeners();
   }
 
@@ -178,7 +179,7 @@ class RelationsTabView extends StatelessWidget {
         tabs: [Text('Follower'), Text('Following')],
         views: [
           UserListBody(listBuilder: followersListView),
-          UserListBody(listBuilder: followersListView),
+          UserListBody(listBuilder: followingsListView),
         ],
         onChange: (index) {
           provider.changeTab();
@@ -211,7 +212,7 @@ class _FollowerTileState extends State<FollowerTile> {
           style: TextStyle(color: mainBackgroundColor),
         ),
         subtitle: Text(
-          widget.user.userName,
+          widget.user.tagger!,
           style: TextStyle(color: Colors.white60),
         ),
         trailing: (widget.user.isFollowedByUser == null ||
@@ -289,14 +290,13 @@ class _UserListBodyState extends State<UserListBody>
   void reload() {
     // this should recieve all data from the server,
     // then refreshed all contents of the page
+    if (_load) {
+      return;
+    }
     setState(() {
-      _load = true;
-      Timer(Duration(seconds: _duration), () {
-        (mounted)
-            ? setState(() {
-                _load = false;
-              })
-            : null;
+      setLoadingTrue();
+      context.read<RelationsListManager>().refresh().then((value) {
+        updateCallback();
       });
     });
   }
@@ -329,6 +329,36 @@ ListView followersListView(
         );
       } else {
         return FollowerTile(user: provider.followers[index]);
+      }
+    },
+    separatorBuilder: (BuildContext context, int index) {
+      return const Divider(
+        color: Colors.white10,
+        thickness: 1.4,
+        indent: 38,
+        endIndent: 38,
+        height: 18,
+      );
+    },
+  );
+}
+
+ListView followingsListView(
+  RelationsListManager provider,
+  Widget animationLoader,
+) {
+  return ListView.separated(
+    itemCount: provider.followings.length,
+    itemBuilder: (context, index) {
+      if (index == 0) {
+        return Column(
+          children: [
+            animationLoader,
+            FollowerTile(user: provider.followings[index]),
+          ],
+        );
+      } else {
+        return FollowerTile(user: provider.followings[index]);
       }
     },
     separatorBuilder: (BuildContext context, int index) {

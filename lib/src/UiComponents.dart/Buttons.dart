@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:mockingjae2_mobile/src/components/icons.dart';
+import 'package:mockingjae2_mobile/src/models/User.dart';
 import 'package:mockingjae2_mobile/utils/colors.dart';
 import 'package:mockingjae2_mobile/utils/ui.dart';
 import 'package:mockingjae2_mobile/utils/utils.dart';
@@ -437,5 +438,110 @@ class _InfoWithIconState extends State<InfoWithIcon> {
         ]),
       ),
     );
+  }
+}
+
+class ProfileFollowButton extends StatefulWidget {
+  UserMin user;
+  Future<bool> Function() onFollowCall;
+  Future<bool> Function() onUnfollowCall;
+
+  ProfileFollowButton(
+      {super.key,
+      required this.user,
+      required this.onFollowCall,
+      required this.onUnfollowCall});
+
+  @override
+  State<ProfileFollowButton> createState() => _ProfileFollowButtonState();
+}
+
+class _ProfileFollowButtonState extends State<ProfileFollowButton> {
+  bool isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading || widget.user.isFollowedByUser == null) {
+      return FlatButton(
+        onPressed: () {},
+        width: 135,
+        height: 38,
+        radius: 10,
+        gradient: minimizedLensFlareGradient,
+        content: CupertinoActivityIndicator(
+          radius: 10,
+          animating: true,
+          color: mainBackgroundColor,
+        ),
+      );
+    } else if (!isLoading && widget.user.isFollowedByUser!) {
+      return FlatButton(
+        onPressed: () async {
+          setState(() {
+            isLoading = true;
+          });
+          bool result = await widget.onUnfollowCall();
+          setState(() {
+            isLoading = false;
+            result
+                ? widget.user.isFollowedByUser = false
+                : widget.user.isFollowedByUser = true;
+          });
+        },
+        width: 135,
+        height: 38,
+        radius: 10,
+        gradient: minimizedWarmGradient,
+        content: Text(
+          "Unfollow",
+          style: GoogleFonts.quicksand(
+              letterSpacing: 0.5,
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+              color: scrollsBackgroundColor),
+        ),
+      );
+    } else {
+      return FlatButton(
+        onPressed: () async {
+          setState(() {
+            isLoading = true;
+          });
+          bool result = await widget.onFollowCall();
+          setState(() {
+            isLoading = false;
+            result
+                ? widget.user.isFollowedByUser = true
+                : widget.user.isFollowedByUser = false;
+          });
+        },
+        width: 135,
+        height: 38,
+        radius: 10,
+        gradient: minimizedLensFlareGradient,
+        content: Padding(
+          padding: const EdgeInsets.only(left: 14),
+          child: Container(
+            alignment: Alignment.centerRight,
+            width: 80,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  "Follow",
+                  style: GoogleFonts.quicksand(
+                      letterSpacing: 0.5,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: mainBackgroundColor),
+                ),
+                GlichuIcon(10, 22),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
   }
 }

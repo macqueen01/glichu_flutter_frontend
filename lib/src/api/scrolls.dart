@@ -123,11 +123,11 @@ class ScrollsUploader {
   int? scrollsId;
 
   File currentLoadedVideo;
+  File currentLoadedCover;
   int hashedVideoFile = 0;
 
-  ScrollsUploader({
-    required this.currentLoadedVideo,
-  }) {
+  ScrollsUploader(
+      {required this.currentLoadedVideo, required this.currentLoadedCover}) {
     hashedVideoFile = currentLoadedVideo.hashCode;
   }
 
@@ -159,12 +159,16 @@ class ScrollsUploader {
 
   // With following input, upload a video file to the backend
 
-  Future<Map?> _uploadVideoFileAPI(File videoFile, String fileName) async {
+  Future<Map?> _uploadVideoFileAPI(
+      File videoFile, File coverFile, String fileName) async {
     fileName = '$fileName.${fileExtension(videoFile)}';
+    String coverName = '$fileName.${fileExtension(coverFile)}';
 
     dio.FormData formData = dio.FormData.fromMap({
       'video_to_upload':
           await dio.MultipartFile.fromFile(videoFile.path, filename: fileName),
+      'thumbnail':
+          await dio.MultipartFile.fromFile(coverFile.path, filename: coverName),
       'title': fileName
     });
 
@@ -228,8 +232,8 @@ class ScrollsUploader {
   }
 
   Future<void> uploadVideoFile() async {
-    Map? response = await _uploadVideoFileAPI(
-        this.currentLoadedVideo, this.hashedVideoFile.toString());
+    Map? response = await _uploadVideoFileAPI(this.currentLoadedVideo,
+        this.currentLoadedCover, this.hashedVideoFile.toString());
     if (_isValidResponse(response!, ['task_id'])) {
       setVideoUploadTaskId(response['task_id']);
     }

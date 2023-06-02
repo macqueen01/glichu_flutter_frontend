@@ -147,8 +147,9 @@ class _VideoEditingPageState extends State<VideoEditingPage> {
     super.dispose();
   }
 
-  void _exportCallback(File file) async {
-    uploader = ScrollsUploader(currentLoadedVideo: file);
+  void _exportCallback(File videoFile, File coverFile) async {
+    uploader = ScrollsUploader(
+        currentLoadedVideo: videoFile, currentLoadedCover: coverFile);
     bool task_done = false;
 
     try {
@@ -193,7 +194,11 @@ class _VideoEditingPageState extends State<VideoEditingPage> {
   Future<void> _exportVideo() async {
     _exportingProgress.value = 0;
     _isExporting.value = true;
+    File? coverImage = null;
     // NOTE: To use `-crf 1` and [VideoExportPreset] you need `ffmpeg_kit_flutter_min_gpl` package (with `ffmpeg_kit` only it won't work)
+    await _controller.extractCover(onCompleted: (File file) {
+      coverImage = file;
+    });
     await _controller.exportVideo(
       // format: VideoExportFormat.gif,
       // preset: VideoExportPreset.medium,
@@ -216,7 +221,7 @@ class _VideoEditingPageState extends State<VideoEditingPage> {
         );
         */
 
-        _exportCallback(file);
+        _exportCallback(file, coverImage!);
         // Then this should pass the file after the conversion.
       },
     );

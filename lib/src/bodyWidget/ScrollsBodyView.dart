@@ -428,6 +428,7 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
           widget.parentScrollController.isIndexChanged()) {
         scrollsManager.setIndex(widget.index);
 
+        return const LoadingView();
         //initializeVideoController(
         //    'https://mockingjae-test-bucket.s3.ap-northeast-2.amazonaws.com/auto-recording/7/1020524228.mp4');
       }
@@ -480,6 +481,7 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
                           onHorizontalDragStart: (details) {},
                           child: BoxContainer(
                               context: context,
+                              radius: 0,
                               backgroundColor: scrollsBackgroundColor,
                               height: MediaQuery.of(context).size.height,
                               width: MediaQuery.of(context).size.width,
@@ -516,9 +518,8 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
                                                     ..seekTo(Duration(
                                                         milliseconds:
                                                             ((currentIndex /
-                                                                            25) *
-                                                                        1000 +
-                                                                    3)
+                                                                        25) *
+                                                                    1000)
                                                                 .floor()))),
                                                 ),
                                                 //widget.scrollsCache

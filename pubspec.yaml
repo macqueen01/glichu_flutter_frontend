@@ -49,7 +49,7 @@ dependencies:
        path: modal_bottom_sheet
   modals: ^1.0.0+1
   sticky_headers: ^0.3.0+2
-  flutter_slidable: ^2.0.0
+  flutter_slidable: ^3.0.0
   http: ^0.13.5
   just_audio: ^0.9.31
   audioplayers: ^3.0.1
@@ -77,6 +77,13 @@ dependencies:
   dot_navigation_bar: ^1.0.1+4
   glassmorphism_ui: ^0.3.0
   visibility_detector: ^0.4.0+2
+  dismissible_page: ^1.0.2
+  cupertino_onboarding: ^1.1.1
+  local_hero: ^0.2.0
+  connectivity_checker: ^1.1.0
+  flutter_screenutil: ^5.8.2
+  animations: ^2.0.7
+  simple_ripple_animation: ^0.0.7
 
 
 dev_dependencies:

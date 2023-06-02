@@ -66,7 +66,7 @@ mixin DragUpdatable<T extends StatefulWidget> on State<T> {
       width: MediaQuery.of(context).size.width,
       alignment: Alignment.center,
       child: SvgPicture.asset(
-        'assets/icons/Me.svg',
+        'assets/icons/pizzaSpinner.svg',
         width: 30,
         height: 30,
         color: mainBackgroundColor,

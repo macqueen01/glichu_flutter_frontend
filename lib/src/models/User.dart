@@ -53,15 +53,18 @@ class UserMin {
   String? profileImagePath;
   bool? isFollowedByUser;
   bool? isFollowingUser;
+  String? tagger;
 
   UserMin(
       {required this.userName,
       required this.userId,
+      this.tagger,
       this.profileImagePath,
       this.isFollowedByUser,
       this.isFollowingUser});
 
   static fromJson(json) {
+    print(json);
     return UserMin(
       userName: json['username'],
       userId: '${json['id']}',
@@ -73,6 +76,7 @@ class UserMin {
           : json['is_followed_by_user'],
       isFollowingUser:
           json['is_following_user'] == null ? null : json['is_following_user'],
+      tagger: json['tagged_by'],
     );
   }
 }

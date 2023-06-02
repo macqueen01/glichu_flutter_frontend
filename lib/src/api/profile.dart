@@ -19,6 +19,26 @@ class RelationsFetcher {
   BaseUrlGenerator backendUrls = BaseUrl().baseUrl;
   AuthenticationHeader header = AuthenticationHeader();
 
+  Future<UserMin?> fetchUserSelf() async {
+    Map<String, String>? headerMap = await header.getHeader();
+
+    if (headerMap == null) {
+      return null;
+    }
+
+    final userUrl = Uri.parse('${backendUrls.profileUrls.selfUrl}');
+    final response = await get(userUrl, headers: headerMap);
+
+    if (response.statusCode == HttpStatus.ok) {
+      final userMap = json.decode(response.body);
+      final UserMin user = UserMin.fromJson(userMap);
+
+      return user;
+    } else {
+      return null;
+    }
+  }
+
   Future<UserMin?> fetchUserMin(String userId) async {
     Map<String, String>? headerMap = await header.getHeader();
 
@@ -92,6 +112,27 @@ class RelationsFetcher {
       return users;
     } else {
       return [];
+    }
+  }
+
+  Future<bool> isSelfQuery(int targetId) async {
+    Map<String, String>? headerMap = await header.getHeader();
+
+    if (headerMap == null) {
+      return false;
+    }
+
+    final isSelfUrl =
+        Uri.parse('${backendUrls.profileUrls.isSelfUrl}?id=$targetId');
+    final response = await get(isSelfUrl, headers: headerMap);
+
+    if (response.statusCode == HttpStatus.ok) {
+      final int result = json.decode(response.body)['is_self'];
+      bool isSelf = result == 1 ? true : false;
+
+      return isSelf;
+    } else {
+      return false;
     }
   }
 }

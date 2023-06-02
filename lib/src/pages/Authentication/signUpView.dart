@@ -4,18 +4,15 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mockingjae2_mobile/src/Providers/authenticationPageProvider.dart';
 import 'package:mockingjae2_mobile/src/UiComponents.dart/Buttons.dart';
+import 'package:mockingjae2_mobile/src/UiComponents.dart/StaticLoading.dart';
 import 'package:mockingjae2_mobile/src/components/icons.dart';
 
 import 'package:mockingjae2_mobile/src/components/navbars/topBars.dart';
-import 'package:mockingjae2_mobile/src/models/Token.dart';
-import 'package:mockingjae2_mobile/src/models/User.dart';
 import 'package:mockingjae2_mobile/src/pages/Authentication/loginLandingView.dart';
-import 'package:mockingjae2_mobile/src/pages/Authentication/mainPage.dart';
 import 'package:mockingjae2_mobile/src/secret.dart';
 import 'package:mockingjae2_mobile/utils/colors.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:modals/modals.dart';
 import 'package:provider/provider.dart';
 
 import 'package:webview_flutter/webview_flutter.dart' as web;
@@ -48,7 +45,9 @@ class _JoinViewState extends State<JoinView> {
             provider.setUserMin(value);
           }
           setState(() {
-            _pending = false;
+            if (mounted) {
+              _pending = false;
+            }
           });
         });
       });
@@ -58,149 +57,149 @@ class _JoinViewState extends State<JoinView> {
       Navigator.pop(context);
     }
 
-    if (_pending) {
-      return LoginLandingView(context);
-    }
-
-    return Scaffold(
-      backgroundColor: scrollsBackgroundColor,
-      resizeToAvoidBottomInset: true,
-      extendBody: true,
-      appBar: BigAppBar(
-        onBackButtonPressed: (BuildContext context) {},
-        onForwardButtonPressed: (BuildContext context) {},
-        backButtonActivate: false,
-        preferredSize: const Size.fromHeight(200),
-        backgroundColor: Color.fromRGBO(0, 0, 0, 0),
-        headerTextWidget: Container(
-          alignment: Alignment.centerLeft,
+    if (!_pending && provider.userMin == null) {
+      return Scaffold(
+        backgroundColor: scrollsBackgroundColor,
+        resizeToAvoidBottomInset: true,
+        extendBody: true,
+        appBar: BigAppBar(
+          onBackButtonPressed: (BuildContext context) {},
+          onForwardButtonPressed: (BuildContext context) {},
+          backButtonActivate: false,
+          preferredSize: const Size.fromHeight(200),
+          backgroundColor: Color.fromRGBO(0, 0, 0, 0),
+          headerTextWidget: Container(
+            alignment: Alignment.centerLeft,
+            width: MediaQuery.of(context).size.width,
+            height: 100,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Welcome to',
+                  style: GoogleFonts.quicksand(
+                      color: mainBackgroundColor,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 1),
+                ),
+                Container(
+                    margin: EdgeInsets.only(top: 17),
+                    child: LogoNavIcon(100, 55, mainBackgroundColor))
+              ],
+            ),
+          ),
+          title: const Text(
+            '',
+            style: TextStyle(
+                decoration: TextDecoration.none,
+                fontSize: 20,
+                fontWeight: FontWeight.w200,
+                color: mainBackgroundColor,
+                textBaseline: TextBaseline.alphabetic),
+          ),
+        ),
+        body: Container(
           width: MediaQuery.of(context).size.width,
-          height: 100,
+          alignment: Alignment.center,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Welcome to',
-                style: GoogleFonts.quicksand(
-                    color: mainBackgroundColor,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 1),
-              ),
+              Expanded(
+                  child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 90),
+                    child: Container(
+                      alignment: Alignment.center,
+                      width: MediaQuery.of(context).size.width,
+                      height: 300,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Container(
+                            height: 90,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  alignment: Alignment.center,
+                                  child: const Text(
+                                    "Now start with ...",
+                                    style: TextStyle(
+                                        color: mainBackgroundColor,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w300),
+                                  ),
+                                ),
+                                FlatButton(
+                                    onPressed: () async {
+                                      AuthenticationCenterProvider provider =
+                                          context.read<
+                                              AuthenticationCenterProvider>();
+
+                                      try {
+                                        final credential = await SignInWithApple
+                                            .getAppleIDCredential(
+                                          scopes: [
+                                            AppleIDAuthorizationScopes.email,
+                                            AppleIDAuthorizationScopes.fullName,
+                                          ],
+                                        );
+
+                                        provider
+                                            .setAppleCredentialInfo(credential);
+
+                                        //provider.setAppleCredentialInfo(credential);
+                                      } catch (e) {
+                                        provider.resetAll();
+                                        print(e);
+                                      }
+                                    },
+                                    color: Colors.white,
+                                    icon: SvgPicture.asset(
+                                        'assets/icons/apple.svg',
+                                        width: 18,
+                                        height: 18,
+                                        color: Colors.black),
+                                    content: Text("Apple",
+                                        style: TextStyle(
+                                            letterSpacing: 0.5,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.black)),
+                                    width: 300,
+                                    height: 40,
+                                    radius: 10),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              )),
               Container(
-                  margin: EdgeInsets.only(top: 17),
-                  child: LogoNavIcon(100, 55, mainBackgroundColor))
+                padding: EdgeInsets.only(bottom: 55),
+                alignment: Alignment.center,
+                child: Text(
+                  "from Jinhae",
+                  style: GoogleFonts.quicksand(
+                    color: mainBackgroundColor,
+                    fontSize: 15,
+                    letterSpacing: 1,
+                  ),
+                ),
+              )
             ],
           ),
         ),
-        title: const Text(
-          '',
-          style: TextStyle(
-              decoration: TextDecoration.none,
-              fontSize: 20,
-              fontWeight: FontWeight.w200,
-              color: mainBackgroundColor,
-              textBaseline: TextBaseline.alphabetic),
-        ),
-      ),
-      body: Container(
-        width: MediaQuery.of(context).size.width,
-        alignment: Alignment.center,
-        child: Column(
-          children: [
-            Expanded(
-                child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 90),
-                  child: Container(
-                    alignment: Alignment.center,
-                    width: MediaQuery.of(context).size.width,
-                    height: 300,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Container(
-                          height: 90,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                alignment: Alignment.center,
-                                child: const Text(
-                                  "Now start with ...",
-                                  style: TextStyle(
-                                      color: mainBackgroundColor,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w300),
-                                ),
-                              ),
-                              FlatButton(
-                                  onPressed: () async {
-                                    AuthenticationCenterProvider provider =
-                                        context.read<
-                                            AuthenticationCenterProvider>();
+      );
+    }
 
-                                    try {
-                                      final credential = await SignInWithApple
-                                          .getAppleIDCredential(
-                                        scopes: [
-                                          AppleIDAuthorizationScopes.email,
-                                          AppleIDAuthorizationScopes.fullName,
-                                        ],
-                                      );
-
-                                      provider
-                                          .setAppleCredentialInfo(credential);
-
-                                      //provider.setAppleCredentialInfo(credential);
-                                    } catch (e) {
-                                      provider.resetAll();
-                                      print(e);
-                                    }
-                                  },
-                                  color: Colors.white,
-                                  icon: SvgPicture.asset(
-                                      'assets/icons/apple.svg',
-                                      width: 18,
-                                      height: 18,
-                                      color: Colors.black),
-                                  content: Text("Apple",
-                                      style: TextStyle(
-                                          letterSpacing: 0.5,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.black)),
-                                  width: 300,
-                                  height: 40,
-                                  radius: 10),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            )),
-            Container(
-              padding: EdgeInsets.only(bottom: 55),
-              alignment: Alignment.center,
-              child: Text(
-                "from Jinhae",
-                style: GoogleFonts.quicksand(
-                  color: mainBackgroundColor,
-                  fontSize: 15,
-                  letterSpacing: 1,
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
-    );
+    return LoginLandingView(context);
   }
 }
 

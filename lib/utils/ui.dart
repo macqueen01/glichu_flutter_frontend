@@ -1,12 +1,59 @@
 import 'package:flutter/material.dart';
 
 import 'package:figma_squircle/figma_squircle.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:mockingjae2_mobile/src/components/icons.dart';
 import 'package:mockingjae2_mobile/utils/colors.dart';
 import 'package:shimmer/shimmer.dart';
 
 import 'dart:math' as math;
 
 import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
+
+class NetworkErrorView extends StatelessWidget {
+  const NetworkErrorView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        alignment: Alignment.center,
+        child: Container(
+          width: 100,
+          height: 300,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              GlichuIcon(70, 70),
+              Container(
+                height: 200,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Network seems to be weak",
+                      style: GoogleFonts.quicksand(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      """You might want to check 
+                      your network connection""",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+        ));
+  }
+}
 
 Widget BoxContainer(
     {required BuildContext context,

@@ -11,7 +11,7 @@ String mainUrl = 'https://storage.memehouses.com/scrolls';
 String testUrl = 'http://localhost:8000/scrolls';
 
 class BaseUrl {
-  BaseUrlGenerator baseUrl = BaseUrlGenerator(mainUrl: mainUrl);
+  BaseUrlGenerator baseUrl = BaseUrlGenerator(mainUrl: testUrl);
 }
 
 class BaseUrlGenerator {
@@ -25,6 +25,7 @@ class BaseUrlGenerator {
   late final AuthenticationUrls authenticationUrls;
   late final ProfileUrls profileUrls;
   late final MessagingUrls messagingUrls;
+  late final SocialInteractionUrls socialInteractionUrls;
 
   BaseUrlGenerator({required mainUrl}) {
     baseUrl = mainUrl;
@@ -35,6 +36,7 @@ class BaseUrlGenerator {
     authenticationUrls = AuthenticationUrls(mainUrl: mainUrl);
     profileUrls = ProfileUrls(mainUrl: mainUrl);
     messagingUrls = MessagingUrls(mainUrl: mainUrl);
+    socialInteractionUrls = SocialInteractionUrls(mainUrl: mainUrl);
   }
 }
 
@@ -96,11 +98,15 @@ class ProfileUrls {
   late final String baseUrl;
   late final String followingsUrl;
   late final String followersUrl;
+  late final String selfUrl;
+  late final String isSelfUrl;
 
   ProfileUrls({required mainUrl}) {
     baseUrl = '$mainUrl/user';
     followingsUrl = '$baseUrl/following';
     followersUrl = '$baseUrl/follower';
+    selfUrl = '$baseUrl/self';
+    isSelfUrl = '$baseUrl/is-self';
   }
 }
 
@@ -113,6 +119,20 @@ class MessagingUrls {
     baseUrl = '$mainUrl/messaging';
     autoRecordingMessageUpload = '$baseUrl/auto-recording/upload';
     autoRecordingMessage = '$baseUrl/auto-recording';
+  }
+}
+
+class SocialInteractionUrls {
+  late final String baseUrl;
+  late final String likeUrl;
+  late final String followUrl;
+  late final String unfollowUrl;
+
+  SocialInteractionUrls({required mainUrl}) {
+    baseUrl = '$mainUrl/user';
+    likeUrl = '$baseUrl/like';
+    followUrl = '$baseUrl/follow';
+    unfollowUrl = '$baseUrl/unfollow';
   }
 }
 

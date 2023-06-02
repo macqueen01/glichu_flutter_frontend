@@ -141,14 +141,17 @@ class _MJAppBarState extends State<MJAppBar> {
         elevation: 0,
         // color: Theme.of(context).appBarTheme.backgroundColor,
         color: widget.backgroundColor,
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          padding: const EdgeInsets.fromLTRB(20, 50, 20, 5),
-          alignment: Alignment.center,
-          child: Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [GlichuLogoIcon(30), PresentNavIcon(Colors.white)]),
+        child: Hero(
+          tag: 'appBar',
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            padding: const EdgeInsets.fromLTRB(20, 50, 20, 5),
+            alignment: Alignment.center,
+            child: Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [GlichuLogoIcon(30), PresentNavIcon(Colors.white)]),
+          ),
         ));
   }
 }

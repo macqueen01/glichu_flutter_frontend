@@ -19,6 +19,7 @@ import 'package:video_player/video_player.dart';
 // Interacts as a state manager
 class ScrollsPreviewManager extends ScrollsManager {
   UserMin user;
+  bool? isUserSelf = null;
 
   List<ScrollsPreviewModel> _previewModelList = [];
   bool updateInProgress = false;
@@ -36,9 +37,15 @@ class ScrollsPreviewManager extends ScrollsManager {
   Future<void> update() async {
     updateInProgress = true;
     await scrollsPreviewUpdate();
-    await Future.delayed(const Duration(seconds: 1));
+    isUserSelf = await isSelf();
+    await Future.delayed(const Duration(milliseconds: 100));
     updateInProgress = false;
     notifyListeners();
+  }
+
+  Future<bool> isSelf() async {
+    int targetId = int.parse(user.userId);
+    return await relationsFetcher.isSelfQuery(targetId);
   }
 
   void initializeList() {
@@ -67,15 +74,16 @@ class ScrollsPreviewManager extends ScrollsManager {
     return thumbnail;
   }
 
-  Future<void> updateUser() async {
+  Future<UserMin> updateUser() async {
     UserMin? updatedUser = await relationsFetcher.fetchUserMin(user.userId);
 
     if (updatedUser == null) {
-      return;
+      return user;
     }
 
     user = updatedUser;
     notifyListeners();
+    return user;
   }
 
   Future<void> scrollsPreviewUpdate() async {

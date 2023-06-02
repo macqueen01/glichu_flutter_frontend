@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mockingjae2_mobile/src/Providers/authenticationPageProvider.dart';
 import 'package:mockingjae2_mobile/src/UiComponents.dart/Buttons.dart';
 import 'package:mockingjae2_mobile/src/components/icons.dart';
 import 'package:mockingjae2_mobile/src/components/inputs.dart';

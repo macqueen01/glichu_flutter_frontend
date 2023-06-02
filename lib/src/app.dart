@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:mockingjae2_mobile/src/api/authentication.dart';
 import 'package:mockingjae2_mobile/src/bodyWidget/ScrollsBodyView.dart';
 import 'package:mockingjae2_mobile/src/bodyWidget/main.dart';
 import 'package:mockingjae2_mobile/src/components/navbars/bottomBars.dart';
+import 'package:mockingjae2_mobile/src/db/TokenDB.dart';
+import 'package:mockingjae2_mobile/src/models/User.dart';
 import 'package:mockingjae2_mobile/src/pages/Authentication/mainPage.dart';
 import 'package:mockingjae2_mobile/src/pages/ScrollsUploader/VideoEditingPage.dart';
 
@@ -52,6 +55,24 @@ class _MainPageState extends State<MainPage> {
     return mainThemeColor;
   }
 
+  Future<bool> _loginTrial() async {
+    TokenDatabase database = TokenDatabase.instance;
+
+    String? token = await database.getToken();
+
+    if (token == null) {
+      return false;
+    }
+
+    UserMin? user = await AuthenticationAPI().MJlogin(token);
+
+    if (user == null) {
+      return false;
+    }
+
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -62,45 +83,46 @@ class _MainPageState extends State<MainPage> {
                 extendBody: (selectedIndex.value == 1) ? true : false,
                 appBar: MJAppBar(backgroundColor: _NavBarColor(selectedIndex)),
                 body: const ScrollsBodyView(),
-                bottomNavigationBar: MainBottomNavbar()
+                bottomNavigationBar:
+                    Hero(tag: 'bottomBar', child: MainBottomNavbar())
 
                 /*
-                MJBottomNavBar(
-                  onTap: _onIconTap,
-                  items: [
-                    MJIconItem(
-                        iconData: iconData(
-                            activeDir: 'assets/icons/Home.svg',
-                            // inactiveDir: 'assets/icons/Home_stroke.svg',
-                            inactiveDir: 'assets/icons/Home.svg',
-                            defaultColor: mainThemeColor,
-                            height: 28,
-                            width: 28)),
-                    MJIconItem(
-                        iconData: iconData(
-                            activeDir: 'assets/icons/Global.svg',
-                            // inactiveDir: 'assets/icons/Global_stroke.svg',
-                            inactiveDir: 'assets/icons/Global.svg',
-                            defaultColor: mainThemeColor,
-                            height: 28,
-                            width: 28)),
-                    MJIconItem(
-                        iconData: iconData(
-                            activeDir: 'assets/icons/addWithBorder_inverse.svg',
-                            inactiveDir: 'assets/icons/addWithBorder.svg',
-                            defaultColor: mainThemeColor,
-                            height: 28,
-                            width: 28)),
-                    MJIconItem(
-                        iconData: iconData(
-                            activeDir: 'assets/icons/locked.svg',
-                            // inactiveDir: 'assets/icons/locked_stroke.svg',
-                            inactiveDir: 'assets/icons/locked.svg',
-                            defaultColor: mainThemeColor,
-                            height: 28,
-                            width: 28)),
-                  ],
-                )*/
+                    MJBottomNavBar(
+                      onTap: _onIconTap,
+                      items: [
+                        MJIconItem(
+                            iconData: iconData(
+                                activeDir: 'assets/icons/Home.svg',
+                                // inactiveDir: 'assets/icons/Home_stroke.svg',
+                                inactiveDir: 'assets/icons/Home.svg',
+                                defaultColor: mainThemeColor,
+                                height: 28,
+                                width: 28)),
+                        MJIconItem(
+                            iconData: iconData(
+                                activeDir: 'assets/icons/Global.svg',
+                                // inactiveDir: 'assets/icons/Global_stroke.svg',
+                                inactiveDir: 'assets/icons/Global.svg',
+                                defaultColor: mainThemeColor,
+                                height: 28,
+                                width: 28)),
+                        MJIconItem(
+                            iconData: iconData(
+                                activeDir: 'assets/icons/addWithBorder_inverse.svg',
+                                inactiveDir: 'assets/icons/addWithBorder.svg',
+                                defaultColor: mainThemeColor,
+                                height: 28,
+                                width: 28)),
+                        MJIconItem(
+                            iconData: iconData(
+                                activeDir: 'assets/icons/locked.svg',
+                                // inactiveDir: 'assets/icons/locked_stroke.svg',
+                                inactiveDir: 'assets/icons/locked.svg',
+                                defaultColor: mainThemeColor,
+                                height: 28,
+                                width: 28)),
+                      ],
+                    )*/
                 );
           }),
           valueListenable: selectedIndex,

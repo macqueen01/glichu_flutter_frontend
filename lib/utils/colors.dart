@@ -37,6 +37,11 @@ const minimizedLensFlareGradient = LinearGradient(colors: [
   Color.fromRGBO(125, 111, 215, 1),
 ], begin: Alignment.topLeft, end: Alignment.bottomRight);
 
+const minimizedLensFlareGradient2 = LinearGradient(colors: [
+  Color.fromRGBO(53, 48, 191, 1),
+  Color.fromRGBO(64, 59, 192, 1),
+], begin: Alignment.topLeft, end: Alignment.bottomRight);
+
 const minimizedWarmGradient = LinearGradient(colors: [
   Color.fromRGBO(229, 209, 134, 1),
   Color.fromRGBO(160, 71, 66, 1),
@@ -59,3 +64,6 @@ const autoRecorderGradient = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
 );
+
+Color glichuColor1 = Color.fromARGB(255, 255, 163, 156);
+Color glichuColor2 = Color.fromARGB(255, 217, 99, 83);
