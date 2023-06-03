@@ -499,86 +499,75 @@ class _ScrollsState extends State<Scrolls> with SingleTickerProviderStateMixin {
                                                   .value
                                                   .aspectRatio;
                                       return Stack(
-                                        alignment:
-                                            AlignmentDirectional.topStart,
-                                        children: (widget.index ==
-                                                widget.parentScrollController
-                                                    .getCurrentScrollsIndex())
-                                            ? ([
-                                                Positioned(
-                                                  left: (constraints.maxWidth -
-                                                          videoWidth) /
-                                                      2,
-                                                  top: 0,
-                                                  width: videoWidth,
-                                                  height: constraints.maxHeight,
-                                                  child: VideoPlayer(widget
-                                                      .scrollsCache
-                                                      .videoController!
-                                                    ..seekTo(Duration(
-                                                        milliseconds:
-                                                            ((currentIndex /
-                                                                        25) *
-                                                                    1000)
-                                                                .floor()))),
-                                                ),
-                                                //widget.scrollsCache
-                                                //    .scrollsImages![currentIndex],
-                                                // status bar
-                                                //StatusBar(
-                                                //    currentIndex: currentIndex,
-                                                //    length: widget.scrollsCache
-                                                //        .scrollsImages!.length),
-                                                // remix number
+                                          alignment:
+                                              AlignmentDirectional.topStart,
+                                          children: [
+                                            Positioned(
+                                              left: (constraints.maxWidth -
+                                                      videoWidth) /
+                                                  2,
+                                              top: 0,
+                                              width: videoWidth,
+                                              height: constraints.maxHeight,
+                                              child: VideoPlayer(widget
+                                                  .scrollsCache.videoController!
+                                                ..seekTo(Duration(
+                                                    milliseconds:
+                                                        ((currentIndex / 25) *
+                                                                1000)
+                                                            .floor()))),
+                                            ),
+                                            //widget.scrollsCache
+                                            //    .scrollsImages![currentIndex],
+                                            // status bar
+                                            //StatusBar(
+                                            //    currentIndex: currentIndex,
+                                            //    length: widget.scrollsCache
+                                            //        .scrollsImages!.length),
+                                            // remix number
 
-                                                // facad gradient on top of the video
-                                                Positioned(
-                                                  left: 0,
-                                                  top: 0,
-                                                  width: constraints.maxWidth,
-                                                  height: 100,
-                                                  child: Container(
-                                                    height: 100,
-                                                    decoration: const BoxDecoration(
-                                                        gradient: LinearGradient(
-                                                            begin: Alignment
-                                                                .topCenter,
-                                                            end: Alignment
-                                                                .bottomCenter,
-                                                            colors: [
-                                                          Color.fromARGB(
-                                                              142, 20, 20, 20),
-                                                          Colors.transparent
-                                                        ])),
-                                                  ),
-                                                ),
-                                                Positioned(
-                                                  right: 2.5,
-                                                  top: 20,
-                                                  child:
-                                                      ScrollsRelatedInfoButtonWrap(
-                                                    scrollsId: widget
-                                                        .scrollsCache
-                                                        .scrollsModel
-                                                        .id,
-                                                  ),
-                                                ),
-                                                Positioned(
-                                                  left: 10,
-                                                  top: 15,
-                                                  width: 250,
-                                                  child: ScrollsHeader(
-                                                    createdAt: widget
-                                                        .scrollsCache
-                                                        .scrollsModel
-                                                        .createdAt,
-                                                    user: widget.scrollsCache
-                                                        .scrollsModel.user,
-                                                  ),
-                                                )
-                                              ])
-                                            : [],
-                                      );
+                                            // facad gradient on top of the video
+                                            Positioned(
+                                              left: 0,
+                                              top: 0,
+                                              width: constraints.maxWidth,
+                                              height: 100,
+                                              child: Container(
+                                                height: 100,
+                                                decoration: const BoxDecoration(
+                                                    gradient: LinearGradient(
+                                                        begin:
+                                                            Alignment.topCenter,
+                                                        end: Alignment
+                                                            .bottomCenter,
+                                                        colors: [
+                                                      Color.fromARGB(
+                                                          142, 20, 20, 20),
+                                                      Colors.transparent
+                                                    ])),
+                                              ),
+                                            ),
+                                            Positioned(
+                                              right: 2.5,
+                                              top: 20,
+                                              child:
+                                                  ScrollsRelatedInfoButtonWrap(
+                                                scrollsId: widget.scrollsCache
+                                                    .scrollsModel.id,
+                                              ),
+                                            ),
+                                            Positioned(
+                                              left: 10,
+                                              top: 15,
+                                              width: 250,
+                                              child: ScrollsHeader(
+                                                createdAt: widget.scrollsCache
+                                                    .scrollsModel.createdAt,
+                                                user: widget.scrollsCache
+                                                    .scrollsModel.user,
+                                              ),
+                                            )
+                                          ]);
                                     })),
                         ),
                       )
